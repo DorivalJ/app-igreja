@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Membros - Dark Mode</title>
+    <title>Gestão de Membros - Igreja Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #020617; /* slate-950 */
-        }
-        /* Custom scrollbar para combinar com o tema dark */
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -20,9 +17,8 @@
     </style>
 </head>
 <body class="text-slate-200">
-
     <div class="min-h-screen flex flex-col">
-        <!-- HEADER -->
+        
         <header class="bg-slate-900/50 border-b border-slate-800 px-6 py-4 backdrop-blur-sm sticky top-0 z-10">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -34,7 +30,7 @@
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Painel Administrativo</p>
                     </div>
                 </div>
-                <div class="hidden md:block">
+                <div>
                     <span class="text-sm bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">
                         Igreja Digital v1.0
                     </span>
@@ -44,50 +40,55 @@
 
         <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-8">
             
-            <!-- FORMULÁRIO DE CADASTRO -->
             <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                 <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
                     <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
                     <h2 class="font-semibold text-slate-100">Novo Cadastro</h2>
                 </div>
                 
-                <form class="p-6 md:p-8">
+                <form id="formMembro" class="p-6 md:p-8">
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                        <!-- Nome -->
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
-                            <input type="text" placeholder="Ex: João Silva" 
-                                class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                            <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
                         </div>
 
-                        <!-- Data Nascimento -->
                         <div class="md:col-span-1.5">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nascimento</label>
-                            <input type="date" 
-                                class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
+                            <input type="date" id="data_nascimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
                         </div>
 
-                        <!-- Telefone -->
                         <div class="md:col-span-1.5">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
-                            <input type="text" placeholder="(00) 00000-0000" 
-                                class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Celular</label>
+                            <input type="text" id="celular" placeholder="(00) 00000-0000" maxlength="15" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
-                        <!-- Data Adesão -->
-                        <div class="md:col-span-2">
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
+                            <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                            <input type="text" id="cargo" placeholder="Ex: Membro, Diácono, Pastor, Voluntário" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                        </div>
+
+                        <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Adesão</label>
-                            <input type="date" 
-                                class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
+                            <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
                         </div>
 
-                        <!-- Status -->
-                        <div class="md:col-span-2">
+                        <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status do Membro</label>
-                            <select class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer">
+                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer">
                                 <option value="Ativo">Ativo</option>
                                 <option value="Inativo">Inativo</option>
                             </select>
+                        </div>
+
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
+                            <textarea id="observacao" rows="3" placeholder="Informações adicionais sobre o membro..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none"></textarea>
                         </div>
                     </div>
 
@@ -100,104 +101,188 @@
                 </form>
             </section>
 
-            <!-- LISTAGEM E BUSCA -->
             <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                <!-- Barra de Busca -->
                 <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center gap-2">
                         <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i>
                         <h2 class="font-semibold text-slate-100">Lista de Membros</h2>
                     </div>
-                    
                     <div class="relative max-w-sm w-full">
                         <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500">
                             <i data-lucide="search" class="w-4 h-4"></i>
                         </span>
-                        <input type="text" placeholder="Buscar por nome..." 
-                            class="w-full pl-11 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                        <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full pl-11 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                     </div>
                 </div>
 
-                <!-- Tabela -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
                                 <th class="px-6 py-4 border-b border-slate-800">Dados do Membro</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Cargo / Função</th>
                                 <th class="px-6 py-4 border-b border-slate-800">Contato</th>
                                 <th class="px-6 py-4 border-b border-slate-800">Adesão</th>
                                 <th class="px-6 py-4 border-b border-slate-800">Status</th>
                                 <th class="px-6 py-4 border-b border-slate-800 text-right">Gerenciar</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800">
-                            <!-- Exemplo Ativo -->
-                            <tr class="hover:bg-slate-800/30 transition-colors group">
-                                <td class="px-6 py-4">
-                                    <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">Ricardo Almeida</div>
-                                    <div class="text-xs text-slate-500">Nasc: 12/05/1985</div>
-                                </td>
-                                <td class="px-6 py-4 text-slate-400 text-sm">(11) 98888-7777</td>
-                                <td class="px-6 py-4 text-slate-400 text-sm">10 Jan 2022</td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                        ATIVO
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="p-2 text-slate-500 hover:text-white hover:bg-slate-700 rounded-lg transition-all">
-                                            <i data-lucide="pencil" class="w-4 h-4"></i>
-                                        </button>
-                                        <button class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <!-- Exemplo Inativo -->
-                            <tr class="hover:bg-slate-800/30 transition-colors group">
-                                <td class="px-6 py-4">
-                                    <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">Maria Oliveira</div>
-                                    <div class="text-xs text-slate-500">Nasc: 22/08/1990</div>
-                                </td>
-                                <td class="px-6 py-4 text-slate-400 text-sm">(11) 97777-6666</td>
-                                <td class="px-6 py-4 text-slate-400 text-sm">15 Mar 2023</td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-500 border border-slate-700">
-                                        INATIVO
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="p-2 text-slate-500 hover:text-white hover:bg-slate-700 rounded-lg transition-all">
-                                            <i data-lucide="pencil" class="w-4 h-4"></i>
-                                        </button>
-                                        <button class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody id="tabelaMembros" class="divide-y divide-slate-800">
+                            </tbody>
                     </table>
                 </div>
 
-                <!-- Footer da Tabela -->
                 <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-                    <span>Total: 2 Membros</span>
+                    <span id="totalMembros">Total: 0 Membros</span>
                     <span class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Sistema Online
                     </span>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Inicializar Ícones -->
     <script>
+        // ==========================================
+        // 🔑 COLE SUAS CHAVES DO SUPABASE AQUI ABAIXO
+        // ==========================================
+        const SUPABASE_URL = 'SUA_URL_AQUI';
+        const SUPABASE_ANON_KEY = 'SUA_CHAVE_ANON_AQUI';
+
+        // Inicializa o cliente do Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Elementos da página
+        const formMembro = document.getElementById('formMembro');
+        const inputCelular = document.getElementById('celular');
+        const tabelaMembros = document.getElementById('tabelaMembros');
+        const totalMembros = document.getElementById('totalMembros');
+        const inputBusca = document.getElementById('busca');
+
+        // MÁSCARA AUTOMÁTICA DO CELULAR
+        inputCelular.addEventListener('input', (e) => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+
+        // FORMATAR DATA PARA PADRÃO BRASILEIRO
+        function formatarData(dataString) {
+            if (!dataString) return '-';
+            const [ano, mes, dia] = dataString.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        // CARREGAR E LISTAR MEMBROS
+        async function carregarMembros(termoBusca = '') {
+            let query = supabase.from('membros').select('*').order('nome', { ascending: true });
+            
+            if (termoBusca) {
+                query = query.ilike('nome', `%${termoBusca}%`);
+            }
+
+            const { data: membros, error } = await query;
+
+            if (error) {
+                console.error('Erro ao buscar membros:', error);
+                return;
+            }
+
+            tabelaMembros.innerHTML = '';
+            totalMembros.textContent = `Total: ${membros.length} Membros`;
+
+            if (membros.length === 0) {
+                tabelaMembros.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm">
+                            Nenhum membro encontrado.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            membros.forEach(membro => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/30 transition-colors group';
+                
+                const statusClasse = membro.status === 'Ativo' 
+                    ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+                    : 'bg-slate-800 text-slate-500 border border-slate-700';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">${membro.nome}</div>
+                        <div class="text-xs text-slate-500">Nasc: ${formatarData(membro.data_nascimento)}</div>
+                        ${membro.observacao ? `<div class="text-xs text-slate-400 mt-1 italic max-w-xs truncate" title="${membro.observacao}">Obs: ${membro.observacao}</div>` : ''}
+                    </td>
+                    <td class="px-6 py-4 text-slate-300 text-sm">${membro.cargo || '-'}</td>
+                    <td class="px-6 py-4 text-slate-400 text-sm">
+                        <div>${membro.celular || '-'}</div>
+                        <div class="text-xs text-slate-500">${membro.email || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-400 text-sm">${formatarData(membro.data_adesao)}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold ${statusClasse}">
+                            ${membro.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="deletarMembro(${membro.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title="Excluir Membro">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tabelaMembros.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        // SALVAR NOVO MEMBRO
+        formMembro.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const novoMembro = {
+                nome: document.getElementById('nome').value,
+                data_nascimento: document.getElementById('data_nascimento').value || null,
+                celular: document.getElementById('celular').value,
+                email: document.getElementById('email').value || null,
+                cargo: document.getElementById('cargo').value || null,
+                data_adesao: document.getElementById('data_adesao').value || null,
+                status: document.getElementById('status').value,
+                observacao: document.getElementById('observacao').value || null
+            };
+
+            const { error } = await supabase.from('membros').insert([novoMembro]);
+
+            if (error) {
+                alert('Erro ao cadastrar membro: ' + error.message);
+            } else {
+                formMembro.reset();
+                carregarMembros();
+                alert('Membro cadastrado com sucesso!');
+            }
+        });
+
+        // DELETAR MEMBRO
+        window.deletarMembro = async (id) => {
+            if (confirm('Tem certeza que deseja excluir este membro?')) {
+                const { error } = await supabase.from('membros').delete().eq('id', id);
+                if (error) {
+                    alert('Erro ao excluir: ' + error.message);
+                } else {
+                    carregarMembros();
+                }
+            }
+        };
+
+        // BUSCA EM TEMPO REAL
+        inputBusca.addEventListener('input', (e) => {
+            carregarMembros(e.target.value);
+        });
+
+        // Inicializar ícones e carregar dados na abertura da página
         lucide.createIcons();
+        carregarMembros();
     </script>
 </body>
 </html>
