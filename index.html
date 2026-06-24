@@ -81,4 +81,123 @@
                                 class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
                         </div>
 
-                        <!-- Status
+                        <!-- Status -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status do Membro</label>
+                            <select class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer">
+                                <option value="Ativo">Ativo</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button type="submit" class="group inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all shadow-lg shadow-indigo-600/20">
+                            <i data-lucide="save" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                            Salvar Membro
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- LISTAGEM E BUSCA -->
+            <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                <!-- Barra de Busca -->
+                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i>
+                        <h2 class="font-semibold text-slate-100">Lista de Membros</h2>
+                    </div>
+                    
+                    <div class="relative max-w-sm w-full">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </span>
+                        <input type="text" placeholder="Buscar por nome..." 
+                            class="w-full pl-11 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                    </div>
+                </div>
+
+                <!-- Tabela -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                <th class="px-6 py-4 border-b border-slate-800">Dados do Membro</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Contato</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Adesão</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Status</th>
+                                <th class="px-6 py-4 border-b border-slate-800 text-right">Gerenciar</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <!-- Exemplo Ativo -->
+                            <tr class="hover:bg-slate-800/30 transition-colors group">
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">Ricardo Almeida</div>
+                                    <div class="text-xs text-slate-500">Nasc: 12/05/1985</div>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400 text-sm">(11) 98888-7777</td>
+                                <td class="px-6 py-4 text-slate-400 text-sm">10 Jan 2022</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                        ATIVO
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <button class="p-2 text-slate-500 hover:text-white hover:bg-slate-700 rounded-lg transition-all">
+                                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                                        </button>
+                                        <button class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Exemplo Inativo -->
+                            <tr class="hover:bg-slate-800/30 transition-colors group">
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">Maria Oliveira</div>
+                                    <div class="text-xs text-slate-500">Nasc: 22/08/1990</div>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400 text-sm">(11) 97777-6666</td>
+                                <td class="px-6 py-4 text-slate-400 text-sm">15 Mar 2023</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-500 border border-slate-700">
+                                        INATIVO
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <button class="p-2 text-slate-500 hover:text-white hover:bg-slate-700 rounded-lg transition-all">
+                                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                                        </button>
+                                        <button class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer da Tabela -->
+                <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                    <span>Total: 2 Membros</span>
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online
+                    </span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Inicializar Ícones -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
