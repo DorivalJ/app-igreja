@@ -101,6 +101,38 @@
                 </form>
             </section>
 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Membros Ativos</p>
+                        <h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 border border-emerald-500/20">
+                        <i data-lucide="user-check" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Membros Inativos</p>
+                        <h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 border border-rose-500/20">
+                        <i data-lucide="user-x" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aniversariantes do Mês</p>
+                        <h3 id="dashAniversariantes" class="text-3xl font-bold text-indigo-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 border border-indigo-500/20">
+                        <i data-lucide="cake" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
             <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                 <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -128,7 +160,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabelaMembros" class="divide-y divide-slate-800">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
 
@@ -145,7 +177,7 @@
 
     <script>
         // ==========================================
-        // 🔑 COLE SUAS CHAVES DO SUPABASE AQUI ABAIXO
+        // 🔑 SUAS CHAVES DO SUPABASE CONFIGURADAS
         // ==========================================
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W';
@@ -160,21 +192,10 @@
         const totalMembros = document.getElementById('totalMembros');
         const inputBusca = document.getElementById('busca');
 
-        // MÁSCARA AUTOMÁTICA DO CELULAR (REFORMULADA COMPATÍVEL)
-        inputCelular.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 11) value = value.slice(0, 11);
-            
-            if (value.length > 6) {
-                e.target.value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
-            } else if (value.length > 2) {
-                e.target.value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
-            } else if (value.length > 0) {
-                e.target.value = `(${value}`;
-            } else {
-                e.target.value = '';
-            }
-        });
+        // Elementos do Dashboard
+        const dashAtivos = document.getElementById('dashAtivos');
+        const dashInativos = document.getElementById('dashInativos');
+        const dashAniversariantes = document.getElementById('dashAniversariantes');
 
         // FORMATAR DATA PARA PADRÃO BRASILEIRO
         function formatarData(dataString) {
@@ -183,7 +204,7 @@
             return `${dia}/${mes}/${ano}`;
         }
 
-        // CARREGAR E LISTAR MEMBROS
+        // CARREGAR E LISTAR MEMBROS + ATUALIZAR DASHBOARD
         async function carregarMembros(termoBusca = '') {
             let query = supabase.from('membros').select('*').order('nome', { ascending: true });
             
@@ -201,6 +222,12 @@
             tabelaMembros.innerHTML = '';
             totalMembros.textContent = `Total: ${membros.length} Membros`;
 
+            // Lógica dos Indicadores do Dashboard
+            let ativos = 0;
+            let inativos = 0;
+            let niverMes = 0;
+            const mesAtual = new Date().getMonth() + 1; // Janeiro é 0, adiciona 1
+
             if (membros.length === 0) {
                 tabelaMembros.innerHTML = `
                     <tr>
@@ -208,10 +235,22 @@
                             Nenhum membro encontrado.
                         </td>
                     </tr>`;
+                dashAtivos.textContent = '0';
+                dashInativos.textContent = '0';
+                dashAniversariantes.textContent = '0';
                 return;
             }
 
             membros.forEach(membro => {
+                // Contadores do dashboard
+                if (membro.status === 'Ativo') ativos++;
+                else if (membro.status === 'Inativo') inativos++;
+
+                if (membro.data_nascimento) {
+                    const mesNasc = parseInt(membro.data_nascimento.split('-')[1]);
+                    if (mesNasc === mesAtual) niverMes++;
+                }
+
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800/30 transition-colors group';
                 
@@ -244,6 +283,12 @@
                 `;
                 tabelaMembros.appendChild(tr);
             });
+
+            // Atualiza os números na tela
+            dashAtivos.textContent = ativos;
+            dashInativos.textContent = inativos;
+            dashAniversariantes.textContent = niverMes;
+
             lucide.createIcons();
         }
 
@@ -268,7 +313,7 @@
                 alert('Erro ao cadastrar membro: ' + error.message);
             } else {
                 formMembro.reset();
-                carregarMembros();
+                await carregarMembros();
                 alert('Membro cadastrado com sucesso!');
             }
         });
@@ -280,7 +325,7 @@
                 if (error) {
                     alert('Erro ao excluir: ' + error.message);
                 } else {
-                    carregarMembros();
+                    await carregarMembros();
                 }
             }
         };
@@ -296,4 +341,3 @@
     </script>
 </body>
 </html>
- 
