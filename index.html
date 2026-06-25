@@ -144,6 +144,15 @@
                         <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
+
+                <!-- RODAPÉ DA TABELA (TOTALIZADOR) -->
+                <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                    <span id="totalMembros">Total: <span class="text-emerald-500 font-bold text-sm">0</span> Membros</span>
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Sistema Online
+                    </span>
+                </div>
             </section>
         </main>
     </div>
@@ -203,16 +212,20 @@
                     tbody.appendChild(tr);
                 });
 
+                // ATUALIZAÇÃO DOS INDICADORES E DO TOTAL NO RODAPÉ
                 document.getElementById('dashAtivos').textContent = ativos;
                 document.getElementById('dashInativos').textContent = inativos;
                 document.getElementById('dashAniversariantes').textContent = niverMes;
+                
+                // Texto do Total em Verde
+                document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${membros.length}</span> Membros`;
+                
                 lucide.createIcons();
             } catch (err) {
                 console.error('Erro ao carregar:', err);
             }
         }
 
-        // --- SALVAMENTO CORRIGIDO COM NOMES DA SUA TABELA ---
         document.getElementById('formMembro').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSalvar');
@@ -221,7 +234,7 @@
             const dadosMembro = {
                 nome: document.getElementById('nome').value,
                 data_nascimento: document.getElementById('data_nascimento').value || null,
-                celular: document.getElementById('input_celular').value || null, // NOME EXATO DA SUA COLUNA
+                celular: document.getElementById('input_celular').value || null,
                 email: document.getElementById('email').value || null,
                 cargo: document.getElementById('cargo').value || null,
                 data_adesao: document.getElementById('data_adesao').value || null,
@@ -232,8 +245,7 @@
             const { data, error } = await _supabase.from('membros').insert([dadosMembro]);
 
             if (error) {
-                console.error('Erro detalhado:', error);
-                alert('Erro ao gravar no banco: ' + error.message);
+                alert('Erro ao gravar: ' + error.message);
             } else {
                 alert('Membro gravado com sucesso!');
                 document.getElementById('formMembro').reset();
