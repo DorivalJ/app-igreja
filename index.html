@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Membros - Igreja Digital</title>
+    <title>Gestão - Igreja Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,153 +17,277 @@
     </style>
 </head>
 <body class="text-slate-200">
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex">
         
-        <header class="bg-slate-900/50 border-b border-slate-800 px-6 py-4 backdrop-blur-sm sticky top-0 z-10">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20">
-                        <i data-lucide="users"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-white">Gestão de Membros</h1>
-                        <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Painel Administrativo</p>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-8">
-            
-            <!-- FORMULÁRIO COM TÍTULOS NOS CAMPOS -->
-            <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i id="iconeForm" data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
-                        <h2 id="tituloForm" class="font-semibold text-slate-100">Novo Cadastro</h2>
-                    </div>
-                    <button id="btnCancelar" onclick="resetarEstado()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                        Cancelar Edição
-                    </button>
-                </div>
-                
-                <form id="formMembro" class="p-6 md:p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                        <!-- NOME -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
-                            <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
-                        </div>
-
-                        <!-- DATA NASCIMENTO -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Nascimento</label>
-                            <input type="date" id="data_nascimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
-                        </div>
-
-                        <!-- TELEFONE -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
-                            <input type="text" id="input_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
-                        </div>
-
-                        <!-- EMAIL -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
-                            <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
-                        </div>
-
-                        <!-- CARGO/FUNÇÃO -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
-                            <input type="text" id="cargo" placeholder="Ex: Diácono, Membro, Pastor" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
-                        </div>
-
-                        <!-- DATA DE MEMBRESIA -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Membresia</label>
-                            <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
-                        </div>
-
-                        <!-- STATUS -->
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
-                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
-                                <option value="Ativo">Ativo</option>
-                                <option value="Inativo">Inativo</option>
-                            </select>
-                        </div>
-
-                        <!-- OBSERVAÇÃO -->
-                        <div class="md:col-span-6">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                            <textarea id="observacao" rows="2" placeholder="Informações adicionais..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 flex justify-end">
-                        <button type="submit" id="btnSalvar" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
-                            <i data-lucide="save" class="w-5 h-5"></i>
-                            <span id="textoBtnSalvar">Salvar Membro</span>
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- INDICADORES -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
-                    <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ativos</p><h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3></div>
-                    <i data-lucide="user-check" class="text-emerald-500/50"></i>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
-                    <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inativos</p><h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3></div>
-                    <i data-lucide="user-x" class="text-rose-500/50"></i>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl text-emerald-500">
-                    <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-slate-500">Total Geral</p><h3 id="dashTotal" class="text-3xl font-bold mt-1">0</h3></div>
-                    <i data-lucide="users" class="text-emerald-500/50"></i>
-                </div>
-            </div>
-
-            <!-- TABELA -->
-            <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                        <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
+        <!-- ========================================== -->
+        <!--        PAINEL LATERAL (SIDEBAR)            -->
+        <!-- ========================================== -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
+            <div>
+                <!-- Cabeçalho da Igreja -->
+                <div class="p-6 border-b border-slate-800">
+                    <h2 class="text-xl font-bold text-indigo-400 tracking-wide text-center">
+                        Igreja Digital
                     </h2>
-                    <input type="text" id="busca" oninput="carregarMembros()" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
+                    <p class="text-xs text-slate-500 text-center mt-1 uppercase tracking-widest font-medium">Painel Admin</p>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                <th class="px-6 py-4">Membro</th>
-                                <th class="px-6 py-4">Cargo</th>
-                                <th class="px-6 py-4">Contato</th>
-                                <th class="px-6 py-4">Status</th>
-                                <th class="px-6 py-4 text-right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
-                    </table>
+
+                <!-- Links de Navegação do Menu -->
+                <nav class="p-4 space-y-1">
+                    <button id="btn-menu-membros" onclick="navegarPara('membros')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span>Membros</span>
+                    </button>
+                    
+                    <button id="btn-menu-financeiro" onclick="navegarPara('financeiro')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                        <span>Tesouraria</span>
+                    </button>
+
+                    <button id="btn-menu-agenda" onclick="navegarPara('agenda')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                        <span>Agenda Semanal</span>
+                    </button>
+
+                    <button id="btn-menu-documentos" onclick="navegarPara('documentos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span>Cartas e Convites</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Rodapé do Menu (Sair) -->
+            <div class="p-4 border-t border-slate-800">
+                <button class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Sair do Sistema</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ========================================== -->
+        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
+        <!-- ========================================== -->
+        <div class="flex-1 ml-64 flex flex-col min-h-screen">
+            
+            <!-- Topbar / Cabeçalho -->
+            <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
+                <div class="max-w-6xl mx-auto flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div id="iconeDinamicoTopbar" class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+                            <i id="iconeHeader" data-lucide="users"></i>
+                        </div>
+                        <div>
+                            <h1 id="tituloTopbar" class="text-xl font-bold tracking-tight text-white">Gestão de Membros</h1>
+                            <p id="subtituloTopbar" class="text-xs text-slate-500 font-medium uppercase tracking-wider">Módulos Ativos</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-                    <span id="totalMembros">Total: <span class="text-emerald-500 font-bold text-sm">0</span> Membros</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online</span>
+            </header>
+
+            <!-- CONTEÚDO DINÂMICO (Abas Mudam Aqui) -->
+            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
+                
+                <!-- 1. TELA DE MEMBROS (Seu código original completo) -->
+                <div id="tela-membros" class="space-y-8 dynamic-screen">
+                    <!-- FORMULÁRIO -->
+                    <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeForm" data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
+                                <h2 id="tituloForm" class="font-semibold text-slate-100">Novo Cadastro</h2>
+                            </div>
+                            <button id="btnCancelar" onclick="resetarEstado()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
+                        </div>
+                        
+                        <form id="formMembro" class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
+                                    <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Nascimento</label>
+                                    <input type="date" id="data_nascimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
+                                    <input type="text" id="input_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
+                                    <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                                    <input type="text" id="cargo" placeholder="Ex: Diácono, Membro, Pastor" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Membresia</label>
+                                    <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
+                                    <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                        <option value="Ativo">Ativo</option>
+                                        <option value="Inativo">Inativo</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
+                                    <textarea id="observacao" rows="2" placeholder="Informações adicionais..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-8 flex justify-end">
+                                <button type="submit" id="btnSalvar" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
+                                    <i data-lucide="save" class="w-5 h-5"></i>
+                                    <span id="textoBtnSalvar">Salvar Membro</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- INDICADORES -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ativos</p><h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3></div>
+                            <i data-lucide="user-check" class="text-emerald-500/50"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inativos</p><h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3></div>
+                            <i data-lucide="user-x" class="text-rose-500/50"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl text-emerald-500">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-slate-500">Total Geral</p><h3 id="dashTotal" class="text-3xl font-bold mt-1">0</h3></div>
+                            <i data-lucide="users" class="text-emerald-500/50"></i>
+                        </div>
+                    </div>
+
+                    <!-- TABELA -->
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
+                            </h2>
+                            <input type="text" id="busca" oninput="carregarMembros()" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Membro</th>
+                                        <th class="px-6 py-4">Cargo</th>
+                                        <th class="px-6 py-4">Contato</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                            <span id="totalMembros">Total: <span class="text-emerald-500 font-bold text-sm">0</span> Membros</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online</span>
+                        </div>
+                    </section>
                 </div>
-            </section>
-        </main>
+
+                <!-- 2. TELA FINANCEIRA (Próxima que vamos construir) -->
+                <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
+                    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center">
+                        <i data-lucide="dollar-sign" class="w-12 h-12 text-emerald-500 mx-auto mb-4"></i>
+                        <h2 class="text-2xl font-bold text-white">Módulo de Tesouraria</h2>
+                        <p class="text-slate-400 mt-2">Pronto para começarmos a criar os lançamentos de Dízimos, Ofertas e as caixas de Despesas Fixas!</p>
+                    </div>
+                </div>
+
+                <!-- 3. TELA DE AGENDA SEMANAL -->
+                <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
+                    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center">
+                        <i data-lucide="calendar" class="w-12 h-12 text-amber-500 mx-auto mb-4"></i>
+                        <h2 class="text-2xl font-bold text-white">Agenda Semanal da Igreja</h2>
+                        <p class="text-slate-400 mt-2">Módulo destinado aos Cultos, Ensaios, Oração e emissão de relatório para o mural.</p>
+                    </div>
+                </div>
+
+                <!-- 4. TELA DE DOCUMENTOS -->
+                <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
+                    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center">
+                        <i data-lucide="file-text" class="w-12 h-12 text-blue-500 mx-auto mb-4"></i>
+                        <h2 class="text-2xl font-bold text-white">Cartas e Convites</h2>
+                        <p class="text-slate-400 mt-2">Emissão automática de cartas de convite para pregadores, cantores e palestrantes.</p>
+                    </div>
+                </div>
+
+            </main>
+        </div>
     </div>
 
+    <!-- ========================================== -->
+    <!--                  LÓGICA JAVASCRIPT         -->
+    <!-- ========================================== -->
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; // <--- Verifique se esta é a chave correta no seu painel!
+        const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         let editandoID = null;
 
+        // --- SISTEMA DE NAVEGAÇÃO DA SIDEBAR ---
+        function navegarPara(idTela) {
+            // Esconde todas as telas dinâmicas
+            document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
+            
+            // Mostra a tela selecionada
+            document.getElementById(`tela-${idTela}`).classList.remove('hidden');
+
+            // Reseta a estilização de todos os botões do menu
+            const botoesMenu = {
+                membros: document.getElementById('btn-menu-membros'),
+                financeiro: document.getElementById('btn-menu-financeiro'),
+                agenda: document.getElementById('btn-menu-agenda'),
+                documentos: document.getElementById('btn-menu-documentos')
+            };
+
+            Object.keys(botoesMenu).forEach(chave => {
+                if(botoesMenu[chave]) {
+                    botoesMenu[chave].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+                }
+            });
+
+            // Cores e ícones dinâmicos do cabeçalho baseado na tela
+            const topbarIconContainer = document.getElementById('iconeDinamicoTopbar');
+            const topbarTitulo = document.getElementById('tituloTopbar');
+            const iconeHeader = document.getElementById('iconeHeader');
+
+            if (idTela === 'membros') {
+                botoesMenu.membros.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
+                topbarTitulo.innerText = "Gestão de Membros";
+                topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
+                iconeHeader.setAttribute('data-lucide', 'users');
+            } else if (idTela === 'financeiro') {
+                botoesMenu.financeiro.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-emerald-600 text-white shadow-lg shadow-emerald-900/20";
+                topbarTitulo.innerText = "Tesouraria & Fluxo de Caixa";
+                topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
+                iconeHeader.setAttribute('data-lucide', 'dollar-sign');
+            } else if (idTela === 'agenda') {
+                botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
+                topbarTitulo.innerText = "Agenda Semanal";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
+                iconeHeader.setAttribute('data-lucide', 'calendar');
+            } else if (idTela === 'documentos') {
+                botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
+                topbarTitulo.innerText = "Cartas e Convites";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
+                iconeHeader.setAttribute('data-lucide', 'file-text');
+            }
+
+            lucide.createIcons();
+        }
+
+        // --- SISTEMA ORIGINÁRIO DE MEMBROS ---
         function formatarData(dataString) {
             if (!dataString) return '-';
             const [ano, mes, dia] = dataString.split('-');
@@ -241,7 +365,7 @@
             if (error) {
                 alert("Erro ao salvar: " + error.message);
             } else {
-                alert(editandoID ? "Membro atualizado!" : "Membro cadastrado!");
+                alert(editandoID ? "Membro updated!" : "Membro cadastrado!");
                 resetarEstado();
                 carregarMembros();
             }
@@ -287,7 +411,10 @@
             }
         }
 
-        window.onload = carregarMembros;
+        window.onload = function() {
+            carregarMembros();
+            lucide.createIcons();
+        };
     </script>
 </body>
 </html>
