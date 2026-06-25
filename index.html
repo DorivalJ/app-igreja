@@ -176,149 +176,145 @@
     </div>
 
     <script>
-        // ==========================================
-        // 🔑 SUAS CHAVES DO SUPABASE CONFIGURADAS
-        // ==========================================
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W';
 
-        // Inicializa o cliente do Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Elementos da página
         const formMembro = document.getElementById('formMembro');
         const inputCelular = document.getElementById('celular');
         const tabelaMembros = document.getElementById('tabelaMembros');
         const totalMembros = document.getElementById('totalMembros');
         const inputBusca = document.getElementById('busca');
 
-        // Elementos do Dashboard
         const dashAtivos = document.getElementById('dashAtivos');
         const dashInativos = document.getElementById('dashInativos');
         const dashAniversariantes = document.getElementById('dashAniversariantes');
 
-        // FORMATAR DATA PARA PADRÃO BRASILEIRO
         function formatarData(dataString) {
             if (!dataString) return '-';
-            const [ano, mes, dia] = dataString.split('-');
-            return `${dia}/${mes}/${ano}`;
+            const partes = dataString.split('-');
+            if (partes.length !== 3) return dataString;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
-        // CARREGAR E LISTAR MEMBROS + ATUALIZAR DASHBOARD
         async function carregarMembros(termoBusca = '') {
-            let query = supabase.from('membros').select('*').order('nome', { ascending: true });
-            
-            if (termoBusca) {
-                query = query.ilike('nome', `%${termoBusca}%`);
-            }
-
-            const { data: membros, error } = await query;
-
-            if (error) {
-                console.error('Erro ao buscar membros:', error);
-                return;
-            }
-
-            tabelaMembros.innerHTML = '';
-            totalMembros.textContent = `Total: ${membros.length} Membros`;
-
-            // Lógica dos Indicadores do Dashboard
-            let ativos = 0;
-            let inativos = 0;
-            let niverMes = 0;
-            const mesAtual = new Date().getMonth() + 1; // Janeiro é 0, adiciona 1
-
-            if (membros.length === 0) {
-                tabelaMembros.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm">
-                            Nenhum membro encontrado.
-                        </td>
-                    </tr>`;
-                dashAtivos.textContent = '0';
-                dashInativos.textContent = '0';
-                dashAniversariantes.textContent = '0';
-                return;
-            }
-
-            membros.forEach(membro => {
-                // Contadores do dashboard
-                if (membro.status === 'Ativo') ativos++;
-                else if (membro.status === 'Inativo') inativos++;
-
-                if (membro.data_nascimento) {
-                    const mesNasc = parseInt(membro.data_nascimento.split('-')[1]);
-                    if (mesNasc === mesAtual) niverMes++;
+            try {
+                let query = supabase.from('membros').select('*').order('nome', { ascending: true });
+                
+                if (termoBusca) {
+                    query = query.ilike('nome', `%${termoBusca}%`);
                 }
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/30 transition-colors group';
-                
-                const statusClasse = membro.status === 'Ativo' 
-                    ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
-                    : 'bg-slate-800 text-slate-500 border border-slate-700';
+                const { data: membros, error } = await query;
 
-                tr.innerHTML = `
-                    <td class="px-6 py-4">
-                        <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">${membro.nome}</div>
-                        <div class="text-xs text-slate-500">Nasc: ${formatarData(membro.data_nascimento)}</div>
-                        ${membro.observacao ? `<div class="text-xs text-slate-400 mt-1 italic max-w-xs truncate" title="${membro.observacao}">Obs: ${membro.observacao}</div>` : ''}
-                    </td>
-                    <td class="px-6 py-4 text-slate-300 text-sm">${membro.cargo || '-'}</td>
-                    <td class="px-6 py-4 text-slate-400 text-sm">
-                        <div>${membro.celular || '-'}</div>
-                        <div class="text-xs text-slate-500">${membro.email || ''}</div>
-                    </td>
-                    <td class="px-6 py-4 text-slate-400 text-sm">${formatarData(membro.data_adesao)}</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold ${statusClasse}">
-                            ${membro.status.toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button onclick="deletarMembro(${membro.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title="Excluir Membro">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
-                tabelaMembros.appendChild(tr);
-            });
+                if (error) {
+                    console.error('Erro ao buscar membros:', error);
+                    return;
+                }
 
-            // Atualiza os números na tela
-            dashAtivos.textContent = ativos;
-            dashInativos.textContent = inativos;
-            dashAniversariantes.textContent = niverMes;
+                tabelaMembros.innerHTML = '';
+                totalMembros.textContent = `Total: ${membros.length} Membros`;
 
-            lucide.createIcons();
+                let ativos = 0;
+                let inativos = 0;
+                let niverMes = 0;
+                const mesAtual = new Date().getMonth() + 1;
+
+                if (!membros || membros.length === 0) {
+                    tabelaMembros.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm">
+                                Nenhum membro encontrado.
+                            </td>
+                        </tr>`;
+                    dashAtivos.textContent = '0';
+                    dashInativos.textContent = '0';
+                    dashAniversariantes.textContent = '0';
+                    return;
+                }
+
+                membros.forEach(membro => {
+                    if (membro.status === 'Ativo') ativos++;
+                    else if (membro.status === 'Inativo') inativos++;
+
+                    if (membro.data_nascimento && membro.data_nascimento.includes('-')) {
+                        const mesNasc = parseInt(membro.data_nascimento.split('-')[1]);
+                        if (mesNasc === mesAtual) niverMes++;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-800/30 transition-colors group';
+                    
+                    const statusClasse = membro.status === 'Ativo' 
+                        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+                        : 'bg-slate-800 text-slate-500 border border-slate-700';
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">${membro.nome}</div>
+                            <div class="text-xs text-slate-500">Nasc: ${formatarData(membro.data_nascimento)}</div>
+                            ${membro.observacao ? `<div class="text-xs text-slate-400 mt-1 italic max-w-xs truncate" title="${membro.observacao}">Obs: ${membro.observacao}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 text-slate-300 text-sm">${membro.cargo || '-'}</td>
+                        <td class="px-6 py-4 text-slate-400 text-sm">
+                            <div>${membro.celular || '-'}</div>
+                            <div class="text-xs text-slate-500">${membro.email || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 text-slate-400 text-sm">${formatarData(membro.data_adesao)}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold ${statusClasse}">
+                                ${membro.status.toUpperCase()}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="deletarMembro(${membro.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title="Excluir Membro">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    `;
+                    tabelaMembros.appendChild(tr);
+                });
+
+                dashAtivos.textContent = ativos;
+                dashInativos.textContent = inativos;
+                dashAniversariantes.textContent = niverMes;
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Erro crítico no carregamento:', err);
+            }
         }
 
-        // SALVAR NOVO MEMBRO
         formMembro.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const novoMembro = {
-                nome: document.getElementById('nome').value,
-                data_nascimento: document.getElementById('data_nascimento').value || null,
-                celular: document.getElementById('celular').value,
-                email: document.getElementById('email').value || null,
-                cargo: document.getElementById('cargo').value || null,
-                data_adesao: document.getElementById('data_adesao').value || null,
-                status: document.getElementById('status').value,
-                observacao: document.getElementById('observacao').value || null
-            };
+            try {
+                const novoMembro = {
+                    nome: document.getElementById('nome').value,
+                    data_nascimento: document.getElementById('data_nascimento').value || null,
+                    celular: document.getElementById('celular').value || null,
+                    email: document.getElementById('email').value || null,
+                    cargo: document.getElementById('cargo').value || null,
+                    data_adesao: document.getElementById('data_adesao').value || null,
+                    status: document.getElementById('status').value,
+                    observacao: document.getElementById('observacao').value || null
+                };
 
-            const { error } = await supabase.from('membros').insert([novoMembro]);
+                const { error } = await supabase.from('membros').insert([novoMembro]);
 
-            if (error) {
-                alert('Erro ao cadastrar membro: ' + error.message);
-            } else {
-                formMembro.reset();
-                await carregarMembros();
-                alert('Membro cadastrado com sucesso!');
+                if (error) {
+                    alert('Erro ao cadastrar membro: ' + error.message);
+                } else {
+                    formMembro.reset();
+                    alert('Membro cadastrado com sucesso!');
+                    await carregarMembros();
+                }
+            } catch (err) {
+                alert('Erro inesperado no envio: ' + err.message);
             }
         });
 
-        // DELETAR MEMBRO
         window.deletarMembro = async (id) => {
             if (confirm('Tem certeza que deseja excluir este membro?')) {
                 const { error } = await supabase.from('membros').delete().eq('id', id);
@@ -330,12 +326,10 @@
             }
         };
 
-        // BUSCA EM TEMPO REAL
         inputBusca.addEventListener('input', (e) => {
             carregarMembros(e.target.value);
         });
 
-        // Inicializar ícones e carregar dados na abertura da página
         lucide.createIcons();
         carregarMembros();
     </script>
