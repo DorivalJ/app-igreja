@@ -9,11 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #020617; scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        [color-scheme:dark] { color-scheme: dark; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
 <body class="text-slate-200">
@@ -30,28 +30,27 @@
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Painel Administrativo</p>
                     </div>
                 </div>
+                <div>
+                    <span class="text-sm bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">
+                        Igreja Digital v1.0
+                    </span>
+                </div>
             </div>
         </header>
 
         <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-8">
             
-            <!-- FORMULÁRIO -->
-            <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i id="iconeForm" data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
-                        <h2 id="tituloForm" class="font-semibold text-slate-100">Novo Cadastro</h2>
-                    </div>
-                    <button id="btnCancelar" onclick="cancelarEdicao()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                        Cancelar Edição
-                    </button>
+            <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
+                    <h2 class="font-semibold text-slate-100">Novo Cadastro</h2>
                 </div>
                 
                 <form id="formMembro" class="p-6 md:p-8">
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
-                            <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
@@ -61,17 +60,17 @@
 
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Celular</label>
-                            <input type="text" id="input_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <input type="text" id="celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
-                            <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo</label>
-                            <input type="text" id="cargo" placeholder="Ex: Membro, Diácono" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                            <input type="text" id="cargo" placeholder="Ex: Membro, Diácono, Pastor, Voluntário" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
@@ -80,8 +79,8 @@
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
-                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status do Membro</label>
+                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer">
                                 <option value="Ativo">Ativo</option>
                                 <option value="Inativo">Inativo</option>
                             </select>
@@ -89,60 +88,88 @@
 
                         <div class="md:col-span-6">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                            <textarea id="observacao" rows="2" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                            <textarea id="observacao" rows="3" placeholder="Informações adicionais sobre o membro..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none"></textarea>
                         </div>
                     </div>
 
                     <div class="mt-8 flex justify-end">
-                        <button type="submit" id="btnSalvar" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
-                            <i data-lucide="save" class="w-5 h-5"></i>
-                            <span id="textoBtnSalvar">Salvar Membro</span>
+                        <button type="submit" class="group inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all shadow-lg shadow-indigo-600/20">
+                            <i data-lucide="save" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                            Salvar Membro
                         </button>
                     </div>
                 </form>
             </section>
 
-            <!-- INDICADORES -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex items-center justify-between">
-                    <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ativos</p><h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3></div>
-                    <i data-lucide="user-check" class="text-emerald-500/50"></i>
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Membros Ativos</p>
+                        <h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 border border-emerald-500/20">
+                        <i data-lucide="user-check" class="w-6 h-6"></i>
+                    </div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex items-center justify-between">
-                    <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inativos</p><h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3></div>
-                    <i data-lucide="user-x" class="text-rose-500/50"></i>
+
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Membros Inativos</p>
+                        <h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 border border-rose-500/20">
+                        <i data-lucide="user-x" class="w-6 h-6"></i>
+                    </div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex items-center justify-between">
-                    <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aniversariantes</p><h3 id="dashAniversariantes" class="text-3xl font-bold text-indigo-400 mt-1">0</h3></div>
-                    <i data-lucide="cake" class="text-indigo-500/50"></i>
+
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aniversariantes do Mês</p>
+                        <h3 id="dashAniversariantes" class="text-3xl font-bold text-indigo-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 border border-indigo-500/20">
+                        <i data-lucide="cake" class="w-6 h-6"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- TABELA -->
             <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                 <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                        <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
-                    </h2>
-                    <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i>
+                        <h2 class="font-semibold text-slate-100">Lista de Membros</h2>
+                    </div>
+                    <div class="relative max-w-sm w-full">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </span>
+                        <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full pl-11 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                    </div>
                 </div>
+
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                <th class="px-6 py-4">Membro</th>
-                                <th class="px-6 py-4">Cargo</th>
-                                <th class="px-6 py-4">Contato</th>
-                                <th class="px-6 py-4">Status</th>
-                                <th class="px-6 py-4 text-right">Gerenciar</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Dados do Membro</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Cargo / Função</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Contato</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Adesão</th>
+                                <th class="px-6 py-4 border-b border-slate-800">Status</th>
+                                <th class="px-6 py-4 border-b border-slate-800 text-right">Gerenciar</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
+                        <tbody id="tabelaMembros" class="divide-y divide-slate-800">
+                        </tbody>
                     </table>
                 </div>
+
                 <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-                    <span id="totalMembros">Total: <span class="text-emerald-500 font-bold text-sm">0</span> Membros</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online</span>
+                    <span id="totalMembros">Total: 0 Membros</span>
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Sistema Online
+                    </span>
                 </div>
             </section>
         </main>
@@ -151,166 +178,160 @@
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let editandoID = null; // Variável para controlar se estamos editando ou cadastrando
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const formMembro = document.getElementById('formMembro');
+        const inputCelular = document.getElementById('celular');
+        const tabelaMembros = document.getElementById('tabelaMembros');
+        const totalMembros = document.getElementById('totalMembros');
+        const inputBusca = document.getElementById('busca');
+
+        const dashAtivos = document.getElementById('dashAtivos');
+        const dashInativos = document.getElementById('dashInativos');
+        const dashAniversariantes = document.getElementById('dashAniversariantes');
 
         function formatarData(dataString) {
             if (!dataString) return '-';
-            const [ano, mes, dia] = dataString.split('-');
-            return `${dia}/${mes}/${ano}`;
+            const partes = dataString.split('-');
+            if (partes.length !== 3) return dataString;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
         async function carregarMembros(termoBusca = '') {
             try {
-                let query = _supabase.from('membros').select('*').order('nome', { ascending: true });
-                if (termoBusca) query = query.ilike('nome', `%${termoBusca}%`);
+                let query = supabase.from('membros').select('*').order('nome', { ascending: true });
+                
+                if (termoBusca) {
+                    query = query.ilike('nome', `%${termoBusca}%`);
+                }
 
                 const { data: membros, error } = await query;
-                if (error) throw error;
 
-                const tbody = document.getElementById('tabelaMembros');
-                tbody.innerHTML = '';
+                if (error) {
+                    console.error('Erro ao buscar membros:', error);
+                    return;
+                }
 
-                let ativos = 0, inativos = 0, niverMes = 0;
+                tabelaMembros.innerHTML = '';
+                totalMembros.textContent = `Total: ${membros.length} Membros`;
+
+                let ativos = 0;
+                let inativos = 0;
+                let niverMes = 0;
                 const mesAtual = new Date().getMonth() + 1;
 
-                membros.forEach(m => {
-                    if (m.status === 'Ativo') ativos++; else inativos++;
-                    if (m.data_nascimento && parseInt(m.data_nascimento.split('-')[1]) === mesAtual) niverMes++;
+                if (!membros || membros.length === 0) {
+                    tabelaMembros.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm">
+                                Nenhum membro encontrado.
+                            </td>
+                        </tr>`;
+                    dashAtivos.textContent = '0';
+                    dashInativos.textContent = '0';
+                    dashAniversariantes.textContent = '0';
+                    return;
+                }
+
+                membros.forEach(membro => {
+                    if (membro.status === 'Ativo') ativos++;
+                    else if (membro.status === 'Inativo') inativos++;
+
+                    if (membro.data_nascimento && membro.data_nascimento.includes('-')) {
+                        const mesNasc = parseInt(membro.data_nascimento.split('-')[1]);
+                        if (mesNasc === mesAtual) niverMes++;
+                    }
 
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-800/30 transition-colors group';
+                    
+                    const statusClasse = membro.status === 'Ativo' 
+                        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+                        : 'bg-slate-800 text-slate-500 border border-slate-700';
+
                     tr.innerHTML = `
                         <td class="px-6 py-4">
-                            <div class="font-medium text-slate-100">${m.nome}</div>
-                            <div class="text-xs text-slate-500 italic">Nasc: ${formatarData(m.data_nascimento)}</div>
+                            <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">${membro.nome}</div>
+                            <div class="text-xs text-slate-500">Nasc: ${formatarData(membro.data_nascimento)}</div>
+                            ${membro.observacao ? `<div class="text-xs text-slate-400 mt-1 italic max-w-xs truncate" title="${membro.observacao}">Obs: ${membro.observacao}</div>` : ''}
                         </td>
-                        <td class="px-6 py-4 text-slate-300 text-sm">${m.cargo || '-'}</td>
+                        <td class="px-6 py-4 text-slate-300 text-sm">${membro.cargo || '-'}</td>
                         <td class="px-6 py-4 text-slate-400 text-sm">
-                            <div>${m.celular || '-'}</div>
-                            <div class="text-xs text-slate-500">${m.email || ''}</div>
+                            <div>${membro.celular || '-'}</div>
+                            <div class="text-xs text-slate-500">${membro.email || ''}</div>
                         </td>
+                        <td class="px-6 py-4 text-slate-400 text-sm">${formatarData(membro.data_adesao)}</td>
                         <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded text-[10px] font-bold ${m.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}">
-                                ${m.status.toUpperCase()}
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold ${statusClasse}">
+                                ${membro.status.toUpperCase()}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-2">
-                                <button onclick="prepararEdicao(${m.id})" class="text-slate-500 hover:text-indigo-400 p-2 transition-all" title="Editar Membro">
-                                    <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="deletarMembro(${m.id})" class="text-slate-500 hover:text-rose-400 p-2 transition-all" title="Excluir Membro">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
+                            <button onclick="deletarMembro(${membro.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title="Excluir Membro">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
                         </td>
                     `;
-                    tbody.appendChild(tr);
+                    tabelaMembros.appendChild(tr);
                 });
 
-                document.getElementById('dashAtivos').textContent = ativos;
-                document.getElementById('dashInativos').textContent = inativos;
-                document.getElementById('dashAniversariantes').textContent = niverMes;
-                document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${membros.length}</span> Membros`;
-                
+                dashAtivos.textContent = ativos;
+                dashInativos.textContent = inativos;
+                dashAniversariantes.textContent = niverMes;
+
                 lucide.createIcons();
             } catch (err) {
-                console.error('Erro ao carregar:', err);
+                console.error('Erro crítico no carregamento:', err);
             }
         }
 
-        // --- FUNÇÃO PARA CARREGAR OS DADOS NO FORMULÁRIO (EDITAR) ---
-        async function prepararEdicao(id) {
-            const { data: m, error } = await _supabase.from('membros').select('*').eq('id', id).single();
-            
-            if (error) {
-                alert('Erro ao buscar dados do membro');
-                return;
-            }
-
-            // Preenche os campos
-            editandoID = id;
-            document.getElementById('nome').value = m.nome;
-            document.getElementById('data_nascimento').value = m.data_nascimento;
-            document.getElementById('input_celular').value = m.celular;
-            document.getElementById('email').value = m.email;
-            document.getElementById('cargo').value = m.cargo;
-            document.getElementById('data_adesao').value = m.data_adesao;
-            document.getElementById('status').value = m.status;
-            document.getElementById('observacao').value = m.observacao;
-
-            // Altera o Visual para Modo de Edição
-            document.getElementById('tituloForm').innerText = 'Editando Membro';
-            document.getElementById('iconeForm').setAttribute('data-lucide', 'edit-3');
-            document.getElementById('textoBtnSalvar').innerText = 'Atualizar Cadastro';
-            document.getElementById('btnSalvar').classList.replace('bg-indigo-600', 'bg-amber-600');
-            document.getElementById('btnCancelar').classList.remove('hidden');
-            
-            // Sobe para o topo para o usuário ver o formulário preenchido
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            lucide.createIcons();
-        }
-
-        function cancelarEdicao() {
-            editandoID = null;
-            document.getElementById('formMembro').reset();
-            document.getElementById('tituloForm').innerText = 'Novo Cadastro';
-            document.getElementById('iconeForm').setAttribute('data-lucide', 'user-plus');
-            document.getElementById('textoBtnSalvar').innerText = 'Salvar Membro';
-            document.getElementById('btnSalvar').classList.replace('bg-amber-600', 'bg-indigo-600');
-            document.getElementById('btnCancelar').classList.add('hidden');
-            lucide.createIcons();
-        }
-
-        document.getElementById('formMembro').addEventListener('submit', async (e) => {
+        formMembro.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnSalvar');
-            btn.disabled = true;
 
-            const dadosMembro = {
-                nome: document.getElementById('nome').value,
-                data_nascimento: document.getElementById('data_nascimento').value || null,
-                celular: document.getElementById('input_celular').value || null,
-                email: document.getElementById('email').value || null,
-                cargo: document.getElementById('cargo').value || null,
-                data_adesao: document.getElementById('data_adesao').value || null,
-                status: document.getElementById('status').value,
-                observacao: document.getElementById('observacao').value || null
-            };
+            try {
+                const novoMembro = {
+                    nome: document.getElementById('nome').value,
+                    data_nascimento: document.getElementById('data_nascimento').value || null,
+                    celular: document.getElementById('celular').value || null,
+                    email: document.getElementById('email').value || null,
+                    cargo: document.getElementById('cargo').value || null,
+                    data_adesao: document.getElementById('data_adesao').value || null,
+                    status: document.getElementById('status').value,
+                    observacao: document.getElementById('observacao').value || null
+                };
 
-            let resultado;
+                const { error } = await supabase.from('membros').insert([novoMembro]);
 
-            if (editandoID) {
-                // MODO EDIÇÃO: Atualiza o registro existente
-                resultado = await _supabase.from('membros').update(dadosMembro).eq('id', editandoID);
-            } else {
-                // MODO CADASTRO: Insere novo registro
-                resultado = await _supabase.from('membros').insert([dadosMembro]);
+                if (error) {
+                    alert('Erro ao cadastrar membro: ' + error.message);
+                } else {
+                    formMembro.reset();
+                    alert('Membro cadastrado com sucesso!');
+                    await carregarMembros();
+                }
+            } catch (err) {
+                alert('Erro inesperado no envio: ' + err.message);
             }
-
-            if (resultado.error) {
-                alert('Erro na operação: ' + resultado.error.message);
-            } else {
-                alert(editandoID ? 'Membro atualizado com sucesso!' : 'Membro gravado com sucesso!');
-                cancelarEdicao(); // Limpa o form e volta ao estado normal
-                carregarMembros();
-            }
-            btn.disabled = false;
         });
 
         window.deletarMembro = async (id) => {
-            if (confirm('Excluir este membro permanentemente?')) {
-                const { error } = await _supabase.from('membros').delete().eq('id', id);
-                if (error) alert('Erro ao excluir');
-                else carregarMembros();
+            if (confirm('Tem certeza que deseja excluir este membro?')) {
+                const { error } = await supabase.from('membros').delete().eq('id', id);
+                if (error) {
+                    alert('Erro ao excluir: ' + error.message);
+                } else {
+                    await carregarMembros();
+                }
             }
         };
 
-        document.getElementById('busca').addEventListener('input', (e) => carregarMembros(e.target.value));
+        inputBusca.addEventListener('input', (e) => {
+            carregarMembros(e.target.value);
+        });
 
-        window.onload = carregarMembros;
+        lucide.createIcons();
+        carregarMembros();
     </script>
 </body>
 </html>
