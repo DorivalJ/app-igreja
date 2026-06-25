@@ -55,8 +55,8 @@
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
-                            <input type="text" id="telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Celular</label>
+                            <input type="text" id="input_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
@@ -70,13 +70,13 @@
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Adesão</label>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Adesão</label>
                             <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
                         </div>
 
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
-                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer">
                                 <option value="Ativo">Ativo</option>
                                 <option value="Inativo">Inativo</option>
                             </select>
@@ -128,7 +128,7 @@
                     <h2 class="font-semibold text-slate-100 flex items-center gap-2">
                         <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
                     </h2>
-                    <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                    <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -149,10 +149,9 @@
     </div>
 
     <script>
-        // CONFIGURAÇÕES SUPABASE
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function formatarData(dataString) {
             if (!dataString) return '-';
@@ -162,7 +161,7 @@
 
         async function carregarMembros(termoBusca = '') {
             try {
-                let query = supabase.from('membros').select('*').order('nome', { ascending: true });
+                let query = _supabase.from('membros').select('*').order('nome', { ascending: true });
                 if (termoBusca) query = query.ilike('nome', `%${termoBusca}%`);
 
                 const { data: membros, error } = await query;
@@ -187,7 +186,7 @@
                         </td>
                         <td class="px-6 py-4 text-slate-300 text-sm">${m.cargo || '-'}</td>
                         <td class="px-6 py-4 text-slate-400 text-sm">
-                            <div>${m.telefone || '-'}</div>
+                            <div>${m.celular || '-'}</div>
                             <div class="text-xs text-slate-500">${m.email || ''}</div>
                         </td>
                         <td class="px-6 py-4">
@@ -196,7 +195,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick="deletarMembro('${m.id}')" class="text-slate-500 hover:text-rose-400 p-2">
+                            <button onclick="deletarMembro(${m.id})" class="text-slate-500 hover:text-rose-400 p-2">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </td>
@@ -213,57 +212,47 @@
             }
         }
 
-        // --- CORREÇÃO DO SALVAMENTO ---
+        // --- SALVAMENTO CORRIGIDO COM NOMES DA SUA TABELA ---
         document.getElementById('formMembro').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSalvar');
             btn.disabled = true;
-            btn.innerHTML = 'Salvando...';
 
-            try {
-                const dadosMembro = {
-                    nome: document.getElementById('nome').value,
-                    data_nascimento: document.getElementById('data_nascimento').value || null,
-                    telefone: document.getElementById('telefone').value || null, // NOME DA COLUNA NO BANCO
-                    email: document.getElementById('email').value || null,
-                    cargo: document.getElementById('cargo').value || null,
-                    data_adesao: document.getElementById('data_adesao').value || null,
-                    status: document.getElementById('status').value,
-                    observacao: document.getElementById('observacao').value || null
-                };
+            const dadosMembro = {
+                nome: document.getElementById('nome').value,
+                data_nascimento: document.getElementById('data_nascimento').value || null,
+                celular: document.getElementById('input_celular').value || null, // NOME EXATO DA SUA COLUNA
+                email: document.getElementById('email').value || null,
+                cargo: document.getElementById('cargo').value || null,
+                data_adesao: document.getElementById('data_adesao').value || null,
+                status: document.getElementById('status').value,
+                observacao: document.getElementById('observacao').value || null
+            };
 
-                const { error } = await supabase.from('membros').insert([dadosMembro]);
+            const { data, error } = await _supabase.from('membros').insert([dadosMembro]);
 
-                if (error) {
-                    console.error('Erro Supabase:', error);
-                    alert('Erro ao salvar: ' + error.message);
-                } else {
-                    alert('Membro cadastrado com sucesso!');
-                    document.getElementById('formMembro').reset();
-                    await carregarMembros();
-                }
-            } catch (err) {
-                alert('Erro inesperado: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Salvar Membro';
-                lucide.createIcons();
+            if (error) {
+                console.error('Erro detalhado:', error);
+                alert('Erro ao gravar no banco: ' + error.message);
+            } else {
+                alert('Membro gravado com sucesso!');
+                document.getElementById('formMembro').reset();
+                carregarMembros();
             }
+            btn.disabled = false;
         });
 
         window.deletarMembro = async (id) => {
             if (confirm('Excluir este membro?')) {
-                const { error } = await supabase.from('membros').delete().eq('id', id);
+                const { error } = await _supabase.from('membros').delete().eq('id', id);
                 if (error) alert('Erro ao excluir');
-                else await carregarMembros();
+                else carregarMembros();
             }
         };
 
         document.getElementById('busca').addEventListener('input', (e) => carregarMembros(e.target.value));
 
-        // Inicialização
-        carregarMembros();
-        lucide.createIcons();
+        window.onload = carregarMembros;
     </script>
 </body>
 </html>
