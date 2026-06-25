@@ -226,7 +226,7 @@
             }
         }
 
-        document.getElementById('formMembro').addEventListener('submit', async (e) => {
+document.getElementById('formMembro').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSalvar');
             btn.disabled = true;
@@ -242,14 +242,15 @@
                 observacao: document.getElementById('observacao').value || null
             };
 
-            const { data, error } = await _supabase.from('membros').insert([dadosMembro]);
+            // Adicionado o .select() para o Supabase responder com sucesso total
+            const { error } = await _supabase.from('membros').insert([dadosMembro]).select();
 
             if (error) {
                 alert('Erro ao gravar: ' + error.message);
             } else {
                 alert('Membro gravado com sucesso!');
                 document.getElementById('formMembro').reset();
-                carregarMembros();
+                await carregarMembros(); // Aguarda o carregamento dos dados novos
             }
             btn.disabled = false;
         });
@@ -264,7 +265,8 @@
 
         document.getElementById('busca').addEventListener('input', (e) => carregarMembros(e.target.value));
 
-        window.onload = carregarMembros;
+        // Força a leitura imediata assim que o script terminar de ler as funções
+        carregarMembros();
     </script>
 </body>
 </html>
