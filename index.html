@@ -13,7 +13,7 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        [color-scheme:dark] { color-scheme: dark; }
     </style>
 </head>
 <body class="text-slate-200">
@@ -30,16 +30,12 @@
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Painel Administrativo</p>
                     </div>
                 </div>
-                <div>
-                    <span class="text-sm bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">
-                        Igreja Digital v1.0
-                    </span>
-                </div>
             </div>
         </header>
 
         <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-8">
             
+            <!-- FORMULÁRIO -->
             <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                 <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
                     <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
@@ -50,7 +46,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
-                            <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                            <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
@@ -59,28 +55,28 @@
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Celular</label>
-                            <input type="text" id="celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
+                            <input type="text" id="telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
-                            <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                            <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
-                            <input type="text" id="cargo" placeholder="Ex: Membro, Diácono, Pastor, Voluntário" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo</label>
+                            <input type="text" id="cargo" placeholder="Ex: Membro, Diácono" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Adesão</label>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Adesão</label>
                             <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status do Membro</label>
-                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
+                            <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
                                 <option value="Ativo">Ativo</option>
                                 <option value="Inativo">Inativo</option>
                             </select>
@@ -88,212 +84,147 @@
 
                         <div class="md:col-span-6">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                            <textarea id="observacao" rows="3" placeholder="Informações adicionais sobre o membro..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none"></textarea>
+                            <textarea id="observacao" rows="2" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
                         </div>
                     </div>
 
                     <div class="mt-8 flex justify-end">
-                        <button type="submit" class="group inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all shadow-lg shadow-indigo-600/20">
-                            <i data-lucide="save" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                        <button type="submit" id="btnSalvar" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
+                            <i data-lucide="save" class="w-5 h-5"></i>
                             Salvar Membro
                         </button>
                     </div>
                 </form>
             </section>
 
+            <!-- INDICADORES -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
                     <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Membros Ativos</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ativos</p>
                         <h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3>
                     </div>
-                    <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 border border-emerald-500/20">
-                        <i data-lucide="user-check" class="w-6 h-6"></i>
-                    </div>
+                    <i data-lucide="user-check" class="text-emerald-500/50"></i>
                 </div>
-
                 <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
                     <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Membros Inativos</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inativos</p>
                         <h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3>
                     </div>
-                    <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 border border-rose-500/20">
-                        <i data-lucide="user-x" class="w-6 h-6"></i>
-                    </div>
+                    <i data-lucide="user-x" class="text-rose-500/50"></i>
                 </div>
-
                 <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
                     <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aniversariantes do Mês</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aniversariantes</p>
                         <h3 id="dashAniversariantes" class="text-3xl font-bold text-indigo-400 mt-1">0</h3>
                     </div>
-                    <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 border border-indigo-500/20">
-                        <i data-lucide="cake" class="w-6 h-6"></i>
-                    </div>
+                    <i data-lucide="cake" class="text-indigo-500/50"></i>
                 </div>
             </div>
 
+            <!-- TABELA -->
             <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                 <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i>
-                        <h2 class="font-semibold text-slate-100">Lista de Membros</h2>
-                    </div>
-                    <div class="relative max-w-sm w-full">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500">
-                            <i data-lucide="search" class="w-4 h-4"></i>
-                        </span>
-                        <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full pl-11 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
-                    </div>
+                    <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                        <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
+                    </h2>
+                    <input type="text" id="busca" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                 </div>
-
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left">
                         <thead>
                             <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                <th class="px-6 py-4 border-b border-slate-800">Dados do Membro</th>
-                                <th class="px-6 py-4 border-b border-slate-800">Cargo / Função</th>
-                                <th class="px-6 py-4 border-b border-slate-800">Contato</th>
-                                <th class="px-6 py-4 border-b border-slate-800">Adesão</th>
-                                <th class="px-6 py-4 border-b border-slate-800">Status</th>
-                                <th class="px-6 py-4 border-b border-slate-800 text-right">Gerenciar</th>
+                                <th class="px-6 py-4">Membro</th>
+                                <th class="px-6 py-4">Cargo</th>
+                                <th class="px-6 py-4">Contato</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4 text-right">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelaMembros" class="divide-y divide-slate-800">
-                        </tbody>
+                        <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
                     </table>
-                </div>
-
-                <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-                    <span id="totalMembros">Total: 0 Membros</span>
-                    <span class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Sistema Online
-                    </span>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
+        // CONFIGURAÇÕES SUPABASE
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W';
-
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const formMembro = document.getElementById('formMembro');
-        const inputCelular = document.getElementById('celular');
-        const tabelaMembros = document.getElementById('tabelaMembros');
-        const totalMembros = document.getElementById('totalMembros');
-        const inputBusca = document.getElementById('busca');
-
-        const dashAtivos = document.getElementById('dashAtivos');
-        const dashInativos = document.getElementById('dashInativos');
-        const dashAniversariantes = document.getElementById('dashAniversariantes');
 
         function formatarData(dataString) {
             if (!dataString) return '-';
-            const partes = dataString.split('-');
-            if (partes.length !== 3) return dataString;
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            const [ano, mes, dia] = dataString.split('-');
+            return `${dia}/${mes}/${ano}`;
         }
 
         async function carregarMembros(termoBusca = '') {
             try {
                 let query = supabase.from('membros').select('*').order('nome', { ascending: true });
-                
-                if (termoBusca) {
-                    query = query.ilike('nome', `%${termoBusca}%`);
-                }
+                if (termoBusca) query = query.ilike('nome', `%${termoBusca}%`);
 
                 const { data: membros, error } = await query;
+                if (error) throw error;
 
-                if (error) {
-                    console.error('Erro ao buscar membros:', error);
-                    return;
-                }
+                const tbody = document.getElementById('tabelaMembros');
+                tbody.innerHTML = '';
 
-                tabelaMembros.innerHTML = '';
-                totalMembros.textContent = `Total: ${membros.length} Membros`;
-
-                let ativos = 0;
-                let inativos = 0;
-                let niverMes = 0;
+                let ativos = 0, inativos = 0, niverMes = 0;
                 const mesAtual = new Date().getMonth() + 1;
 
-                if (!membros || membros.length === 0) {
-                    tabelaMembros.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm">
-                                Nenhum membro encontrado.
-                            </td>
-                        </tr>`;
-                    dashAtivos.textContent = '0';
-                    dashInativos.textContent = '0';
-                    dashAniversariantes.textContent = '0';
-                    return;
-                }
-
-                membros.forEach(membro => {
-                    if (membro.status === 'Ativo') ativos++;
-                    else if (membro.status === 'Inativo') inativos++;
-
-                    if (membro.data_nascimento && membro.data_nascimento.includes('-')) {
-                        const mesNasc = parseInt(membro.data_nascimento.split('-')[1]);
-                        if (mesNasc === mesAtual) niverMes++;
-                    }
+                membros.forEach(m => {
+                    if (m.status === 'Ativo') ativos++; else inativos++;
+                    if (m.data_nascimento && parseInt(m.data_nascimento.split('-')[1]) === mesAtual) niverMes++;
 
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-800/30 transition-colors group';
-                    
-                    const statusClasse = membro.status === 'Ativo' 
-                        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
-                        : 'bg-slate-800 text-slate-500 border border-slate-700';
-
                     tr.innerHTML = `
                         <td class="px-6 py-4">
-                            <div class="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors">${membro.nome}</div>
-                            <div class="text-xs text-slate-500">Nasc: ${formatarData(membro.data_nascimento)}</div>
-                            ${membro.observacao ? `<div class="text-xs text-slate-400 mt-1 italic max-w-xs truncate" title="${membro.observacao}">Obs: ${membro.observacao}</div>` : ''}
+                            <div class="font-medium text-slate-100">${m.nome}</div>
+                            <div class="text-xs text-slate-500">Nasc: ${formatarData(m.data_nascimento)}</div>
                         </td>
-                        <td class="px-6 py-4 text-slate-300 text-sm">${membro.cargo || '-'}</td>
+                        <td class="px-6 py-4 text-slate-300 text-sm">${m.cargo || '-'}</td>
                         <td class="px-6 py-4 text-slate-400 text-sm">
-                            <div>${membro.celular || '-'}</div>
-                            <div class="text-xs text-slate-500">${membro.email || ''}</div>
+                            <div>${m.telefone || '-'}</div>
+                            <div class="text-xs text-slate-500">${m.email || ''}</div>
                         </td>
-                        <td class="px-6 py-4 text-slate-400 text-sm">${formatarData(membro.data_adesao)}</td>
                         <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold ${statusClasse}">
-                                ${membro.status.toUpperCase()}
+                            <span class="px-2 py-1 rounded text-[10px] font-bold ${m.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}">
+                                ${m.status.toUpperCase()}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick="deletarMembro(${membro.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title="Excluir Membro">
+                            <button onclick="deletarMembro('${m.id}')" class="text-slate-500 hover:text-rose-400 p-2">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </td>
                     `;
-                    tabelaMembros.appendChild(tr);
+                    tbody.appendChild(tr);
                 });
 
-                dashAtivos.textContent = ativos;
-                dashInativos.textContent = inativos;
-                dashAniversariantes.textContent = niverMes;
-
+                document.getElementById('dashAtivos').textContent = ativos;
+                document.getElementById('dashInativos').textContent = inativos;
+                document.getElementById('dashAniversariantes').textContent = niverMes;
                 lucide.createIcons();
             } catch (err) {
-                console.error('Erro crítico no carregamento:', err);
+                console.error('Erro ao carregar:', err);
             }
         }
 
-        formMembro.addEventListener('submit', async (e) => {
+        // --- CORREÇÃO DO SALVAMENTO ---
+        document.getElementById('formMembro').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btnSalvar');
+            btn.disabled = true;
+            btn.innerHTML = 'Salvando...';
 
             try {
-                const novoMembro = {
+                const dadosMembro = {
                     nome: document.getElementById('nome').value,
                     data_nascimento: document.getElementById('data_nascimento').value || null,
-                    celular: document.getElementById('celular').value || null,
+                    telefone: document.getElementById('telefone').value || null, // NOME DA COLUNA NO BANCO
                     email: document.getElementById('email').value || null,
                     cargo: document.getElementById('cargo').value || null,
                     data_adesao: document.getElementById('data_adesao').value || null,
@@ -301,37 +232,38 @@
                     observacao: document.getElementById('observacao').value || null
                 };
 
-                const { error } = await supabase.from('membros').insert([novoMembro]);
+                const { error } = await supabase.from('membros').insert([dadosMembro]);
 
                 if (error) {
-                    alert('Erro ao cadastrar membro: ' + error.message);
+                    console.error('Erro Supabase:', error);
+                    alert('Erro ao salvar: ' + error.message);
                 } else {
-                    formMembro.reset();
                     alert('Membro cadastrado com sucesso!');
+                    document.getElementById('formMembro').reset();
                     await carregarMembros();
                 }
             } catch (err) {
-                alert('Erro inesperado no envio: ' + err.message);
+                alert('Erro inesperado: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Salvar Membro';
+                lucide.createIcons();
             }
         });
 
         window.deletarMembro = async (id) => {
-            if (confirm('Tem certeza que deseja excluir este membro?')) {
+            if (confirm('Excluir este membro?')) {
                 const { error } = await supabase.from('membros').delete().eq('id', id);
-                if (error) {
-                    alert('Erro ao excluir: ' + error.message);
-                } else {
-                    await carregarMembros();
-                }
+                if (error) alert('Erro ao excluir');
+                else await carregarMembros();
             }
         };
 
-        inputBusca.addEventListener('input', (e) => {
-            carregarMembros(e.target.value);
-        });
+        document.getElementById('busca').addEventListener('input', (e) => carregarMembros(e.target.value));
 
-        lucide.createIcons();
+        // Inicialização
         carregarMembros();
+        lucide.createIcons();
     </script>
 </body>
 </html>
