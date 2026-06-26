@@ -217,20 +217,50 @@
                                     </select>
                                 </div>
 
-                                <!-- DESCRIÇÃO DINÂMICA (Membro ou Caixas de Seleção de Despesa) -->
+                                <!-- CAMPOS EXCLUSIVOS DO DÍZIMO -->
                                 <div class="md:col-span-2" id="container-descricao-membro">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro (Opcional)</label>
                                     <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
                                         <option value="Contribuinte Geral">Geral / Anônimo</option>
                                     </select>
                                 </div>
-
-                                <!-- NOVO: CARGO/FUNÇÃO DO MEMBRO -->
                                 <div class="md:col-span-2" id="container-cargo-membro">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
                                     <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
                                 </div>
 
+                                <!-- CAMPOS EXCLUSIVOS DA OFERTA -->
+                                <div class="md:col-span-2 hidden" id="container-oferta-culto">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Culto</label>
+                                    <div class="flex flex-col gap-2">
+                                        <select id="fin_oferta_culto" onchange="verificarCultoOutros()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                            <option value="Culto Publico">Culto Público</option>
+                                            <option value="Culto de Santa Ceia">Culto de Santa Ceia</option>
+                                            <option value="Culto de Ensinamento">Culto de Ensinamento</option>
+                                            <option value="Culto de Missões">Culto de Missões</option>
+                                            <option value="Culto das irmãs">Culto das irmãs</option>
+                                            <option value="Culto com os dolescentes">Culto com os dolescentes</option>
+                                            <option value="Congresso">Congresso</option>
+                                            <option value="Não houve Culto">Não houve Culto</option>
+                                            <option value="Outro Culto">Outro (Digitar...)</option>
+                                        </select>
+                                        <input type="text" id="fin_culto_manual" placeholder="Qual culto?" class="hidden w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none mt-1">
+                                    </div>
+                                </div>
+                                <div class="md:col-span-2 hidden" id="container-oferta-dia">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia da Semana</label>
+                                    <select id="fin_oferta_dia" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                        <option value="Domingo">Domingo</option>
+                                        <option value="Segunda-feira">Segunda-feira</option>
+                                        <option value="Terça-feira">Terça-feira</option>
+                                        <option value="Quarta-feira">Quarta-feira</option>
+                                        <option value="Quinta-feira">Quinta-feira</option>
+                                        <option value="Sexta-feira">Sexta-feira</option>
+                                        <option value="Sábado">Sábado</option>
+                                    </select>
+                                </div>
+
+                                <!-- CAMPOS EXCLUSIVOS DA DESPESA -->
                                 <div class="md:col-span-4 hidden" id="container-descricao-despesa">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria da Despesa</label>
                                     <div class="flex gap-2">
@@ -257,6 +287,12 @@
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
                                     <input type="date" id="fin_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+
+                                <!-- NOVO: CAMPO OBSERVAÇÃO GLOBAL PARA TODOS OS FLUXOS -->
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observações do Lançamento</label>
+                                    <input type="text" id="fin_observacao" placeholder="Algum detalhe importante sobre este dízimo, oferta ou conta..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
@@ -311,6 +347,7 @@
                                         <th class="px-6 py-4">Data</th>
                                         <th class="px-6 py-4">Tipo</th>
                                         <th class="px-6 py-4">Descrição / Origem</th>
+                                        <th class="px-6 py-4">Obs</th>
                                         <th class="px-6 py-4 text-right">Valor</th>
                                         <th class="px-6 py-4 text-right">Ações</th>
                                     </tr>
@@ -352,8 +389,8 @@
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let editandoID = null;
-        let editandoFinanceiroID = null; // ID para controle de edição das finanças
-        let listaMembrosCache = []; // Guarda os membros para buscar o cargo rápido localmente
+        let editandoFinanceiroID = null; 
+        let listaMembrosCache = []; 
 
         // --- SISTEMA DE NAVEGAÇÃO DA SIDEBAR ---
         function navegarPara(idTela) {
@@ -407,7 +444,7 @@
             lucide.createIcons();
         }
 
-        // --- SISTEMA ORIGINÁRIO DE MEMBROS ---
+        // --- SISTEMA DE MEMBROS ---
         function formatarData(dataString) {
             if (!dataString) return '-';
             const [ano, mes, dia] = dataString.split('-');
@@ -485,7 +522,7 @@
             if (error) {
                 alert("Erro ao salvar: " + error.message);
             } else {
-                alert(editandoID ? "Membro updated!" : "Membro cadastrado!");
+                alert(editandoID ? "Membro atualizado!" : "Membro cadastrado!");
                 resetarEstado();
                 carregarMembros();
             }
@@ -536,27 +573,54 @@
         // --- SISTEMA DA TESOURARIA (FINANCEIRO) ---
         // ==========================================
 
-        // Alterna entre caixas de seleção de membros ou de despesas fixas
+        // Controla de forma inteligente quais blocos de campos aparecem baseados no Tipo de Fluxo
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
+            
             const containerMembro = document.getElementById('container-descricao-membro');
             const containerCargo = document.getElementById('container-cargo-membro');
             const containerDespesa = document.getElementById('container-descricao-despesa');
+            const containerOfertaCulto = document.getElementById('container-oferta-culto');
+            const containerOfertaDia = document.getElementById('container-oferta-dia');
 
-            if (tipo === 'Despesa') {
-                containerMembro.classList.add('hidden');
-                containerCargo.classList.add('hidden');
-                containerDespesa.classList.remove('hidden');
-            } else {
+            // Esconde tudo primeiro por segurança
+            containerMembro.classList.add('hidden');
+            containerCargo.classList.add('hidden');
+            containerDespesa.classList.add('hidden');
+            containerOfertaCulto.classList.add('hidden');
+            containerOfertaDia.classList.add('hidden');
+
+            if (tipo === 'Dízimo') {
                 containerMembro.classList.remove('hidden');
                 containerCargo.classList.remove('hidden');
-                containerDespesa.classList.add('hidden');
                 autopreencherCargoMembro();
+            } else if (tipo === 'Oferta') {
+                containerOfertaCulto.classList.remove('hidden');
+                containerOfertaDia.classList.remove('hidden');
+                verificarCultoOutros();
+            } else if (tipo === 'Despesa') {
+                containerDespesa.classList.remove('hidden');
+                verificarDespesaOutros();
             }
-            verificarDespesaOutros();
         }
 
-        // Se escolher "Outras Despesas", abre campo de texto para digitar manualmente
+        // Se escolher "Outro Culto", abre campo de texto livre
+        function verificarCultoOutros() {
+            const cultoSel = document.getElementById('fin_oferta_culto').value;
+            const inputManual = document.getElementById('fin_culto_manual');
+            const tipo = document.getElementById('fin_tipo').value;
+
+            if (tipo === 'Oferta' && cultoSel === 'Outro Culto') {
+                inputManual.classList.remove('hidden');
+                inputManual.required = true;
+            } else {
+                inputManual.classList.add('hidden');
+                inputManual.required = false;
+                inputManual.value = '';
+            }
+        }
+
+        // Se escolher "Outras Despesas", abre campo livre
         function verificarDespesaOutros() {
             const despesaFixa = document.getElementById('fin_despesa_fixa').value;
             const inputManual = document.getElementById('fin_despesa_manual');
@@ -572,7 +636,6 @@
             }
         }
 
-        // NOVO: Busca automática de Cargo/Função ao selecionar o nome do irmão
         function autopreencherCargoMembro() {
             const nomeSelecionado = document.getElementById('fin_membro_nome').value;
             const inputCargo = document.getElementById('fin_membro_cargo');
@@ -582,7 +645,6 @@
                 return;
             }
 
-            // Procura o membro no cache local puxado do banco
             const membroEncontrado = listaMembrosCache.find(m => m.nome === nomeSelecionado);
             if (membroEncontrado && membroEncontrado.cargo) {
                 inputCargo.value = membroEncontrado.cargo;
@@ -591,16 +653,13 @@
             }
         }
 
-        // Puxa dinamicamente a sua lista de membros cadastrados para poder escolher no dízimo
         async function atualizarListaMembrosNoFormFinanceiro() {
             try {
                 const { data, error } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
                 if (error) throw error;
                 
-                listaMembrosCache = data; // Atualiza o cache local
+                listaMembrosCache = data; 
                 const selectMembro = document.getElementById('fin_membro_nome');
-                
-                // Guarda o valor selecionado antes do recarregamento (caso esteja editando)
                 const valorAtual = selectMembro.value;
 
                 selectMembro.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
@@ -615,25 +674,32 @@
             }
         }
 
-        // Envia o lançamento ou edita no banco de dados
+        // Realiza o salvamento tratando dízimos, ofertas e despesas de formas diferentes
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const tipo = document.getElementById('fin_tipo').value;
             let descricao = '';
+            let diaSemana = null;
 
-            if (tipo === 'Despesa') {
+            if (tipo === 'Dízimo') {
+                descricao = document.getElementById('fin_membro_nome').value;
+            } else if (tipo === 'Oferta') {
+                const cultoSel = document.getElementById('fin_oferta_culto').value;
+                descricao = (cultoSel === 'Outro Culto') ? document.getElementById('fin_culto_manual').value : cultoSel;
+                diaSemana = document.getElementById('fin_oferta_dia').value;
+            } else if (tipo === 'Despesa') {
                 const fixa = document.getElementById('fin_despesa_fixa').value;
                 descricao = (fixa === 'Outras Despesas') ? document.getElementById('fin_despesa_manual').value : fixa;
-            } else {
-                descricao = document.getElementById('fin_membro_nome').value;
             }
 
             const lancamento = {
                 tipo: tipo,
                 descricao: descricao,
                 valor: parseFloat(document.getElementById('fin_valor').value),
-                data_lancamento: document.getElementById('fin_data').value
+                data_lancamento: document.getElementById('fin_data').value,
+                dia_semana: diaSemana,
+                observacao: document.getElementById('fin_observacao').value || null
             };
 
             const { error } = editandoFinanceiroID 
@@ -643,13 +709,13 @@
             if (error) {
                 alert("Erro ao salvar lançamento: " + error.message);
             } else {
-                alert(editandoFinanceiroID ? "Lançamento financeiro atualizado!" : "Lançamento financeiro realizado!");
+                alert(editandoFinanceiroID ? "Lançamento atualizado!" : "Lançamento realizado com sucesso!");
                 resetarEstadoFinanceiro();
                 carregarFinancas();
             }
         });
 
-        // NOVO: Função para carregar os dados de volta para o formulário para editar
+        // Puxa a linha da tabela de volta para o formulário ajustando os campos corretos
         async function editarFinanca(id) {
             try {
                 const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
@@ -658,9 +724,22 @@
                 editandoFinanceiroID = id;
                 
                 document.getElementById('fin_tipo').value = data.tipo;
-                ajustarCamposFinancas(); // Ajusta os containers visuais na hora
+                ajustarCamposFinancas(); 
 
-                if (data.tipo === 'Despesa') {
+                if (data.tipo === 'Dízimo') {
+                    document.getElementById('fin_membro_nome').value = data.descricao;
+                    autopreencherCargoMembro();
+                } else if (data.tipo === 'Oferta') {
+                    const opcoesCultos = ["Culto Publico", "Culto de Santa Ceia", "Culto de Ensinamento", "Culto de Missões", "Culto das irmãs", "Culto com os dolescentes", "Congresso", "Não houve Culto"];
+                    if (opcoesCultos.includes(data.descricao)) {
+                        document.getElementById('fin_oferta_culto').value = data.descricao;
+                    } else {
+                        document.getElementById('fin_oferta_culto').value = 'Outro Culto';
+                        verificarCultoOutros();
+                        document.getElementById('fin_culto_manual').value = data.descricao;
+                    }
+                    document.getElementById('fin_oferta_dia').value = data.dia_semana || 'Domingo';
+                } else if (data.tipo === 'Despesa') {
                     const opcoesFixas = ['Aluguel', 'Ajuda Eclesiástica', 'Limpeza da igreja', 'Conta de Luz', 'Conta de Água', 'Internet'];
                     if (opcoesFixas.includes(data.descricao)) {
                         document.getElementById('fin_despesa_fixa').value = data.descricao;
@@ -669,14 +748,11 @@
                         verificarDespesaOutros();
                         document.getElementById('fin_despesa_manual').value = data.descricao;
                     }
-                } else {
-                    // Espera carregar a lista se ela estiver vazia, caso contrário seleciona
-                    document.getElementById('fin_membro_nome').value = data.descricao;
-                    autopreencherCargoMembro();
                 }
 
                 document.getElementById('fin_valor').value = data.valor;
                 document.getElementById('fin_data').value = data.data_lancamento;
+                document.getElementById('fin_observacao').value = data.observacao || '';
 
                 // Muda o visual para modo Edição (Âmbar)
                 document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
@@ -684,7 +760,6 @@
                 document.getElementById('btnSalvarFinanceiro').classList.replace('bg-emerald-600', 'bg-amber-600');
                 document.getElementById('btnCancelarFinanceiro').classList.remove('hidden');
                 
-                // Rola suavemente até o topo do formulário
                 document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
                 lucide.createIcons();
             } catch (err) {
@@ -692,7 +767,6 @@
             }
         }
 
-        // NOVO: Limpa o formulário e reverte o estilo de edição de volta para verde
         function resetarEstadoFinanceiro() {
             editandoFinanceiroID = null;
             document.getElementById('formFinanceiro').reset();
@@ -707,7 +781,6 @@
             lucide.createIcons();
         }
 
-        // Carrega lançamentos financeiros filtrando pelo mês vigente
         async function carregarFinancas() {
             try {
                 const filtroTipo = document.getElementById('filtroTipo').value;
@@ -744,6 +817,10 @@
                     const sinalValor = f.tipo === 'Despesa' ? '-' : '+';
                     const corTextoValor = f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400';
 
+                    // Formata a exibição do nome do culto junto com o dia se for Oferta
+                    const sufixoDia = (f.tipo === 'Oferta' && f.dia_semana) ? ` (${f.dia_semana})` : '';
+                    const textoObs = f.observacao ? f.observacao : '---';
+
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4 text-sm text-slate-400">${formatarData(f.data_lancamento)}</td>
@@ -752,7 +829,8 @@
                                     ${f.tipo.toUpperCase()}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-slate-200 text-sm font-medium">${f.descricao}</td>
+                            <td class="px-6 py-4 text-slate-200 text-sm font-medium">${f.descricao}${sufixoDia}</td>
+                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[180px] truncate" title="${textoObs}">${textoObs}</td>
                             <td class="px-6 py-4 text-right ${corTextoValor} font-bold text-sm">
                                 ${sinalValor} R$ ${f.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                             </td>
