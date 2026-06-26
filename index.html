@@ -189,15 +189,20 @@
                 </div>
 
                 <!-- ========================================== -->
-                <!-- 2. TELA FINANCEIRA (NOVA!)                -->
+                <!-- 2. TELA FINANCEIRA                         -->
                 <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
                     
                     <!-- FORMULÁRIO FINANCEIRO -->
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
-                            <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
-                            <h2 class="font-semibold text-slate-100">Lançamento de Caixa</h2>
+                    <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeFormFinanceiro" data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
+                                <h2 id="tituloFormFinanceiro" class="font-semibold text-slate-100">Lançamento de Caixa</h2>
+                            </div>
+                            <button id="btnCancelarFinanceiro" onclick="resetarEstadoFinanceiro()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
                         </div>
                         
                         <form id="formFinanceiro" class="p-6 md:p-8">
@@ -213,11 +218,17 @@
                                 </div>
 
                                 <!-- DESCRIÇÃO DINÂMICA (Membro ou Caixas de Seleção de Despesa) -->
-                                <div class="md:col-span-4" id="container-descricao-membro">
+                                <div class="md:col-span-2" id="container-descricao-membro">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro (Opcional)</label>
-                                    <select id="fin_membro_nome" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                    <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
                                         <option value="Contribuinte Geral">Geral / Anônimo</option>
                                     </select>
+                                </div>
+
+                                <!-- NOVO: CARGO/FUNÇÃO DO MEMBRO -->
+                                <div class="md:col-span-2" id="container-cargo-membro">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                                    <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
                                 </div>
 
                                 <div class="md:col-span-4 hidden" id="container-descricao-despesa">
@@ -250,9 +261,9 @@
                             </div>
 
                             <div class="mt-8 flex justify-end">
-                                <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20">
+                                <button type="submit" id="btnSalvarFinanceiro" class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20">
                                     <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                    <span>Confirmar Lançamento</span>
+                                    <span id="textoBtnSalvarFinanceiro">Confirmar Lançamento</span>
                                 </button>
                             </div>
                         </form>
@@ -301,7 +312,7 @@
                                         <th class="px-6 py-4">Tipo</th>
                                         <th class="px-6 py-4">Descrição / Origem</th>
                                         <th class="px-6 py-4 text-right">Valor</th>
-                                        <th class="px-6 py-4 text-right">Ação</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabelaFinanceiro" class="divide-y divide-slate-800"></tbody>
@@ -341,6 +352,8 @@
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let editandoID = null;
+        let editandoFinanceiroID = null; // ID para controle de edição das finanças
+        let listaMembrosCache = []; // Guarda os membros para buscar o cargo rápido localmente
 
         // --- SISTEMA DE NAVEGAÇÃO DA SIDEBAR ---
         function navegarPara(idTela) {
@@ -376,8 +389,7 @@
                 topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
                 iconeHeader.setAttribute('data-lucide', 'dollar-sign');
                 
-                // Inicializa os dados da financeira ao entrar na aba
-                document.getElementById('fin_data').value = new Date().toISOString().split('T')[0];
+                resetarEstadoFinanceiro();
                 atualizarListaMembrosNoFormFinanceiro();
                 carregarFinancas();
             } else if (idTela === 'agenda') {
@@ -473,7 +485,7 @@
             if (error) {
                 alert("Erro ao salvar: " + error.message);
             } else {
-                alert(editandoID ? "Membro atualizado!" : "Membro cadastrado!");
+                alert(editandoID ? "Membro updated!" : "Membro cadastrado!");
                 resetarEstado();
                 carregarMembros();
             }
@@ -528,14 +540,18 @@
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
             const containerMembro = document.getElementById('container-descricao-membro');
+            const containerCargo = document.getElementById('container-cargo-membro');
             const containerDespesa = document.getElementById('container-descricao-despesa');
 
             if (tipo === 'Despesa') {
                 containerMembro.classList.add('hidden');
+                containerCargo.classList.add('hidden');
                 containerDespesa.classList.remove('hidden');
             } else {
                 containerMembro.classList.remove('hidden');
+                containerCargo.classList.remove('hidden');
                 containerDespesa.classList.add('hidden');
+                autopreencherCargoMembro();
             }
             verificarDespesaOutros();
         }
@@ -556,23 +572,50 @@
             }
         }
 
+        // NOVO: Busca automática de Cargo/Função ao selecionar o nome do irmão
+        function autopreencherCargoMembro() {
+            const nomeSelecionado = document.getElementById('fin_membro_nome').value;
+            const inputCargo = document.getElementById('fin_membro_cargo');
+
+            if (nomeSelecionado === 'Contribuinte Geral') {
+                inputCargo.value = 'Membro';
+                return;
+            }
+
+            // Procura o membro no cache local puxado do banco
+            const membroEncontrado = listaMembrosCache.find(m => m.nome === nomeSelecionado);
+            if (membroEncontrado && membroEncontrado.cargo) {
+                inputCargo.value = membroEncontrado.cargo;
+            } else {
+                inputCargo.value = 'Membro';
+            }
+        }
+
         // Puxa dinamicamente a sua lista de membros cadastrados para poder escolher no dízimo
         async function atualizarListaMembrosNoFormFinanceiro() {
             try {
-                const { data, error } = await _supabase.from('membros').select('nome').order('nome', { ascending: true });
+                const { data, error } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
                 if (error) throw error;
                 
+                listaMembrosCache = data; // Atualiza o cache local
                 const selectMembro = document.getElementById('fin_membro_nome');
+                
+                // Guarda o valor selecionado antes do recarregamento (caso esteja editando)
+                const valorAtual = selectMembro.value;
+
                 selectMembro.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
                 data.forEach(m => {
                     selectMembro.innerHTML += `<option value="${m.nome}">${m.nome}</option>`;
                 });
+
+                if(valorAtual) selectMembro.value = valorAtual;
+                autopreencherCargoMembro();
             } catch (err) {
                 console.error("Erro ao carregar membros no financeiro:", err.message);
             }
         }
 
-        // Envia o lançamento para o banco de dados
+        // Envia o lançamento ou edita no banco de dados
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -593,24 +636,82 @@
                 data_lancamento: document.getElementById('fin_data').value
             };
 
-            const { error } = await _supabase.from('financeiro').insert([lancamento]);
+            const { error } = editandoFinanceiroID 
+                ? await _supabase.from('financeiro').update(lancamento).eq('id', editandoFinanceiroID)
+                : await _supabase.from('financeiro').insert([lancamento]);
 
             if (error) {
                 alert("Erro ao salvar lançamento: " + error.message);
             } else {
-                alert("Lançamento financeiro realizado!");
-                document.getElementById('fin_valor').value = '';
-                document.getElementById('fin_despesa_manual').value = '';
+                alert(editandoFinanceiroID ? "Lançamento financeiro atualizado!" : "Lançamento financeiro realizado!");
+                resetarEstadoFinanceiro();
                 carregarFinancas();
             }
         });
+
+        // NOVO: Função para carregar os dados de volta para o formulário para editar
+        async function editarFinanca(id) {
+            try {
+                const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
+                if (error) throw error;
+
+                editandoFinanceiroID = id;
+                
+                document.getElementById('fin_tipo').value = data.tipo;
+                ajustarCamposFinancas(); // Ajusta os containers visuais na hora
+
+                if (data.tipo === 'Despesa') {
+                    const opcoesFixas = ['Aluguel', 'Ajuda Eclesiástica', 'Limpeza da igreja', 'Conta de Luz', 'Conta de Água', 'Internet'];
+                    if (opcoesFixas.includes(data.descricao)) {
+                        document.getElementById('fin_despesa_fixa').value = data.descricao;
+                    } else {
+                        document.getElementById('fin_despesa_fixa').value = 'Outras Despesas';
+                        verificarDespesaOutros();
+                        document.getElementById('fin_despesa_manual').value = data.descricao;
+                    }
+                } else {
+                    // Espera carregar a lista se ela estiver vazia, caso contrário seleciona
+                    document.getElementById('fin_membro_nome').value = data.descricao;
+                    autopreencherCargoMembro();
+                }
+
+                document.getElementById('fin_valor').value = data.valor;
+                document.getElementById('fin_data').value = data.data_lancamento;
+
+                // Muda o visual para modo Edição (Âmbar)
+                document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
+                document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
+                document.getElementById('btnSalvarFinanceiro').classList.replace('bg-emerald-600', 'bg-amber-600');
+                document.getElementById('btnCancelarFinanceiro').classList.remove('hidden');
+                
+                // Rola suavemente até o topo do formulário
+                document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
+                lucide.createIcons();
+            } catch (err) {
+                alert("Erro ao carregar lançamento: " + err.message);
+            }
+        }
+
+        // NOVO: Limpa o formulário e reverte o estilo de edição de volta para verde
+        function resetarEstadoFinanceiro() {
+            editandoFinanceiroID = null;
+            document.getElementById('formFinanceiro').reset();
+            document.getElementById('fin_data').value = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
+            document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
+            document.getElementById('btnSalvarFinanceiro').className = "inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20";
+            document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
+            
+            ajustarCamposFinancas();
+            lucide.createIcons();
+        }
 
         // Carrega lançamentos financeiros filtrando pelo mês vigente
         async function carregarFinancas() {
             try {
                 const filtroTipo = document.getElementById('filtroTipo').value;
                 
-                // Pega primeiro e último dia do mês atual para o filtro automático
                 const agora = new Date();
                 const primeiroDia = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0];
                 const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0];
@@ -655,7 +756,8 @@
                             <td class="px-6 py-4 text-right ${corTextoValor} font-bold text-sm">
                                 ${sinalValor} R$ ${f.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                                 <button onclick="deletarFinanca(${f.id})" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>
@@ -664,7 +766,6 @@
 
                 const saldoMese = (totalDizimos + totalOfertas) - totalDespesas;
 
-                // Atualiza os indicadores na tela
                 document.getElementById('dashDizimos').textContent = `R$ ${totalDizimos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                 document.getElementById('dashOfertas').textContent = `R$ ${totalOfertas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                 document.getElementById('dashDespesas').textContent = `R$ ${totalDespesas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
