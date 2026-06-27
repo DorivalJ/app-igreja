@@ -365,61 +365,51 @@
                         
                         <form id="formAgenda" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                                <!-- Data (date) -->
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
                                     <input type="date" id="agenda_data" onchange="atualizarDiaSemanaAutomatico()" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
                                 </div>
 
-                                <!-- dia_semana (text) -> PREENCHIDO AUTOMATICAMENTE -->
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia da Semana</label>
                                     <input type="text" id="agenda_dia_semana" readonly placeholder="Calculado automaticamente" class="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-amber-400 font-medium focus:outline-none cursor-not-allowed">
                                 </div>
 
-                                <!-- horario (text) -->
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
                                     <input type="text" id="agenda_horario" required placeholder="Ex: 19:30, 09:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- tipo_evento (text) -->
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Evento</label>
                                     <input type="text" id="agenda_tipo_evento" required placeholder="Ex: Culto de Ensino, Ensaio do Louvor, Congresso de Missões" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- dirigente (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dirigente</label>
                                     <input type="text" id="agenda_dirigente" placeholder="Nome do dirigente" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- pregador (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pregador</label>
                                     <input type="text" id="agenda_pregador" placeholder="Nome do pregador" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- escala_portaria (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Portaria</label>
                                     <input type="text" id="agenda_escala_portaria" placeholder="Responsáveis pela portaria" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- escala_ofertas (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Ofertas</label>
                                     <input type="text" id="agenda_escala_ofertas" placeholder="Responsáveis pelo recolhimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- saida_visita (text) -> Rótulo Observação -->
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
                                     <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- mes_referencia (text) e ano_referencia (int4) ocultos -->
                                 <input type="hidden" id="agenda_mes_referencia">
                                 <input type="hidden" id="agenda_ano_referencia">
                             </div>
@@ -433,7 +423,6 @@
                         </form>
                     </section>
 
-                    <!-- TABELA DE EXIBIÇÃO DA AGENDA SEMANAL -->
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
@@ -731,7 +720,67 @@
             lucide.createIcons();
         }
 
-        function resetarEstadoFinanceiro() { editandoFinanceiroID = null; document.getElementById('formFinanceiro').reset(); ajustarCamposFinancas(); }
+        async function editarFinanca(id) {
+            try {
+                const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
+                if (error) throw error;
+
+                editandoFinanceiroID = id;
+                document.getElementById('fin_tipo').value = data.tipo;
+                ajustarCamposFinancas();
+
+                if (data.tipo === 'Dízimo') {
+                    document.getElementById('fin_membro_nome').value = data.descricao;
+                } else if (data.tipo === 'Oferta') {
+                    const selectCulto = document.getElementById('fin_oferta_culto');
+                    const opcoesDisponiveis = Array.from(selectCulto.options).map(o => o.value);
+                    
+                    if (opcoesDisponiveis.includes(data.descricao)) {
+                        selectCulto.value = data.descricao;
+                    } else {
+                        selectCulto.value = 'Outro Culto';
+                        const inputManual = document.getElementById('fin_culto_manual');
+                        inputManual.classList.remove('hidden');
+                        inputManual.value = data.descricao;
+                    }
+                    document.getElementById('fin_oferta_dia').value = data.dia_semana || 'Domingo';
+                } else if (data.tipo === 'Despesa') {
+                    const selectDesp = document.getElementById('fin_despesa_fixa');
+                    const opcoesDisponiveis = Array.from(selectDesp.options).map(o => o.value);
+
+                    if (opcoesDisponiveis.includes(data.descricao)) {
+                        selectDesp.value = data.descricao;
+                    } else {
+                        selectDesp.value = 'Outras Despesas';
+                        const inputManual = document.getElementById('fin_despesa_manual');
+                        inputManual.classList.remove('hidden');
+                        inputManual.value = data.descricao;
+                    }
+                }
+
+                document.getElementById('fin_valor').value = data.valor;
+                document.getElementById('fin_data').value = data.data_lancamento;
+                document.getElementById('fin_observacao').value = data.observacao || '';
+
+                document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
+                document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
+                document.getElementById('btnCancelarFinanceiro').classList.remove('hidden');
+
+                document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert("Erro ao buscar fluxo: " + err.message);
+            }
+        }
+
+        function resetarEstadoFinanceiro() { 
+            editandoFinanceiroID = null; 
+            document.getElementById('formFinanceiro').reset(); 
+            document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
+            document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
+            document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
+            ajustarCamposFinancas(); 
+        }
+        
         async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
 
 
@@ -739,7 +788,6 @@
         // ---    SISTEMA DE AGENDA SEMANAL       ---
         // ==========================================
 
-        // Transforma automaticamente a data no Dia da Semana em português
         function atualizarDiaSemanaAutomatico() {
             const dataDigitada = document.getElementById('agenda_data').value;
             const inputDiaSemana = document.getElementById('agenda_dia_semana');
@@ -750,28 +798,13 @@
             }
 
             const dataObjeto = new Date(dataDigitada + 'T00:00:00');
-            
-            const diasOrdenados = [
-                'Domingo',
-                'Segunda-feira',
-                'Terça-feira',
-                'Quarta-feira',
-                'Quinta-feira',
-                'Sexta-feira',
-                'Sábado'
-            ];
-
-            const nomeDoDia = diasOrdenados[dataObjeto.getDay()];
-            inputDiaSemana.value = nomeDoDia;
+            const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            inputDiaSemana.value = diasOrdenados[dataObjeto.getDay()];
         }
         
         async function carregarAgenda() {
             try {
-                const { data, error } = await _supabase
-                    .from('agenda_semanal')
-                    .select('*')
-                    .order('data', { ascending: true });
-
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
                 if (error) throw error;
 
                 const tbody = document.getElementById('tabelaAgenda');
@@ -802,11 +835,8 @@
                         </tr>
                     `;
                 });
-
                 lucide.createIcons();
-            } catch (err) {
-                console.error("Erro ao carregar agenda:", err.message);
-            }
+            } catch (err) { console.error("Erro ao carregar agenda:", err.message); }
         }
 
         document.getElementById('formAgenda').addEventListener('submit', async (e) => {
@@ -874,10 +904,7 @@
                 document.getElementById('btnCancelarAgenda').classList.remove('hidden');
 
                 document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
-                lucide.createIcons();
-            } catch (err) {
-                alert("Erro ao buscar registro: " + err.message);
-            }
+            } catch (err) { alert("Erro ao buscar registro: " + err.message); }
         }
 
         function resetarEstadoAgenda() {
@@ -886,17 +913,12 @@
             document.getElementById('tituloFormAgenda').innerText = "Programar Evento / Culto";
             document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Agenda";
             document.getElementById('btnCancelarAgenda').classList.add('hidden');
-            lucide.createIcons();
         }
 
         async function deletarAgenda(id) {
             if (confirm("Deseja realmente remover este evento da agenda?")) {
                 const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
-                if (error) {
-                    alert("Erro ao excluir registro: " + error.message);
-                } else {
-                    carregarAgenda();
-                }
+                if (error) { alert("Erro ao excluir registro: " + error.message); } else { carregarAgenda(); }
             }
         }
 
