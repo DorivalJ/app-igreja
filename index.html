@@ -1,418 +1,508 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão - Igreja Digital</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sistema de Gestão Eclesiástica</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #020617; scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        [color-scheme:dark] { color-scheme: dark; }
-    </style>
 </head>
-<body class="text-slate-200">
-    <div class="min-h-screen flex">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+
+    <!-- 
+        ======================================================================
+        1. ESTRUTURA DE LAYOUT (SIDEBAR & TOPBAR)
+        ======================================================================
+    -->
+    <div class="flex h-screen overflow-hidden">
         
-        <!-- ========================================== -->
-        <!--        PAINEL LATERAL (SIDEBAR)            -->
-        <!-- ========================================== -->
-        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
-            <div>
-                <div class="p-6 border-b border-slate-800">
-                    <h2 class="text-xl font-bold text-indigo-400 tracking-wide text-center">
-                        Igreja Digital
-                    </h2>
-                    <p class="text-xs text-slate-500 text-center mt-1 uppercase tracking-widest font-medium">Painel Admin</p>
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between hidden md:flex z-20">
+            <div class="p-5 space-y-6">
+                <!-- Logo / Nome da Igreja -->
+                <div class="flex items-center gap-3 px-2">
+                    <div class="bg-indigo-600/10 p-2 rounded-xl border border-indigo-500/20 text-indigo-400">
+                        <i data-lucide="church" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm text-slate-200 tracking-wide uppercase">Ad. Central</h1>
+                        <span class="text-[11px] text-slate-500 font-medium">Painel de Gestão</span>
+                    </div>
                 </div>
 
-                <nav class="p-4 space-y-1">
-                    <button id="btn-menu-membros" onclick="navegarPara('membros')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20">
-                        <i data-lucide="users" class="w-5 h-5"></i>
-                        <span>Membros</span>
+                <!-- Menu de Navegação -->
+                <nav class="space-y-1.5">
+                    <button id="btn-menu-membros" onclick="mudarTela('membros')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="users" class="w-5 h-5"></i> Membros
                     </button>
-                    
-                    <button id="btn-menu-financeiro" onclick="navegarPara('financeiro')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
-                        <span>Tesouraria</span>
+                    <button id="btn-menu-financeiro" onclick="mudarTela('financeiro')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i> Tesouraria
                     </button>
-
-                    <button id="btn-menu-agenda" onclick="navegarPara('agenda')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                        <i data-lucide="calendar" class="w-5 h-5"></i>
-                        <span>Agenda Semanal</span>
+                    <button id="btn-menu-agenda" onclick="mudarTela('agenda')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="calendar" class="w-5 h-5"></i> Agenda Semanal
                     </button>
-
-                    <button id="btn-menu-documentos" onclick="navegarPara('documentos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                        <i data-lucide="file-text" class="w-5 h-5"></i>
-                        <span>Cartas e Convites</span>
+                    <button id="btn-menu-documentos" onclick="mudarTela('documentos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="file-text" class="w-5 h-5"></i> Documentos
                     </button>
                 </nav>
             </div>
 
-            <div class="p-4 border-t border-slate-800">
-                <button class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                    <span>Sair do Sistema</span>
-                </button>
+            <!-- Rodapé da Sidebar -->
+            <div class="p-4 border-t border-slate-800/60 bg-slate-950/20">
+                <div class="flex items-center gap-3 px-2 py-1.5">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
+                        AD
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-slate-300 truncate">Administrador</p>
+                        <p class="text-[10px] text-slate-500 truncate">Painel v1.2</p>
+                    </div>
+                </div>
             </div>
         </aside>
 
-        <!-- ========================================== -->
-        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
-        <!-- ========================================== -->
-        <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        <!-- CONTAINER PRINCIPAL -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             
-            <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
-                <div class="max-w-6xl mx-auto flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div id="iconeDinamicoTopbar" class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20">
-                            <i id="iconeHeader" data-lucide="users"></i>
-                        </div>
-                        <div>
-                            <h1 id="tituloTopbar" class="text-xl font-bold tracking-tight text-white">Gestão de Membros</h1>
-                            <p id="subtituloTopbar" class="text-xs text-slate-500 font-medium uppercase tracking-wider">Módulos Ativos</p>
-                        </div>
+            <!-- TOPBAR DINÂMICA -->
+            <header class="h-16 bg-slate-900/50 border-b border-slate-800/60 backdrop-blur-md px-6 flex items-center justify-between z-10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div id="iconeDinamicoTopbar" class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg">
+                        <i id="iconeHeader" data-lucide="users" class="w-4 h-4"></i>
                     </div>
+                    <h2 id="tituloTopbar" class="text-base font-bold text-slate-200">Gestão de Membros</h2>
+                </div>
+                
+                <!-- Input de Busca Global (Reutilizado na tela de membros) -->
+                <div id="containerBuscaTopbar" class="relative w-64 max-w-xs">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="busca" oninput="carregarMembros()" placeholder="Buscar membros..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-slate-300 text-xs focus:border-indigo-500/50 outline-none transition">
                 </div>
             </header>
 
-            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
-                
-                <!-- ========================================== -->
-                <!-- 1. TELA DE MEMBROS                         -->
-                <!-- ========================================== -->
-                <div id="tela-membros" class="space-y-8 dynamic-screen">
-                    <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i id="iconeForm" data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
-                                <h2 id="tituloForm" class="font-semibold text-slate-100">Novo Cadastro</h2>
+            <!-- CONTEÚDO PRINCIPAL (DASHBOARD SCROLL) -->
+            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                <!-- 
+                    ======================================================================
+                    TELA 1: GESTÃO DE MEMBROS
+                    ======================================================================
+                -->
+                <div id="tela-membros" class="dynamic-screen space-y-6">
+                    <!-- Cards Estatísticos Rápidos -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Ativos</p>
+                                <p id="dashAtivos" class="text-2xl font-bold mt-1 text-emerald-400">0</p>
                             </div>
-                            <button id="btnCancelar" onclick="resetarEstado()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                                Cancelar Edição
-                            </button>
+                            <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400"><i data-lucide="user-check" class="w-5 h-5"></i></div>
                         </div>
-                        
-                        <form id="formMembro" class="p-6 md:p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
-                                    <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Inativos</p>
+                                <p id="dashInativos" class="text-2xl font-bold mt-1 text-slate-400">0</p>
+                            </div>
+                            <div class="bg-slate-800 p-3 rounded-xl text-slate-400"><i data-lucide="user-minus" class="w-5 h-5"></i></div>
+                        </div>
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Total Cadastrado</p>
+                                <p id="dashTotal" class="text-2xl font-bold mt-1 text-indigo-400">0</p>
+                            </div>
+                            <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400"><i data-lucide="users" class="w-5 h-5"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário + Lista de Membros -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Formulário -->
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md h-fit">
+                            <h3 id="tituloForm" class="text-base font-bold text-slate-200 mb-5 flex items-center gap-2">
+                                <i data-lucide="user-plus" class="w-4 h-4 text-indigo-400"></i> Novo Cadastro
+                            </h3>
+                            <form id="formMembro" class="space-y-4">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Nome Completo *</label>
+                                    <input type="text" id="nome" required placeholder="Ex: João da Silva" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
                                 </div>
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Nascimento</label>
-                                    <input type="date" id="data_nascimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Nascimento</label>
+                                        <input type="date" id="data_nascimento" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Celular</label>
+                                        <input type="text" id="input_celular" placeholder="(11) 99999-0000" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
+                                    </div>
                                 </div>
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
-                                    <input type="text" id="input_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">E-mail</label>
+                                    <input type="email" id="email" placeholder="nome@email.com" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
                                 </div>
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
-                                    <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Cargo / Função</label>
+                                        <select id="cargo" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
+                                            <option value="Membro">Membro</option>
+                                            <option value="Cooperador">Cooperador</option>
+                                            <option value="Diácono">Diácono</option>
+                                            <option value="Presbítero">Presbítero</option>
+                                            <option value="Evangelista">Evangelista</option>
+                                            <option value="Pastor">Pastor</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Adesão</label>
+                                        <input type="date" id="data_adesao" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
+                                    </div>
                                 </div>
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
-                                    <input type="text" id="cargo" placeholder="Ex: Diácono, Membro, Pastor" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
-                                </div>
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Membresia</label>
-                                    <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
-                                </div>
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
-                                    <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Status Marital / Status</label>
+                                    <select id="status" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition">
                                         <option value="Ativo">Ativo</option>
                                         <option value="Inativo">Inativo</option>
                                     </select>
                                 </div>
-                                <div class="md:col-span-6">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                                    <textarea id="observacao" rows="2" placeholder="Informações adicionais..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Observações</label>
+                                    <textarea id="observacao" rows="2" placeholder="Informações extras do membro..." class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-indigo-500/50 outline-none transition resize-none"></textarea>
                                 </div>
-                            </div>
-                            <div class="mt-8 flex justify-end">
-                                <button type="submit" id="btnSalvar" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
-                                    <i data-lucide="save" class="w-5 h-5"></i>
-                                    <span id="textoBtnSalvar">Salvar Membro</span>
-                                </button>
-                            </div>
-                        </form>
-                    </section>
+                                <div class="pt-2 flex gap-2">
+                                    <button type="submit" id="btnSalvar" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all text-xs shadow-lg shadow-indigo-600/10">
+                                        <span id="textoBtnSalvar">Salvar Membro</span>
+                                    </button>
+                                    <button type="button" id="btnCancelar" onclick="resetarEstado()" class="hidden px-3 py-2.5 bg-slate-800 text-slate-400 rounded-xl text-xs hover:bg-slate-700 transition">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ativos</p><h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3></div>
-                            <i data-lucide="user-check" class="text-emerald-500/50"></i>
+                        <!-- Lista / Tabela -->
+                        <div class="lg:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-md flex flex-col justify-between">
+                            <div class="p-4 border-b border-slate-800/60 flex justify-between items-center bg-slate-900/20">
+                                <span class="text-xs font-bold text-slate-300">Relação de Membros</span>
+                                <span id="totalMembros" class="text-[11px] text-slate-500">Total: 0</span>
+                            </div>
+                            <div class="overflow-x-auto flex-1">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+                                            <th class="px-6 py-3">Nome</th>
+                                            <th class="px-6 py-3">Cargo</th>
+                                            <th class="px-6 py-3">Contato</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3 text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabelaMembros" class="divide-y divide-slate-800/40">
+                                        <!-- Renderizado Dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inativos</p><h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3></div>
-                            <i data-lucide="user-x" class="text-rose-500/50"></i>
+                    </div>
+                </div>
+
+                <!-- 
+                    ======================================================================
+                    TELA 2: TESOURARIA / FINANCEIRO
+                    ======================================================================
+                -->
+                <div id="tela-financeiro" class="dynamic-screen hidden space-y-6">
+                    <!-- Cards Estatísticos Financeiros -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Dízimos</p>
+                                <p id="dashDizimos" class="text-xl font-bold mt-1 text-emerald-400">R$ 0,00</p>
+                            </div>
+                            <div class="bg-emerald-500/10 p-2.5 rounded-xl text-emerald-400"><i data-lucide="heart-handshake" class="w-4 h-4"></i></div>
                         </div>
-                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl text-emerald-500">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-slate-500">Total Geral</p><h3 id="dashTotal" class="text-3xl font-bold mt-1">0</h3></div>
-                            <i data-lucide="users" class="text-emerald-500/50"></i>
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Ofertas</p>
+                                <p id="dashOfertas" class="text-xl font-bold mt-1 text-teal-400">R$ 0,00</p>
+                            </div>
+                            <div class="bg-teal-500/10 p-2.5 rounded-xl text-teal-400"><i data-lucide="coins" class="w-4 h-4"></i></div>
+                        </div>
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Saídas / Despesas</p>
+                                <p id="dashDespesas" class="text-xl font-bold mt-1 text-rose-400">R$ 0,00</p>
+                            </div>
+                            <div class="bg-rose-500/10 p-2.5 rounded-xl text-rose-400"><i data-lucide="trending-down" class="w-4 h-4"></i></div>
+                        </div>
+                        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase">Saldo do Mês</p>
+                                <p id="dashSaldoTotal" class="text-xl font-bold mt-1 text-slate-200">R$ 0,00</p>
+                            </div>
+                            <div class="bg-slate-800 p-2.5 rounded-xl text-slate-400"><i data-lucide="wallet" class="w-4 h-4"></i></div>
                         </div>
                     </div>
 
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
-                            </h2>
-                            <input type="text" id="busca" oninput="carregarMembros()" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                        <th class="px-6 py-4">Membro</th>
-                                        <th class="px-6 py-4">Cargo</th>
-                                        <th class="px-6 py-4">Contato</th>
-                                        <th class="px-6 py-4">Status</th>
-                                        <th class="px-6 py-4 text-right">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
-                            </table>
-                        </div>
-                        <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-                            <span id="totalMembros">Total: <span class="text-emerald-500 font-bold text-sm">0</span> Membros</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online</span>
-                        </div>
-                    </section>
-                </div>
-
-                <!-- ========================================== -->
-                <!-- 2. TELA FINANCEIRA                         -->
-                <!-- ========================================== -->
-                <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
-                    
-                    <!-- FORMULÁRIO FINANCEIRO -->
-                    <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i id="iconeFormFinanceiro" data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
-                                <h2 id="tituloFormFinanceiro" class="font-semibold text-slate-100">Lançamento de Caixa</h2>
-                            </div>
-                            <button id="btnCancelarFinanceiro" onclick="resetarEstadoFinanceiro()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                                Cancelar Edição
-                            </button>
-                        </div>
-                        
-                        <form id="formFinanceiro" class="p-6 md:p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                                <!-- TIPO DE ENTRADA -->
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Fluxo</label>
-                                    <select id="fin_tipo" onchange="ajustarCamposFinancas()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
-                                        <option value="Dízimo">Dízimo</option>
-                                        <option value="Oferta">Oferta</option>
-                                        <option value="Despesa">Despesa</option>
-                                    </select>
+                    <!-- Fluxo de Lançamentos -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Formulário Caixa -->
+                        <div id="secaoFormFinanceiro" class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md h-fit">
+                            <h3 id="tituloFormFinanceiro" class="text-base font-bold text-slate-200 mb-5 flex items-center gap-2">
+                                <i data-lucide="receipt" class="w-4 h-4 text-emerald-400"></i> Lançamento de Caixa
+                            </h3>
+                            <form id="formFinanceiro" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Data Movimento *</label>
+                                        <input type="date" id="fin_data" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Categoria *</label>
+                                        <select id="fin_tipo" onchange="ajustarCamposFinancas()" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                            <option value="Dízimo">Dízimo</option>
+                                            <option value="Oferta">Oferta</option>
+                                            <option value="Despesa">Despesa (Saída)</option>
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <!-- CAMPOS EXCLUSIVOS DO DÍZIMO -->
-                                <div class="md:col-span-2" id="container-descricao-membro">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro (Opcional)</label>
-                                    <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
-                                        <option value="Contribuinte Geral">Geral / Anônimo</option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2" id="container-cargo-membro">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
-                                    <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
+                                <!-- SUBFORM: CONDICIONAL DÍZIMO -->
+                                <div id="container-descricao-membro" class="space-y-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Membro Ofertante</label>
+                                        <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                            <!-- Injetado dinamicamente via JS -->
+                                        </select>
+                                    </div>
+                                    <div id="container-cargo-membro">
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Cargo Vinculado</label>
+                                        <input type="text" id="fin_membro_cargo" disabled class="w-full bg-slate-950/40 border border-slate-800 text-slate-500 rounded-xl px-3 py-2 text-xs outline-none cursor-not-allowed">
+                                    </div>
                                 </div>
 
-                                <!-- CAMPOS EXCLUSIVOS DA OFERTA -->
-                                <div class="md:col-span-2 hidden" id="container-oferta-culto">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Culto</label>
-                                    <div class="flex flex-col gap-2">
-                                        <select id="fin_oferta_culto" onchange="verificarCultoOutros()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
-                                            <option value="Culto Publico">Culto Público</option>
+                                <!-- SUBFORM: CONDICIONAL OFERTA -->
+                                <div id="container-oferta-culto" class="hidden space-y-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Culto / Destinação</label>
+                                        <select id="fin_oferta_culto" onchange="verificarCultoOutros()" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                            <option value="Culto Publico">Culto Público (Geral)</option>
                                             <option value="Culto de Santa Ceia">Culto de Santa Ceia</option>
                                             <option value="Culto de Ensinamento">Culto de Ensinamento</option>
                                             <option value="Culto de Missões">Culto de Missões</option>
-                                            <option value="Culto das irmãs">Culto das irmãs</option>
-                                            <option value="Culto com os dolescentes">Culto com os dolescentes</option>
-                                            <option value="Congresso">Congresso</option>
+                                            <option value="Culto das irmãs">Culto de Mulheres / Irmãs</option>
+                                            <option value="Culto com os dolescentes">Culto de Jovens / Adolescentes</option>
+                                            <option value="Congresso">Congresso / Festividade</option>
                                             <option value="Não houve Culto">Não houve Culto</option>
-                                            <option value="Outro Culto">Outro (Digitar...)</option>
+                                            <option value="Outro Culto">Outro (Digitar Manualmente)</option>
                                         </select>
-                                        <input type="text" id="fin_culto_manual" placeholder="Qual culto?" class="hidden w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none mt-1">
+                                        <input type="text" id="fin_culto_manual" placeholder="Nome do evento customizado" class="hidden mt-2 w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                    </div>
+                                    <div id="container-oferta-dia">
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Dia da Semana</label>
+                                        <select id="fin_oferta_dia" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                            <option value="Domingo">Domingo</option>
+                                            <option value="Segunda-feira">Segunda-feira</option>
+                                            <option value="Terça-feira">Terça-feira</option>
+                                            <option value="Quarta-feira">Quarta-feira</option>
+                                            <option value="Quinta-feira">Quinta-feira</option>
+                                            <option value="Sexta-feira">Sexta-feira</option>
+                                            <option value="Sábado">Sábado</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="md:col-span-2 hidden" id="container-oferta-dia">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia da Semana</label>
-                                    <select id="fin_oferta_dia" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
-                                        <option value="Domingo">Domingo</option>
-                                        <option value="Segunda-feira">Segunda-feira</option>
-                                        <option value="Terça-feira">Terça-feira</option>
-                                        <option value="Quarta-feira">Quarta-feira</option>
-                                        <option value="Quinta-feira">Quinta-feira</option>
-                                        <option value="Sexta-feira">Sexta-feira</option>
-                                        <option value="Sábado">Sábado</option>
+
+                                <!-- SUBFORM: CONDICIONAL DESPESA -->
+                                <div id="container-descricao-despesa" class="hidden">
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Finalidade da Despesa</label>
+                                    <select id="fin_despesa_fixa" onchange="verificarDespesaOutros()" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                        <option value="Aluguel">Aluguel do Imóvel</option>
+                                        <option value="Ajuda Eclesiástica">Ajuda Eclesiástica / Pastoral</option>
+                                        <option value="Limpeza da igreja">Produtos de Limpeza & Conservação</option>
+                                        <option value="Conta de Luz">Energia Elétrica (Luz)</option>
+                                        <option value="Conta de Água">Abastecimento de Água</option>
+                                        <option value="Internet">Provedor de Internet</option>
+                                        <option value="Outras Despesas">Outra Saída (Digitar Manualmente)</option>
+                                    </select>
+                                    <input type="text" id="fin_despesa_manual" placeholder="Especifique a despesa realizada" class="hidden mt-2 w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition">
+                                </div>
+
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Valor do Lançamento (R$) *</label>
+                                        <input type="number" step="0.01" id="fin_valor" required placeholder="0.00" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs font-bold text-emerald-400 focus:border-emerald-500/50 outline-none transition">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Observações Históricas</label>
+                                    <textarea id="fin_observacao" rows="2" placeholder="Detalhes opcionais do fluxo..." class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-emerald-500/50 outline-none transition resize-none"></textarea>
+                                </div>
+                                <div class="pt-2 flex gap-2">
+                                    <button type="submit" id="btnSalvarFinanceiro" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all text-xs shadow-lg shadow-emerald-600/10">
+                                        <span id="textoBtnSalvarFinanceiro">Confirmar Lançamento</span>
+                                    </button>
+                                    <button type="button" id="btnCancelarFinanceiro" onclick="resetarEstadoFinanceiro()" class="hidden px-3 py-2.5 bg-slate-800 text-slate-400 rounded-xl text-xs hover:bg-slate-700 transition">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Lista Tabela Caixa -->
+                        <div class="lg:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-md flex flex-col justify-between">
+                            <div class="p-4 border-b border-slate-800/60 flex justify-between items-center bg-slate-900/20">
+                                <span class="text-xs font-bold text-slate-300">Livro de Caixa Diário (Mês Atual)</span>
+                                <select id="filtroTipo" onchange="carregarFinancas()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1 text-slate-400 text-[11px] outline-none">
+                                    <option value="">Filtrar Tudo</option>
+                                    <option value="Dízimo">Dízimos</option>
+                                    <option value="Oferta">Ofertas</option>
+                                    <option value="Despesa">Despesas</option>
+                                </select>
+                            </div>
+                            <div class="overflow-x-auto flex-1">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+                                            <th class="px-6 py-3">Data</th>
+                                            <th class="px-6 py-3">Tipo</th>
+                                            <th class="px-6 py-3">Descrição / Origem</th>
+                                            <th class="px-6 py-3">Obs</th>
+                                            <th class="px-6 py-3 text-right">Valor</th>
+                                            <th class="px-6 py-3 text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabelaFinanceiro" class="divide-y divide-slate-800/40">
+                                        <!-- Renderizado Dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 
+                    ======================================================================
+                    TELA 3: AGENDA SEMANAL
+                    ======================================================================
+                -->
+                <div id="tela-agenda" class="dynamic-screen hidden space-y-6">
+                    <!-- Grid Principal: Formulário + Lista -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Formulário de Cadastro de Agenda -->
+                        <div id="secaoFormAgenda" class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md">
+                            <h2 id="tituloFormAgenda" class="text-base font-bold text-slate-100 flex items-center gap-2 mb-5">
+                                <i data-lucide="calendar-plus" class="text-amber-500 w-4 h-4"></i>
+                                Novo Evento / Culto
+                            </h2>
+
+                            <form id="formAgenda" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Data *</label>
+                                        <input type="date" id="age_data" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Horário *</label>
+                                        <input type="text" id="age_horario" placeholder="Ex: 19:30" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Tipo de Evento *</label>
+                                    <select id="age_tipo" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
+                                        <option value="Culto Público">Culto Público</option>
+                                        <option value="Culto de Doutrina">Culto de Doutrina</option>
+                                        <option value="Culto de Missões">Culto de Missões</option>
+                                        <option value="Santa Ceia">Santa Ceia</option>
+                                        <option value="Culto da Juventude">Culto da Juventude</option>
+                                        <option value="Culto das Irmãs">Culto das Irmãs</option>
+                                        <option value="Círculo de Oração">Círculo de Oração</option>
+                                        <option value="Reunião">Reunião</option>
+                                        <option value="Outro">Outro</option>
                                     </select>
                                 </div>
 
-                                <!-- CAMPOS EXCLUSIVOS DA DESPESA -->
-                                <div class="md:col-span-4 hidden" id="container-descricao-despesa">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria da Despesa</label>
-                                    <div class="flex gap-2">
-                                        <select id="fin_despesa_fixa" onchange="verificarDespesaOutros()" class="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
-                                            <option value="Aluguel">Aluguel</option>
-                                            <option value="Ajuda Eclesiástica">Ajuda Eclesiástica</option>
-                                            <option value="Limpeza da igreja">Limpeza da igreja</option>
-                                            <option value="Conta de Luz">Conta de Luz</option>
-                                            <option value="Conta de Água">Conta de Água</option>
-                                            <option value="Internet">Internet</option>
-                                            <option value="Outras Despesas">Outras (Não fixa...)</option>
-                                        </select>
-                                        <input type="text" id="fin_despesa_manual" placeholder="Qual despesa?" class="hidden flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Dirigente</label>
+                                        <input type="text" id="age_dirigente" placeholder="Nome do dirigente" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Pregador</label>
+                                        <input type="text" id="age_pregador" placeholder="Nome do pregador" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
                                     </div>
                                 </div>
 
-                                <!-- VALOR -->
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor (R$)</label>
-                                    <input type="number" id="fin_valor" step="0.01" required placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Escala da Portaria</label>
+                                    <input type="text" id="age_portaria" placeholder="Ex: Ir. João e Ir. Pedro" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
                                 </div>
 
-                                <!-- DATA DO LANÇAMENTO -->
-                                <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
-                                    <input type="date" id="fin_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Escala de Ofertas / Dízimos</label>
+                                    <input type="text" id="age_ofertas" placeholder="Ex: Diácono Lucas" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition">
                                 </div>
 
-                                <!-- NOVO: CAMPO OBSERVAÇÃO GLOBAL PARA TODOS OS FLUXOS -->
-                                <div class="md:col-span-6">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observações do Lançamento</label>
-                                    <input type="text" id="fin_observacao" placeholder="Algum detalhe importante sobre este dízimo, oferta ou conta..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Observação</label>
+                                    <textarea id="age_observacao" rows="2" placeholder="Informações adicionais ou visitas..." class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-200 text-xs focus:border-amber-500/50 outline-none transition resize-none"></textarea>
+                                </div>
+
+                                <div class="pt-2 flex gap-2">
+                                    <button type="submit" id="btnSalvarAgenda" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-500 transition-all text-xs shadow-lg shadow-amber-600/10">
+                                        <span id="textoBtnSalvarAgenda">Salvar Evento</span>
+                                    </button>
+                                    <button type="button" id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden px-3 py-2.5 bg-slate-800 text-slate-400 rounded-xl text-xs hover:bg-slate-700 transition">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tabela / Lista da Agenda -->
+                        <div class="lg:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-md flex flex-col">
+                            <div class="p-4 border-b border-slate-800/60 flex justify-between items-center bg-slate-900/20">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-300">Programação Mensal da Agenda</span>
                                 </div>
                             </div>
 
-                            <div class="mt-8 flex justify-end">
-                                <button type="submit" id="btnSalvarFinanceiro" class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20">
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                    <span id="textoBtnSalvarFinanceiro">Confirmar Lançamento</span>
-                                </button>
+                            <div class="overflow-x-auto flex-1">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+                                            <th class="px-6 py-3">Data / Hora</th>
+                                            <th class="px-6 py-3">Evento / Dirigente</th>
+                                            <th class="px-6 py-3">Pregador</th>
+                                            <th class="px-6 py-3">Escalas</th>
+                                            <th class="px-6 py-3 text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabelaAgenda" class="divide-y divide-slate-800/40">
+                                        <!-- Renderizado Dinamicamente -->
+                                    </tbody>
+                                </table>
                             </div>
-                        </form>
-                    </section>
-
-                    <!-- CARD INDICADORES FINANCEIROS DO MÊS -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dízimos</p><h3 id="dashDizimos" class="text-2xl font-bold text-emerald-400 mt-1">R$ 0,00</h3></div>
-                            <i data-lucide="heart" class="text-emerald-500/30"></i>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ofertas</p><h3 id="dashOfertas" class="text-2xl font-bold text-teal-400 mt-1">R$ 0,00</h3></div>
-                            <i data-lucide="gift" class="text-teal-500/30"></i>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Despesas</p><h3 id="dashDespesas" class="text-2xl font-bold text-rose-400 mt-1">R$ 0,00</h3></div>
-                            <i data-lucide="arrow-down-circle" class="text-rose-500/30"></i>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
-                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Saldo do Mês</p><h3 id="dashSaldoTotal" class="text-2xl font-bold text-white mt-1">R$ 0,00</h3></div>
-                            <i data-lucide="dollar-sign" class="text-slate-400/30"></i>
                         </div>
                     </div>
+                </div>
 
-                    <!-- TABELA DE TRANSAÇÕES -->
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i> Livro Caixa (Mês Vigente)
-                            </h2>
-                            <div class="flex gap-2">
-                                <select id="filtroTipo" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
-                                    <option value="">Todos os Fluxos</option>
-                                    <option value="Dízimo">Apenas Dízimos</option>
-                                    <option value="Oferta">Apenas Ofertas</option>
-                                    <option value="Despesa">Apenas Despesas</option>
-                                </select>
-                            </div>
+                <!-- 
+                    ======================================================================
+                    TELA 4: DOCUMENTOS (PLACEHOLDER)
+                    ======================================================================
+                -->
+                <div id="tela-documentos" class="dynamic-screen hidden space-y-6">
+                    <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-12 backdrop-blur-md text-center max-w-xl mx-auto mt-12">
+                        <div class="bg-blue-500/10 w-12 h-12 rounded-full flex items-center justify-center text-blue-400 mx-auto mb-4">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                        <th class="px-6 py-4">Data</th>
-                                        <th class="px-6 py-4">Tipo</th>
-                                        <th class="px-6 py-4">Descrição / Origem</th>
-                                        <th class="px-6 py-4">Obs</th>
-                                        <th class="px-6 py-4 text-right">Valor</th>
-                                        <th class="px-6 py-4 text-right">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaFinanceiro" class="divide-y divide-slate-800"></tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
- // ======================================================================================================================================
-<!-- ========================================== -->
-                <!-- 3. TELA DE AGENDA SEMANAL (SISTEMÁTICA)    -->
-                <!-- ========================================== -->
-                <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
-                    <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center gap-4 justify-between shadow-xl">
-                        <div class="text-slate-100 font-semibold text-lg flex items-center gap-2">
-                            <i data-lucide="calendar" class="text-amber-400"></i>
-                            <span>Agenda Semanal - <span id="txtMesVigente">Junho</span> / <span id="txtAnoVigente">2026</span></span>
-                        </div>
-                        <div class="flex gap-3 items-center">
-                            <select id="filtroMesAgenda" onchange="carregarAgenda()" class="px-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none cursor-pointer">
-                                <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho" selected>Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
-                            </select>
-                            <input type="number" id="filtroAnoAgenda" value="2026" oninput="carregarAgenda()" class="w-24 px-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none text-center">
-                        </div>
-                    </div>
-                    <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-                            <h2 id="tituloFormAgenda" class="font-semibold text-slate-100 flex items-center gap-2"><i data-lucide="calendar-plus" class="text-amber-400"></i> Agendar Trabalho / Evento</h2>
-                            <button id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">Cancelar Edição</button>
-                        </div>
-                        <form id="formAgenda" class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-8 gap-4">
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Data</label><input type="date" id="age_data" required onchange="autoPreencherDiaSemana()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 [color-scheme:dark]"></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Dias da Semana</label><select id="age_dia_semana" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"><option value="Domingo">Domingo</option><option value="Segunda-feira">Segunda-feira</option><option value="Terça-feira">Terça-feira</option><option value="Quarta-feira">Quarta-feira</option><option value="Quinta-feira">Quinta-feira</option><option value="Sexta-feira">Sexta-feira</option><option value="Sábado">Sábado</option></select></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Trabalho / Evento</label><input type="text" id="age_tipo_evento" required placeholder="Ex: Culto de Doutrina" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Horário</label><input type="time" id="age_horario" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 [color-scheme:dark]"></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Escala Portaria</label><input type="text" id="age_escala_portaria" placeholder="Ex: Ir. Pedro" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Preletor</label><input type="text" id="age_pregador" placeholder="Ex: Pr. Antônio" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Escala Ofertas</label><input type="text" id="age_escala_ofertas" placeholder="Ex: Diác. Lucas" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
-                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Dirigente</label><input type="text" id="age_dirigente" placeholder="Ex: Ev. Marcos" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
-                            <div class="md:col-span-8"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Observação</label><input type="text" id="age_observacao" placeholder="Informações adicionais..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
-                            <div class="md:col-span-8 flex justify-end mt-2"><button type="submit" id="btnSalvarAgenda" class="px-8 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-500 transition-all shadow-lg shadow-amber-600/20 flex items-center gap-2"><i data-lucide="save" class="w-5 h-5"></i><span id="textoBtnSalvarAgenda">Salvar na Agenda</span></button></div>
-                        </form>
-                    </section>
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50"><h2 class="font-semibold text-slate-100 flex items-center gap-2"><i data-lucide="calendar-days" class="text-amber-400"></i> Trabalhos da Semana</h2></div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left table-fixed min-w-[800px] text-xs">
-                                <thead>
-                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
-                                        <th class="px-4 py-4 w-[95px]">Data</th><th class="px-4 py-4 w-[110px]">Dia Sem.</th><th class="px-4 py-4 w-[160px]">Trabalho/Evento</th><th class="px-4 py-4 w-[80px]">Horário</th><th class="px-4 py-4 w-[120px]">Esc. Portaria</th><th class="px-4 py-4 w-[120px]">Preletor</th><th class="px-4 py-4 w-[120px]">Esc. Ofertas</th><th class="px-4 py-4 w-[120px]">Dirigente</th><th class="px-4 py-4 text-right w-[90px]">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaAgenda" class="divide-y divide-slate-800"></tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
- // =========================================================================================================================================
-                <!-- 4. TELA DE DOCUMENTOS -->
-                <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
-                    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center">
-                        <i data-lucide="file-text" class="w-12 h-12 text-blue-500 mx-auto mb-4"></i>
-                        <h2 class="text-2xl font-bold text-white">Cartas e Convites</h2>
-                        <p class="text-slate-400 mt-2">Emissão automática de cartas de convite para pregadores, cantores e palestrantes.</p>
+                        <h3 class="text-lg font-bold text-slate-200">Emissões e Certificados</h3>
+                        <p class="text-sm text-slate-500 mt-2">Módulo de geração automática de cartas de recomendação, mudança e certificados de batismo em desenvolvimento.</p>
                     </div>
                 </div>
 
@@ -420,23 +510,36 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!--                  LÓGICA JAVASCRIPT         -->
-    <!-- ========================================== -->
+    <!-- 
+        ======================================================================
+        4. NÚCLEO LÓGICO & INTEGRAÇÃO SUPABASE
+        ======================================================================
+    -->
     <script>
-        const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
+        // --- COLoque suas credenciais reais aqui ou mantenha o objeto injetado globalmente ---
+        // Exemplo: const _supabase = supabase.createClient('URL', 'KEY')
+        // Presumindo que _supabase já esteja instanciado de forma global no escopo do seu projeto.
 
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Variáveis de Estado de Edição Global
         let editandoID = null;
-        let editandoFinanceiroID = null; 
-        let listaMembrosCache = []; 
+        let editandoFinanceiroID = null;
+        let editandoAgendaID = null;
+        let listaMembrosCache = [];
 
-        // --- SISTEMA DE NAVEGAÇÃO DA SIDEBAR ---
-        function navegarPara(idTela) {
-            document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
-            document.getElementById(`tela-${idTela}`).classList.remove('hidden');
+        // --- SISTEMA DE CONTROLE DE TELAS (NAVEGAÇÃO) ---
+        function mudarTela(idTela) {
+            // 1. Oculta todas as telas do painel
+            document.querySelectorAll('.dynamic-screen').forEach(tela => {
+                tela.classList.add('hidden');
+            });
 
+            // 2. Mostra a tela selecionada
+            const telaAlvo = document.getElementById(`tela-${idTela}`);
+            if (telaAlvo) {
+                telaAlvo.classList.remove('hidden');
+            }
+
+            // 3. Atualiza os Botões de Menu da Sidebar Lateral
             const botoesMenu = {
                 membros: document.getElementById('btn-menu-membros'),
                 financeiro: document.getElementById('btn-menu-financeiro'),
@@ -450,15 +553,21 @@
                 }
             });
 
+            // Elementos visuais mutáveis da Topbar superior
             const topbarIconContainer = document.getElementById('iconeDinamicoTopbar');
             const topbarTitulo = document.getElementById('tituloTopbar');
             const iconeHeader = document.getElementById('iconeHeader');
+            const containerBusca = document.getElementById('containerBuscaTopbar');
+
+            // Exibe barra de busca padrão apenas na tela de membros
+            containerBusca.classList.add('hidden');
 
             if (idTela === 'membros') {
                 botoesMenu.membros.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
                 topbarTitulo.innerText = "Gestão de Membros";
                 topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
                 iconeHeader.setAttribute('data-lucide', 'users');
+                containerBusca.classList.remove('hidden');
                 carregarMembros();
             } else if (idTela === 'financeiro') {
                 botoesMenu.financeiro.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-emerald-600 text-white shadow-lg shadow-emerald-900/20";
@@ -474,6 +583,9 @@
                 topbarTitulo.innerText = "Agenda Semanal";
                 topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-900/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
+                
+                resetarEstadoAgenda();
+                carregarAgenda();
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas e Convites";
@@ -484,12 +596,17 @@
             lucide.createIcons();
         }
 
-        // --- SISTEMA DE MEMBROS ---
+        // --- MÓDULO AUXILIAR TRATAMENTO DE DATAS ---
         function formatarData(dataString) {
             if (!dataString) return '-';
             const [ano, mes, dia] = dataString.split('-');
             return `${dia}/${mes}/${ano}`;
         }
+
+
+        // ==========================================
+        // --- 2. SISTEMA DE GESTÃO DE MEMBROS    ---
+        // ==========================================
 
         async function carregarMembros() {
             try {
@@ -522,7 +639,7 @@
                                     ${m.status.toUpperCase()}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <button onclick="editarMembro(${m.id})" class="text-indigo-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                                 <button onclick="deletarMembro(${m.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
@@ -535,7 +652,7 @@
                 document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${data.length}</span> Membros`;
                 lucide.createIcons();
             } catch (err) {
-                console.error("Erro:", err.message);
+                console.error("Erro ao puxar membros:", err.message);
             }
         }
 
@@ -560,18 +677,19 @@
                 : await _supabase.from('membros').insert([membro]);
 
             if (error) {
-                alert("Erro ao salvar: " + error.message);
+                alert("Erro ao salvar dados cadastrais: " + error.message);
             } else {
-                alert(editandoID ? "Membro atualizado!" : "Membro cadastrado!");
+                alert(editandoID ? "Membro atualizado com sucesso!" : "Membro cadastrado!");
                 resetarEstado();
                 carregarMembros();
+                atualizarListaMembrosNoFormFinanceiro();
             }
             btn.disabled = false;
         });
 
         async function editarMembro(id) {
             const { data, error } = await _supabase.from('membros').select('*').eq('id', id).single();
-            if (error) return alert("Erro ao carregar membro");
+            if (error) return alert("Erro ao recuperar membro correspondente");
 
             editandoID = id;
             document.getElementById('nome').value = data.nome;
@@ -602,18 +720,22 @@
         }
 
         async function deletarMembro(id) {
-            if (confirm("Deseja realmente excluir?")) {
+            if (confirm("Deseja realmente remover permanentemente este membro?")) {
                 const { error } = await _supabase.from('membros').delete().eq('id', id);
-                if (error) alert("Erro ao excluir"); else carregarMembros();
+                if (error) {
+                    alert("Erro ao remover: " + error.message);
+                } else {
+                    carregarMembros();
+                    atualizarListaMembrosNoFormFinanceiro();
+                }
             }
         }
 
 
         // ==========================================
-        // --- SISTEMA DA TESOURARIA (FINANCEIRO) ---
+        // --- 3. MÓDULO TESOURARIA / FINANCEIRO  ---
         // ==========================================
 
-        // Controla de forma inteligente quais blocos de campos aparecem baseados no Tipo de Fluxo
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
             
@@ -623,7 +745,6 @@
             const containerOfertaCulto = document.getElementById('container-oferta-culto');
             const containerOfertaDia = document.getElementById('container-oferta-dia');
 
-            // Esconde tudo primeiro por segurança
             containerMembro.classList.add('hidden');
             containerCargo.classList.add('hidden');
             containerDespesa.classList.add('hidden');
@@ -644,7 +765,6 @@
             }
         }
 
-        // Se escolher "Outro Culto", abre campo de texto livre
         function verificarCultoOutros() {
             const cultoSel = document.getElementById('fin_oferta_culto').value;
             const inputManual = document.getElementById('fin_culto_manual');
@@ -660,7 +780,6 @@
             }
         }
 
-        // Se escolher "Outras Despesas", abre campo livre
         function verificarDespesaOutros() {
             const despesaFixa = document.getElementById('fin_despesa_fixa').value;
             const inputManual = document.getElementById('fin_despesa_manual');
@@ -685,9 +804,9 @@
                 return;
             }
 
-            const membroEncontrado = listaMembrosCache.find(m => m.nome === nomeSelecionado);
-            if (membroEncontrado && membroEncontrado.cargo) {
-                inputCargo.value = membroEncontrado.cargo;
+            if (listaMembrosCache && listaMembrosCache.length > 0) {
+                const membroEncontrado = listaMembrosCache.find(m => m.nome === nomeSelecionado);
+                inputCargo.value = (membroEncontrado && membroEncontrado.cargo) ? membroEncontrado.cargo : 'Membro';
             } else {
                 inputCargo.value = 'Membro';
             }
@@ -710,11 +829,10 @@
                 if(valorAtual) selectMembro.value = valorAtual;
                 autopreencherCargoMembro();
             } catch (err) {
-                console.error("Erro ao carregar membros no financeiro:", err.message);
+                console.error("Erro interno ao preencher combo financeiro:", err.message);
             }
         }
 
-        // Realiza o salvamento tratando dízimos, ofertas e despesas de formas diferentes
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -747,22 +865,20 @@
                 : await _supabase.from('financeiro').insert([lancamento]);
 
             if (error) {
-                alert("Erro ao salvar lançamento: " + error.message);
+                alert("Erro ao validar lançamento de caixa: " + error.message);
             } else {
-                alert(editandoFinanceiroID ? "Lançamento atualizado!" : "Lançamento realizado com sucesso!");
+                alert(editandoFinanceiroID ? "Lançamento modificado!" : "Movimentação registrada com sucesso!");
                 resetarEstadoFinanceiro();
                 carregarFinancas();
             }
         });
 
-        // Puxa a linha da tabela de volta para o formulário ajustando os campos corretos
         async function editarFinanca(id) {
             try {
                 const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
                 if (error) throw error;
 
                 editandoFinanceiroID = id;
-                
                 document.getElementById('fin_tipo').value = data.tipo;
                 ajustarCamposFinancas(); 
 
@@ -794,7 +910,6 @@
                 document.getElementById('fin_data').value = data.data_lancamento;
                 document.getElementById('fin_observacao').value = data.observacao || '';
 
-                // Muda o visual para modo Edição (Âmbar)
                 document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
                 document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
                 document.getElementById('btnSalvarFinanceiro').classList.replace('bg-emerald-600', 'bg-amber-600');
@@ -803,7 +918,7 @@
                 document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
                 lucide.createIcons();
             } catch (err) {
-                alert("Erro ao carregar lançamento: " + err.message);
+                alert("Erro ao ler dados da movimentação: " + err.message);
             }
         }
 
@@ -811,12 +926,14 @@
             editandoFinanceiroID = null;
             document.getElementById('formFinanceiro').reset();
             document.getElementById('fin_data').value = new Date().toISOString().split('T')[0];
-            
             document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
             document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
-            document.getElementById('btnSalvarFinanceiro').className = "inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20";
-            document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
             
+            const btnSalvar = document.getElementById('btnSalvarFinanceiro');
+            btnSalvar.classList.remove('bg-amber-600');
+            btnSalvar.classList.add('bg-emerald-600');
+            
+            document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
             ajustarCamposFinancas();
             lucide.createIcons();
         }
@@ -824,7 +941,6 @@
         async function carregarFinancas() {
             try {
                 const filtroTipo = document.getElementById('filtroTipo').value;
-                
                 const agora = new Date();
                 const primeiroDia = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0];
                 const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0];
@@ -834,9 +950,7 @@
                     .lte('data_lancamento', ultimoDia)
                     .order('data_lancamento', { ascending: false });
 
-                if (filtroTipo) {
-                    query = query.eq('tipo', filtroTipo);
-                }
+                if (filtroTipo) query = query.eq('tipo', filtroTipo);
 
                 const { data, error } = await query;
                 if (error) throw error;
@@ -844,9 +958,7 @@
                 const tbody = document.getElementById('tabelaFinanceiro');
                 tbody.innerHTML = '';
 
-                let totalDizimos = 0;
-                let totalOfertas = 0;
-                let totalDespesas = 0;
+                let totalDizimos = 0, totalOfertas = 0, totalDespesas = 0;
 
                 data.forEach(f => {
                     if (f.tipo === 'Dízimo') totalDizimos += f.valor;
@@ -856,59 +968,192 @@
                     const corBadge = f.tipo === 'Despesa' ? 'bg-rose-500/10 text-rose-400' : (f.tipo === 'Dízimo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-teal-500/10 text-teal-400');
                     const sinalValor = f.tipo === 'Despesa' ? '-' : '+';
                     const corTextoValor = f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400';
-
-                    // Formata a exibição do nome do culto junto com o dia se for Oferta
                     const sufixoDia = (f.tipo === 'Oferta' && f.dia_semana) ? ` (${f.dia_semana})` : '';
                     const textoObs = f.observacao ? f.observacao : '---';
 
                     tbody.innerHTML += `
-                        <tr class="hover:bg-slate-800/30 transition-colors">
-                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(f.data_lancamento)}</td>
+                        <tr class="hover:bg-slate-800/30 transition-colors text-xs">
+                            <td class="px-6 py-4 text-slate-400">${formatarData(f.data_lancamento)}</td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold ${corBadge}">
+                                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${corBadge}">
                                     ${f.tipo.toUpperCase()}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-slate-200 text-sm font-medium">${f.descricao}${sufixoDia}</td>
-                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[180px] truncate" title="${textoObs}">${textoObs}</td>
-                            <td class="px-6 py-4 text-right ${corTextoValor} font-bold text-sm">
+                            <td class="px-6 py-4 text-slate-200 font-medium">${f.descricao}${sufixoDia}</td>
+                            <td class="px-6 py-4 text-slate-500 max-w-[120px] truncate" title="${textoObs}">${textoObs}</td>
+                            <td class="px-6 py-4 text-right ${corTextoValor} font-bold">
                                 ${sinalValor} R$ ${f.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarFinanca(${f.id})" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="deletarFinanca(${f.id})" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                             </td>
-                        </tr>
-                    `;
+                        </tr>`;
                 });
 
                 const saldoMese = (totalDizimos + totalOfertas) - totalDespesas;
-
                 document.getElementById('dashDizimos').textContent = `R$ ${totalDizimos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                 document.getElementById('dashOfertas').textContent = `R$ ${totalOfertas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                 document.getElementById('dashDespesas').textContent = `R$ ${totalDespesas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                 
                 const txtSaldo = document.getElementById('dashSaldoTotal');
                 txtSaldo.textContent = `R$ ${saldoMese.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                txtSaldo.className = `text-2xl font-bold mt-1 ${saldoMese >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
-
+                txtSaldo.className = `text-xl font-bold mt-1 ${saldoMese >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
                 lucide.createIcons();
-
             } catch (err) {
-                console.error("Erro ao carregar livro caixa:", err.message);
+                console.error("Erro livro caixa:", err.message);
             }
         }
 
         async function deletarFinanca(id) {
-            if (confirm("Deseja realmente estornar/excluir este lançamento?")) {
+            if (confirm("Deseja realmente excluir este movimento financeiro?")) {
                 const { error } = await _supabase.from('financeiro').delete().eq('id', id);
-                if (error) alert("Erro ao excluir"); else carregarFinancas();
+                if (error) alert("Erro ao deletar movimento: " + error.message); else carregarFinancas();
             }
         }
 
-        // --- INICIALIZAÇÃO DO APP ---
+
+        // ==========================================
+        // --- 4. MÓDULO INTEGRADO: AGENDA SEMANAL---
+        // ==========================================
+
+        async function carregarAgenda() {
+            try {
+                const agora = new Date();
+                const primeiroDia = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0];
+                const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0];
+
+                // Puxa os dados da tabela agenda_semanal correspondentes ao mês
+                const { data, error } = await _supabase.from('agenda_semanal')
+                    .select('*')
+                    .gte('Data', primeiroDia)
+                    .lte('Data', ultimoDia)
+                    .order('Data', { ascending: true });
+
+                if (error) throw error;
+
+                const tbody = document.getElementById('tabelaAgenda');
+                tbody.innerHTML = '';
+
+                data.forEach(ev => {
+                    const dataFormatada = formatarData(ev.Data);
+                    const obs = ev.saida_visita ? ev.saida_visita : 'Sem observações';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors text-xs">
+                            <td class="px-6 py-4">
+                                <div class="font-semibold text-amber-400">${dataFormatada}</div>
+                                <div class="text-[11px] text-slate-500 font-medium">${ev.horario || ''}h</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-slate-200">${ev.tipo_evento}</div>
+                                <div class="text-[11px] text-slate-400">Dir: ${ev.dirigente || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-300 font-medium">${ev.pregador || '-'}</td>
+                            <td class="px-6 py-4 text-slate-400 space-y-0.5">
+                                <div><span class="text-slate-500 font-medium">Portaria:</span> ${ev.escala_portaria || '-'}</div>
+                                <div><span class="text-slate-500 font-medium">Ofertas:</span> ${ev.escala_ofertas || '-'}</div>
+                                <div class="text-[11px] text-slate-500 italic truncate max-w-[150px]" title="${obs}">Obs: ${obs}</div>
+                            </td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button onclick="editarAgenda(${ev.id})" class="text-amber-500 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="deletarAgenda(${ev.id})" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </td>
+                        </tr>`;
+                });
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Erro interno de carregamento da agenda:", err.message);
+            }
+        }
+
+        document.getElementById('formAgenda').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const dataInput = document.getElementById('age_data').value;
+            const partesData = dataInput.split('-'); 
+            
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const mesNome = meses[parseInt(partesData[1]) - 1];
+
+            const evento = {
+                Data: dataInput,
+                tipo_evento: document.getElementById('age_tipo').value,
+                horario: document.getElementById('age_horario').value,
+                escala_portaria: document.getElementById('age_portaria').value || null,
+                pregador: document.getElementById('age_pregador').value || null,
+                escala_ofertas: document.getElementById('age_ofertas').value || null,
+                dirigente: document.getElementById('age_dirigente').value || null,
+                saida_visita: document.getElementById('age_observacao').value || null, 
+                mes_referencia: mesNome,
+                ano_referencia: parseInt(partesData[0])
+            };
+
+            const { error } = editandoAgendaID 
+                ? await _supabase.from('agenda_semanal').update(evento).eq('id', editandoAgendaID)
+                : await _supabase.from('agenda_semanal').insert([evento]);
+
+            if (error) {
+                alert("Erro ao tentar salvar evento na agenda: " + error.message);
+            } else {
+                alert(editandoAgendaID ? "Programação da agenda atualizada!" : "Culto/Evento agendado!");
+                resetarEstadoAgenda();
+                carregarAgenda();
+            }
+        });
+
+        async function editarAgenda(id) {
+            try {
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
+                if (error) throw error;
+
+                editandoAgendaID = id;
+                document.getElementById('age_data').value = data.Data;
+                document.getElementById('age_tipo').value = data.tipo_evento;
+                document.getElementById('age_horario').value = data.horario;
+                document.getElementById('age_portaria').value = data.escala_portaria || '';
+                document.getElementById('age_pregador').value = data.pregador || '';
+                document.getElementById('age_ofertas').value = data.escala_ofertas || '';
+                document.getElementById('age_dirigente').value = data.dirigente || '';
+                document.getElementById('age_observacao').value = data.saida_visita || '';
+
+                document.getElementById('tituloFormAgenda').innerText = "Editando Programação";
+                document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Evento";
+                document.getElementById('btnCancelarAgenda').classList.remove('hidden');
+                
+                document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
+                lucide.createIcons();
+            } catch (err) {
+                alert("Erro ao buscar dados deste evento: " + err.message);
+            }
+        }
+
+        function resetarEstadoAgenda() {
+            editandoAgendaID = null;
+            document.getElementById('formAgenda').reset();
+            document.getElementById('age_data').value = new Date().toISOString().split('T')[0];
+            document.getElementById('tituloFormAgenda').innerText = "Novo Evento / Culto";
+            document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Evento";
+            document.getElementById('btnCancelarAgenda').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        async function deletarAgenda(id) {
+            if (confirm("Remover permanentemente este evento da listagem da agenda?")) {
+                const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
+                if (error) alert("Erro ao excluir registro de agenda: " + error.message); else carregarAgenda();
+            }
+        }
+
+
+        // --- DISPARO INICIAL (ONLOAD) ---
         window.onload = function() {
+            // Executa a carga total inicial com segurança
             carregarMembros();
+            atualizarListaMembrosNoFormFinanceiro();
+            carregarFinancas();
+            resetarEstadoAgenda();
             lucide.createIcons();
         };
     </script>
