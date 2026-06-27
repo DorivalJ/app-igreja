@@ -357,166 +357,56 @@
                         </div>
                     </section>
                 </div>
-
-                // ==========================================
-        // --- SISTEMA DA AGENDA SEMANAL             ---
-        // ==========================================
-        let editandoAgendaID = null;
-        const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-        // Preenche o select do dia da semana baseado na data escolhida
-        function autoPreencherDiaSemana() {
-            const dataSel = document.getElementById('age_data').value;
-            if(!dataSel) return;
-            const diasSemanaMapa = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-            const dataObj = new Date(dataSel + 'T00:00:00');
-            document.getElementById('age_dia_semana').value = diasSemanaMapa[dataObj.getDay()];
-        }
-
-        // Função auxiliar para descobrir o dia da semana a partir de uma data YYYY-MM-DD
-        function obterDiaSemanaTexto(dataString) {
-            if(!dataString) return '-';
-            const diasSemanaMapa = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-            const dataObj = new Date(dataString + 'T00:00:00');
-            return diasSemanaMapa[dataObj.getDay()];
-        }
-
-        async function carregarAgenda() {
-            try {
-                const mesFiltro = document.getElementById('filtroMesAgenda').value;
-                const anoFiltro = parseInt(document.getElementById('filtroAnoAgenda').value);
-
-                document.getElementById('txtMesVigente').innerText = mesFiltro;
-                document.getElementById('txtAnoVigente').innerText = anoFiltro;
-
-                // Busca filtrando por mês e ano de referência
-                const { data, error } = await _supabase.from('agenda_semanal').select('*')
-                    .eq('mes_referencia', mesFiltro)
-                    .eq('ano_referencia', anoFiltro)
-                    .order('data', { ascending: true }) // d minúsculo corrigido!
-                    .order('horario', { ascending: true });
-
-                if (error) throw error;
-
-                const tbody = document.getElementById('tabelaAgenda');
-                tbody.innerHTML = '';
-
-                data.forEach(a => {
-                    const textoObs = a.saida_visita && a.saida_visita !== 'Nenhuma (Evento Local)' ? a.saida_visita : '';
-                    const diaSemanaCalculado = obterDiaSemanaTexto(a.data);
-                    
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-800/30 transition-colors">
-                            <td class="px-4 py-3 text-slate-400 font-medium">${formatarData(a.data)}</td>
-                            <td class="px-4 py-3 text-slate-400">${diaSemanaCalculado}</td>
-                            <td class="px-4 py-3 text-slate-100 font-semibold">
-                                <div>${a.tipo_evento}</div>
-                                ${textoObs ? `<div class="text-[10px] text-amber-500/80 font-normal italic mt-0.5">${textoObs}</div>` : ''}
-                            </td>
-                            <td class="px-4 py-3 text-amber-400 font-bold">${a.horario}</td>
-                            <td class="px-4 py-3 text-slate-300">${a.escala_portaria || '-'}</td>
-                            <td class="px-4 py-3 text-slate-200 font-medium">${a.pregador || '-'}</td>
-                            <td class="px-4 py-3 text-slate-300">${a.escala_ofertas || '-'}</td>
-                            <td class="px-4 py-3 text-slate-300">${a.dirigente || '-'}</td>
-                            <td class="px-4 py-3 text-right whitespace-nowrap">
-                                <button onclick="editarAgenda('${a.id}')" class="text-amber-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-                                <button onclick="deletarAgenda('${a.id}')" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                lucide.createIcons();
-            } catch (err) {
-                console.error("Erro ao carregar agenda:", err.message);
-            }
-        }
-
-        document.getElementById('formAgenda').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSalvarAgenda');
-            btn.disabled = true;
-
-            const dataSelecionada = document.getElementById('age_data').value;
-            const dataObj = new Date(dataSelecionada + 'T00:00:00');
-
-            // Enviando APENAS as colunas que realmente existem na sua tabela!
-            const evento = {
-                data: dataSelecionada, // d minúsculo!
-                tipo_evento: document.getElementById('age_tipo_evento').value,
-                horario: document.getElementById('age_horario').value,
-                escala_portaria: document.getElementById('age_escala_portaria').value || null,
-                pregador: document.getElementById('age_pregador').value || null,
-                escala_ofertas: document.getElementById('age_escala_ofertas').value || null,
-                dirigente: document.getElementById('age_dirigente').value || null,
-                saida_visita: document.getElementById('age_observacao').value || 'Nenhuma (Evento Local)',
-                mes_referencia: mesesNomes[dataObj.getMonth()],
-                ano_referencia: dataObj.getFullYear()
-            };
-
-            const { error } = editandoAgendaID 
-                ? await _supabase.from('agenda_semanal').update(evento).eq('id', editandoAgendaID)
-                : await _supabase.from('agenda_semanal').insert([evento]);
-
-            if (error) {
-                alert("Erro ao salvar no Supabase: " + error.message);
-            } else {
-                alert(editandoAgendaID ? "Agenda updated!" : "Trabalho agendado com sucesso!");
-                resetarEstadoAgenda();
-                carregarAgenda();
-            }
-            btn.disabled = false;
-        });
-
-        async function editarAgenda(id) {
-            try {
-                const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
-                if (error) throw error;
-
-                editandoAgendaID = id;
-                document.getElementById('age_data').value = data.data; // d minúsculo!
-                document.getElementById('age_tipo_evento').value = data.tipo_evento;
-                document.getElementById('age_horario').value = data.horario;
-                document.getElementById('age_escala_portaria').value = data.escala_portaria || '';
-                document.getElementById('age_pregador').value = data.pregador || '';
-                document.getElementById('age_escala_ofertas').value = data.escala_ofertas || '';
-                document.getElementById('age_dirigente').value = data.dirigente || '';
-                document.getElementById('age_observacao').value = data.saida_visita !== 'Nenhuma (Evento Local)' ? data.saida_visita : '';
-                
-                autoPreencherDiaSemana();
-
-                document.getElementById('tituloFormAgenda').innerText = "Editando Trabalho da Semana";
-                document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Agenda";
-                document.getElementById('btnSalvarAgenda').classList.replace('bg-amber-600', 'bg-indigo-600');
-                document.getElementById('btnCancelarAgenda').classList.remove('hidden');
-
-                document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
-                lucide.createIcons();
-            } catch (err) {
-                alert("Erro ao carregar dados do Supabase: " + err.message);
-            }
-        }
-
-        function resetarEstadoAgenda() {
-            editandoAgendaID = null;
-            document.getElementById('formAgenda').reset();
-            document.getElementById('tituloFormAgenda').innerText = "Agendar Trabalho / Evento";
-            document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar na Agenda";
-            document.getElementById('btnSalvarAgenda').className = "inline-flex items-center gap-2 px-8 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-500 transition-all shadow-lg shadow-amber-600/20";
-            document.getElementById('btnCancelarAgenda').classList.add('hidden');
-            
-            const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('age_data').value = hoje;
-            autoPreencherDiaSemana();
-            
-            lucide.createIcons();
-        }
-
-        async function deletarAgenda(id) {
-            if (confirm("Deseja realmente excluir este trabalho da escala semanal?")) {
-                const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
-                if (error) alert("Erro ao excluir"); else carregarAgenda();
-            }
-        }
+ // ======================================================================================================================================
+<!-- ========================================== -->
+                <!-- 3. TELA DE AGENDA SEMANAL (SISTEMÁTICA)    -->
+                <!-- ========================================== -->
+                <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
+                    <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center gap-4 justify-between shadow-xl">
+                        <div class="text-slate-100 font-semibold text-lg flex items-center gap-2">
+                            <i data-lucide="calendar" class="text-amber-400"></i>
+                            <span>Agenda Semanal - <span id="txtMesVigente">Junho</span> / <span id="txtAnoVigente">2026</span></span>
+                        </div>
+                        <div class="flex gap-3 items-center">
+                            <select id="filtroMesAgenda" onchange="carregarAgenda()" class="px-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none cursor-pointer">
+                                <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho" selected>Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                            </select>
+                            <input type="number" id="filtroAnoAgenda" value="2026" oninput="carregarAgenda()" class="w-24 px-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none text-center">
+                        </div>
+                    </div>
+                    <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <h2 id="tituloFormAgenda" class="font-semibold text-slate-100 flex items-center gap-2"><i data-lucide="calendar-plus" class="text-amber-400"></i> Agendar Trabalho / Evento</h2>
+                            <button id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">Cancelar Edição</button>
+                        </div>
+                        <form id="formAgenda" class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-8 gap-4">
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Data</label><input type="date" id="age_data" required onchange="autoPreencherDiaSemana()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 [color-scheme:dark]"></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Dias da Semana</label><select id="age_dia_semana" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"><option value="Domingo">Domingo</option><option value="Segunda-feira">Segunda-feira</option><option value="Terça-feira">Terça-feira</option><option value="Quarta-feira">Quarta-feira</option><option value="Quinta-feira">Quinta-feira</option><option value="Sexta-feira">Sexta-feira</option><option value="Sábado">Sábado</option></select></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Trabalho / Evento</label><input type="text" id="age_tipo_evento" required placeholder="Ex: Culto de Doutrina" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Horário</label><input type="time" id="age_horario" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 [color-scheme:dark]"></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Escala Portaria</label><input type="text" id="age_escala_portaria" placeholder="Ex: Ir. Pedro" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Preletor</label><input type="text" id="age_pregador" placeholder="Ex: Pr. Antônio" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Escala Ofertas</label><input type="text" id="age_escala_ofertas" placeholder="Ex: Diác. Lucas" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Dirigente</label><input type="text" id="age_dirigente" placeholder="Ex: Ev. Marcos" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
+                            <div class="md:col-span-8"><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Observação</label><input type="text" id="age_observacao" placeholder="Informações adicionais..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100"></div>
+                            <div class="md:col-span-8 flex justify-end mt-2"><button type="submit" id="btnSalvarAgenda" class="px-8 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-500 transition-all shadow-lg shadow-amber-600/20 flex items-center gap-2"><i data-lucide="save" class="w-5 h-5"></i><span id="textoBtnSalvarAgenda">Salvar na Agenda</span></button></div>
+                        </form>
+                    </section>
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50"><h2 class="font-semibold text-slate-100 flex items-center gap-2"><i data-lucide="calendar-days" class="text-amber-400"></i> Trabalhos da Semana</h2></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left table-fixed min-w-[800px] text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+                                        <th class="px-4 py-4 w-[95px]">Data</th><th class="px-4 py-4 w-[110px]">Dia Sem.</th><th class="px-4 py-4 w-[160px]">Trabalho/Evento</th><th class="px-4 py-4 w-[80px]">Horário</th><th class="px-4 py-4 w-[120px]">Esc. Portaria</th><th class="px-4 py-4 w-[120px]">Preletor</th><th class="px-4 py-4 w-[120px]">Esc. Ofertas</th><th class="px-4 py-4 w-[120px]">Dirigente</th><th class="px-4 py-4 text-right w-[90px]">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaAgenda" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+ // =========================================================================================================================================
                 <!-- 4. TELA DE DOCUMENTOS -->
                 <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
                     <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center">
