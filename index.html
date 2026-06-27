@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #020617; scroll-behavior: smooth; }
         ::-webkit-scrollbar { width: 8px; }
@@ -193,7 +193,6 @@
                 <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
                     
-                    <!-- FORMULÁRIO FINANCEIRO -->
                     <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
                             <div class="flex items-center gap-2">
@@ -207,7 +206,6 @@
                         
                         <form id="formFinanceiro" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                                <!-- TIPO DE ENTRADA -->
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Fluxo</label>
                                     <select id="fin_tipo" onchange="ajustarCamposFinancas()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
@@ -217,7 +215,6 @@
                                     </select>
                                 </div>
 
-                                <!-- CAMPOS EXCLUSIVOS DO DÍZIMO -->
                                 <div class="md:col-span-2" id="container-descricao-membro">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro (Opcional)</label>
                                     <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
@@ -229,7 +226,6 @@
                                     <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
                                 </div>
 
-                                <!-- CAMPOS EXCLUSIVOS DA OFERTA -->
                                 <div class="md:col-span-2 hidden" id="container-oferta-culto">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Culto</label>
                                     <div class="flex flex-col gap-2">
@@ -260,7 +256,6 @@
                                     </select>
                                 </div>
 
-                                <!-- CAMPOS EXCLUSIVOS DA DESPESA -->
                                 <div class="md:col-span-4 hidden" id="container-descricao-despesa">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria da Despesa</label>
                                     <div class="flex gap-2">
@@ -277,22 +272,19 @@
                                     </div>
                                 </div>
 
-                                <!-- VALOR -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor (R$)</label>
                                     <input type="number" id="fin_valor" step="0.01" required placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- DATA DO LANÇAMENTO -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
                                     <input type="date" id="fin_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
                                 </div>
 
-                                <!-- NOVO: CAMPO OBSERVAÇÃO GLOBAL PARA TODOS OS FLUXOS -->
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observações do Lançamento</label>
-                                    <input type="text" id="fin_observacao" placeholder="Algum detalhe importante sobre este dízimo, oferta ou conta..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <input type="text" id="fin_observacao" placeholder="Algum detalhe importante..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
@@ -305,7 +297,6 @@
                         </form>
                     </section>
 
-                    <!-- CARD INDICADORES FINANCEIROS DO MÊS -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
                             <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dízimos</p><h3 id="dashDizimos" class="text-2xl font-bold text-emerald-400 mt-1">R$ 0,00</h3></div>
@@ -325,7 +316,6 @@
                         </div>
                     </div>
 
-                    <!-- TABELA DE TRANSAÇÕES -->
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
@@ -375,57 +365,50 @@
                         
                         <form id="formAgenda" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                                <!-- Data (date) -->
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
-                                    <input type="date" id="agenda_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                    <input type="date" id="agenda_data" onchange="atualizarDiaSemanaAutomatico()" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
                                 </div>
 
-                                <!-- tipo_evento (text) -->
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Evento</label>
-                                    <input type="text" id="agenda_tipo_evento" required placeholder="Ex: Culto de Ensino, Ensaio" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia da Semana</label>
+                                    <input type="text" id="agenda_dia_semana" readonly placeholder="Calculado automaticamente" class="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-amber-400 font-medium focus:outline-none cursor-not-allowed">
                                 </div>
 
-                                <!-- horario (text) -->
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
                                     <input type="text" id="agenda_horario" required placeholder="Ex: 19:30, 09:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- dirigente (text) -->
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Evento</label>
+                                    <input type="text" id="agenda_tipo_evento" required placeholder="Ex: Culto de Ensino, Ensaio do Louvor, Congresso de Missões" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dirigente</label>
                                     <input type="text" id="agenda_dirigente" placeholder="Nome do dirigente" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- pregador (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pregador</label>
                                     <input type="text" id="agenda_pregador" placeholder="Nome do pregador" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- escala_portaria (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Portaria</label>
                                     <input type="text" id="agenda_escala_portaria" placeholder="Responsáveis pela portaria" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- escala_ofertas (text) -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Ofertas</label>
                                     <input type="text" id="agenda_escala_ofertas" placeholder="Responsáveis pelo recolhimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- saida_visita (text) -> Rótulo Observação -->
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
                                     <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
-
-                                <!-- mes_referencia (text) e ano_referencia (int4) controlados automaticamente em inputs ocultos -->
-                                <input type="hidden" id="agenda_mes_referencia">
-                                <input type="hidden" id="agenda_ano_referencia">
                             </div>
 
                             <div class="mt-8 flex justify-end">
@@ -437,7 +420,6 @@
                         </form>
                     </section>
 
-                    <!-- TABELA DE EXIBIÇÃO DA AGENDA SEMANAL -->
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
@@ -448,8 +430,8 @@
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                        <th class="px-6 py-4">Data / Hora</th>
-                                        <th class="px-6 py-4">Evento</th>
+                                        <th class="px-6 py-4">Data / Dia</th>
+                                        <th class="px-6 py-4">Eventos</th>
                                         <th class="px-6 py-4">Dirigente / Pregador</th>
                                         <th class="px-6 py-4">Portaria / Ofertas</th>
                                         <th class="px-6 py-4">Observação</th>
@@ -485,10 +467,10 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let editandoID = null;
         let editandoFinanceiroID = null; 
-        let editandoAgendaID = null;
+        let editandoAgendaID = null; 
         let listaMembrosCache = []; 
 
-        // --- SISTEMA DE NAVEGAÇÃO DA SIDEBAR ---
+        // --- NAVEGAÇÃO DA SIDEBAR ---
         function navegarPara(idTela) {
             document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
@@ -521,16 +503,14 @@
                 topbarTitulo.innerText = "Tesouraria & Fluxo de Caixa";
                 topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
                 iconeHeader.setAttribute('data-lucide', 'dollar-sign');
-                
                 resetarEstadoFinanceiro();
                 atualizarListaMembrosNoFormFinanceiro();
                 carregarFinancas();
             } else if (idTela === 'agenda') {
                 botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
                 topbarTitulo.innerText = "Agenda Semanal";
-                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-900/20";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
-                
                 resetarEstadoAgenda();
                 carregarAgenda();
             } else if (idTela === 'documentos') {
@@ -539,17 +519,16 @@
                 topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
             }
-
             lucide.createIcons();
         }
 
-        // --- SISTEMA DE MEMBROS ---
         function formatarData(dataString) {
             if (!dataString) return '-';
             const [ano, mes, dia] = dataString.split('-');
             return `${dia}/${mes}/${ano}`;
         }
 
+        // --- SISTEMA DE MEMBROS ---
         async function carregarMembros() {
             try {
                 const termo = document.getElementById('busca').value;
@@ -593,16 +572,11 @@
                 document.getElementById('dashTotal').textContent = data.length;
                 document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${data.length}</span> Membros`;
                 lucide.createIcons();
-            } catch (err) {
-                console.error("Erro:", err.message);
-            }
+            } catch (err) { console.error(err); }
         }
 
         document.getElementById('formMembro').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnSalvar');
-            btn.disabled = true;
-
             const membro = {
                 nome: document.getElementById('nome').value,
                 data_nascimento: document.getElementById('data_nascimento').value || null,
@@ -618,20 +592,13 @@
                 ? await _supabase.from('membros').update(membro).eq('id', editandoID)
                 : await _supabase.from('membros').insert([membro]);
 
-            if (error) {
-                alert("Erro ao salvar: " + error.message);
-            } else {
-                alert(editandoID ? "Membro atualizado!" : "Membro cadastrado!");
-                resetarEstado();
-                carregarMembros();
-            }
-            btn.disabled = false;
+            if (error) alert("Erro: " + error.message);
+            else { alert("Sucesso!"); resetarEstado(); carregarMembros(); }
         });
 
         async function editarMembro(id) {
             const { data, error } = await _supabase.from('membros').select('*').eq('id', id).single();
-            if (error) return alert("Erro ao carregar membro");
-
+            if (error) return;
             editandoID = id;
             document.getElementById('nome').value = data.nome;
             document.getElementById('data_nascimento').value = data.data_nascimento;
@@ -641,13 +608,11 @@
             document.getElementById('data_adesao').value = data.data_adesao;
             document.getElementById('status').value = data.status;
             document.getElementById('observacao').value = data.observacao;
-
             document.getElementById('tituloForm').innerText = "Editando Membro";
             document.getElementById('textoBtnSalvar').innerText = "Atualizar Cadastro";
             document.getElementById('btnSalvar').classList.replace('bg-indigo-600', 'bg-amber-600');
             document.getElementById('btnCancelar').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            lucide.createIcons();
         }
 
         function resetarEstado() {
@@ -657,156 +622,129 @@
             document.getElementById('textoBtnSalvar').innerText = "Salvar Membro";
             document.getElementById('btnSalvar').classList.replace('bg-amber-600', 'bg-indigo-600');
             document.getElementById('btnCancelar').classList.add('hidden');
-            lucide.createIcons();
         }
 
         async function deletarMembro(id) {
-            if (confirm("Deseja realmente excluir?")) {
-                const { error } = await _supabase.from('membros').delete().eq('id', id);
-                if (error) alert("Erro ao excluir"); else carregarMembros();
-            }
+            if (confirm("Excluir membro?")) { await _supabase.from('membros').delete().eq('id', id); carregarMembros(); }
         }
 
-
-        // ==========================================
-        // --- SISTEMA DA TESOURARIA (FINANCEIRO) ---
-        // ==========================================
+        // --- SISTEMA DA TESOURARIA ---
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
-            
-            const containerMembro = document.getElementById('container-descricao-membro');
-            const containerCargo = document.getElementById('container-cargo-membro');
-            const containerDespesa = document.getElementById('container-descricao-despesa');
-            const containerOfertaCulto = document.getElementById('container-oferta-culto');
-            const containerOfertaDia = document.getElementById('container-oferta-dia');
-
-            containerMembro.classList.add('hidden');
-            containerCargo.classList.add('hidden');
-            containerDespesa.classList.add('hidden');
-            containerOfertaCulto.classList.add('hidden');
-            containerOfertaDia.classList.add('hidden');
+            document.getElementById('container-descricao-membro').classList.add('hidden');
+            document.getElementById('container-cargo-membro').classList.add('hidden');
+            document.getElementById('container-descricao-despesa').classList.add('hidden');
+            document.getElementById('container-oferta-culto').classList.add('hidden');
+            document.getElementById('container-oferta-dia').classList.add('hidden');
 
             if (tipo === 'Dízimo') {
-                containerMembro.classList.remove('hidden');
-                containerCargo.classList.remove('hidden');
+                document.getElementById('container-descricao-membro').classList.remove('hidden');
+                document.getElementById('container-cargo-membro').classList.remove('hidden');
                 autopreencherCargoMembro();
-            } else if (tipo === 'Oferta') {
-                containerOfertaCulto.classList.remove('hidden');
-                containerOfertaDia.classList.remove('hidden');
-                verificarCultoOutros();
+            } else if (tipo === 'Offer' || tipo === 'Oferta') {
+                document.getElementById('container-oferta-culto').classList.remove('hidden');
+                document.getElementById('container-oferta-dia').classList.remove('hidden');
             } else if (tipo === 'Despesa') {
-                containerDespesa.classList.remove('hidden');
-                verificarDespesaOutros();
+                document.getElementById('container-descricao-despesa').classList.remove('hidden');
             }
         }
 
         function verificarCultoOutros() {
-            const cultoSel = document.getElementById('fin_oferta_culto').value;
-            const inputManual = document.getElementById('fin_culto_manual');
-            const tipo = document.getElementById('fin_tipo').value;
-
-            if (tipo === 'Oferta' && cultoSel === 'Outro Culto') {
-                inputManual.classList.remove('hidden');
-                inputManual.required = true;
-            } else {
-                inputManual.classList.add('hidden');
-                inputManual.required = false;
-                inputManual.value = '';
-            }
+            const culto = document.getElementById('fin_oferta_culto').value;
+            document.getElementById('fin_culto_manual').classList.toggle('hidden', culto !== 'Outro Culto');
         }
-
         function verificarDespesaOutros() {
-            const despesaFixa = document.getElementById('fin_despesa_fixa').value;
-            const inputManual = document.getElementById('fin_despesa_manual');
-            const tipo = document.getElementById('fin_tipo').value;
-
-            if (tipo === 'Despesa' && despesaFixa === 'Outras Despesas') {
-                inputManual.classList.remove('hidden');
-                inputManual.required = true;
-            } else {
-                inputManual.classList.add('hidden');
-                inputManual.required = false;
-                inputManual.value = '';
-            }
+            const desp = document.getElementById('fin_despesa_fixa').value;
+            document.getElementById('fin_despesa_manual').classList.toggle('hidden', desp !== 'Outras Despesas');
         }
 
         function autopreencherCargoMembro() {
-            const nomeSelecionado = document.getElementById('fin_membro_nome').value;
-            const inputCargo = document.getElementById('fin_membro_cargo');
-
-            if (nomeSelecionado === 'Contribuinte Geral') {
-                inputCargo.value = 'Membro';
-                return;
-            }
-
-            const membroEncontrado = listaMembrosCache.find(m => m.nome === nomeSelecionado);
-            if (membroEncontrado && membroEncontrado.cargo) {
-                inputCargo.value = membroEncontrado.cargo;
-            } else {
-                inputCargo.value = 'Membro';
-            }
+            const nome = document.getElementById('fin_membro_nome').value;
+            const m = listaMembrosCache.find(x => x.nome === nome);
+            document.getElementById('fin_membro_cargo').value = m ? (m.cargo || 'Membro') : 'Membro';
         }
 
         async function atualizarListaMembrosNoFormFinanceiro() {
-            try {
-                const { data, error } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
-                if (error) throw error;
-                
-                listaMembrosCache = data; 
-                const selectMembro = document.getElementById('fin_membro_nome');
-                const valorAtual = selectMembro.value;
-
-                selectMembro.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
-                data.forEach(m => {
-                    selectMembro.innerHTML += `<option value="${m.nome}">${m.nome}</option>`;
-                });
-
-                if(valorAtual) selectMembro.value = valorAtual;
-                autopreencherCargoMembro();
-            } catch (err) {
-                console.error("Erro ao carregar membros no financeiro:", err.message);
-            }
+            const { data } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
+            listaMembrosCache = data || [];
+            const sel = document.getElementById('fin_membro_nome');
+            sel.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
+            listaMembrosCache.forEach(m => { sel.innerHTML += `<option value="${m.nome}">${m.nome}</option>`; });
+            autopreencherCargoMembro();
         }
 
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const tipo = document.getElementById('fin_tipo').value;
-            let descricao = '';
-            let diaSemana = null;
+            let desc = '';
+            let dia = null;
+            let cargoMembro = document.getElementById('fin_membro_cargo').value || null;
 
-            if (tipo === 'Dízimo') {
-                descricao = document.getElementById('fin_membro_nome').value;
-            } else if (tipo === 'Oferta') {
-                const cultoSel = document.getElementById('fin_oferta_culto').value;
-                descricao = (cultoSel === 'Outro Culto') ? document.getElementById('fin_culto_manual').value : cultoSel;
-                diaSemana = document.getElementById('fin_oferta_dia').value;
-            } else if (tipo === 'Despesa') {
-                const fixa = document.getElementById('fin_despesa_fixa').value;
-                descricao = (fixa === 'Outras Despesas') ? document.getElementById('fin_despesa_manual').value : fixa;
+            if(tipo === 'Dízimo') {
+                desc = document.getElementById('fin_membro_nome').value;
+            } else if(tipo === 'Oferta') {
+                const c = document.getElementById('fin_oferta_culto').value;
+                desc = c === 'Outro Culto' ? document.getElementById('fin_culto_manual').value : c;
+                dia = document.getElementById('fin_oferta_dia').value;
+                cargoMembro = null; 
+            } else {
+                const df = document.getElementById('fin_despesa_fixa').value;
+                desc = df === 'Outras Despesas' ? document.getElementById('fin_despesa_manual').value : df;
+                cargoMembro = null; 
             }
 
-            const lancamento = {
-                tipo: tipo,
-                descricao: descricao,
+            const lanc = {
+                tipo, 
+                descricao: desc, 
+                cargo: cargoMembro, 
+                dia_semana: dia,
                 valor: parseFloat(document.getElementById('fin_valor').value),
                 data_lancamento: document.getElementById('fin_data').value,
-                dia_semana: diaSemana,
                 observacao: document.getElementById('fin_observacao').value || null
             };
 
             const { error } = editandoFinanceiroID 
-                ? await _supabase.from('financeiro').update(lancamento).eq('id', editandoFinanceiroID)
-                : await _supabase.from('financeiro').insert([lancamento]);
+                ? await _supabase.from('financeiro').update(lanc).eq('id', editandoFinanceiroID) 
+                : await _supabase.from('financeiro').insert([lanc]);
 
             if (error) {
-                alert("Erro ao salvar lançamento: " + error.message);
+                alert("Erro ao salvar: " + error.message);
             } else {
-                alert(editandoFinanceiroID ? "Lançamento updated!" : "Lançamento realizado com sucesso!");
-                resetarEstadoFinanceiro();
+                resetarEstadoFinanceiro(); 
                 carregarFinancas();
             }
         });
+
+        async function carregarFinancas() {
+            const { data } = await _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
+            const tbody = document.getElementById('tabelaFinanceiro');
+            tbody.innerHTML = '';
+            let d = 0, o = 0, de = 0;
+
+            (data || []).forEach(f => {
+                if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
+                
+                const exibicaoDescricao = f.cargo ? `<div>${f.descricao}</div><div class="text-xs text-slate-500 italic">${f.cargo}</div>` : f.descricao;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/30 transition-colors">
+                        <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
+                        <td class="px-6 py-4">${f.tipo}</td>
+                        <td class="px-6 py-4">${exibicaoDescricao}</td>
+                        <td class="px-6 py-4 text-xs">${f.observacao||'-'}</td>
+                        <td class="px-6 py-4 text-right">R$ ${f.valor.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>`;
+            });
+            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
+            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
+            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
+            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
+            lucide.createIcons();
+        }
 
         async function editarFinanca(id) {
             try {
@@ -814,31 +752,36 @@
                 if (error) throw error;
 
                 editandoFinanceiroID = id;
-                
                 document.getElementById('fin_tipo').value = data.tipo;
-                ajustarCamposFinancas(); 
+                ajustarCamposFinancas();
 
                 if (data.tipo === 'Dízimo') {
                     document.getElementById('fin_membro_nome').value = data.descricao;
-                    autopreencherCargoMembro();
+                    document.getElementById('fin_membro_cargo').value = data.cargo || 'Membro';
                 } else if (data.tipo === 'Oferta') {
-                    const opcoesCultos = ["Culto Publico", "Culto de Santa Ceia", "Culto de Ensinamento", "Culto de Missões", "Culto das irmãs", "Culto com os dolescentes", "Congresso", "Não houve Culto"];
-                    if (opcoesCultos.includes(data.descricao)) {
-                        document.getElementById('fin_oferta_culto').value = data.descricao;
+                    const selectCulto = document.getElementById('fin_oferta_culto');
+                    const opcoesDisponiveis = Array.from(selectCulto.options).map(o => o.value);
+                    
+                    if (opcoesDisponiveis.includes(data.descricao)) {
+                        selectCulto.value = data.descricao;
                     } else {
-                        document.getElementById('fin_oferta_culto').value = 'Outro Culto';
-                        verificarCultoOutros();
-                        document.getElementById('fin_culto_manual').value = data.descricao;
+                        selectCulto.value = 'Outro Culto';
+                        const inputManual = document.getElementById('fin_culto_manual');
+                        inputManual.classList.remove('hidden');
+                        inputManual.value = data.descricao;
                     }
                     document.getElementById('fin_oferta_dia').value = data.dia_semana || 'Domingo';
                 } else if (data.tipo === 'Despesa') {
-                    const opcoesFixas = ['Aluguel', 'Ajuda Eclesiástica', 'Limpeza da igreja', 'Conta de Luz', 'Conta de Água', 'Internet'];
-                    if (opcoesFixas.includes(data.descricao)) {
-                        document.getElementById('fin_despesa_fixa').value = data.descricao;
+                    const selectDesp = document.getElementById('fin_despesa_fixa');
+                    const opcoesDisponiveis = Array.from(selectDesp.options).map(o => o.value);
+
+                    if (opcoesDisponiveis.includes(data.descricao)) {
+                        selectDesp.value = data.descricao;
                     } else {
-                        document.getElementById('fin_despesa_fixa').value = 'Outras Despesas';
-                        verificarDespesaOutros();
-                        document.getElementById('fin_despesa_manual').value = data.descricao;
+                        selectDesp.value = 'Outras Despesas';
+                        const inputManual = document.getElementById('fin_despesa_manual');
+                        inputManual.classList.remove('hidden');
+                        inputManual.value = data.descricao;
                     }
                 }
 
@@ -848,127 +791,45 @@
 
                 document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
                 document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
-                document.getElementById('btnSalvarFinanceiro').classList.replace('bg-emerald-600', 'bg-amber-600');
                 document.getElementById('btnCancelarFinanceiro').classList.remove('hidden');
-                
+
                 document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
-                lucide.createIcons();
-            } catch (err) {
-                alert("Erro ao carregar lançamento: " + err.message);
-            }
+            } catch (err) { alert("Erro ao buscar fluxo: " + err.message); }
         }
 
-        function resetarEstadoFinanceiro() {
-            editandoFinanceiroID = null;
-            document.getElementById('formFinanceiro').reset();
-            document.getElementById('fin_data').value = new Date().toISOString().split('T')[0];
-            
+        function resetarEstadoFinanceiro() { 
+            editandoFinanceiroID = null; 
+            document.getElementById('formFinanceiro').reset(); 
             document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
             document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
-            document.getElementById('btnSalvarFinanceiro').className = "inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20";
             document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
-            
-            ajustarCamposFinancas();
-            lucide.createIcons();
+            ajustarCamposFinancas(); 
         }
-
-        async function carregarFinancas() {
-            try {
-                const filtroTipo = document.getElementById('filtroTipo').value;
-                
-                const agora = new Date();
-                const primeiroDia = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0];
-                const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0];
-
-                let query = _supabase.from('financeiro').select('*')
-                    .gte('data_lancamento', primeiroDia)
-                    .lte('data_lancamento', ultimoDia)
-                    .order('data_lancamento', { ascending: false });
-
-                if (filtroTipo) {
-                    query = query.eq('tipo', filtroTipo);
-                }
-
-                const { data, error } = await query;
-                if (error) throw error;
-
-                const tbody = document.getElementById('tabelaFinanceiro');
-                tbody.innerHTML = '';
-
-                let totalDizimos = 0;
-                let totalOfertas = 0;
-                let totalDespesas = 0;
-
-                data.forEach(f => {
-                    if (f.tipo === 'Dízimo') totalDizimos += f.valor;
-                    else if (f.tipo === 'Oferta') totalOfertas += f.valor;
-                    else if (f.tipo === 'Despesa') totalDespesas += f.valor;
-
-                    const corBadge = f.tipo === 'Despesa' ? 'bg-rose-500/10 text-rose-400' : (f.tipo === 'Dízimo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-teal-500/10 text-teal-400');
-                    const sinalValor = f.tipo === 'Despesa' ? '-' : '+';
-                    const corTextoValor = f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400';
-
-                    const sufixoDia = (f.tipo === 'Oferta' && f.dia_semana) ? ` (${f.dia_semana})` : '';
-                    const textoObs = f.observacao ? f.observacao : '---';
-
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-800/30 transition-colors">
-                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(f.data_lancamento)}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold ${corBadge}">
-                                    ${f.tipo.toUpperCase()}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-slate-200 text-sm font-medium">${f.descricao}${sufixoDia}</td>
-                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[180px] truncate" title="${textoObs}">${textoObs}</td>
-                            <td class="px-6 py-4 text-right ${corTextoValor} font-bold text-sm">
-                                ${sinalValor} R$ ${f.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                            </td>
-                            <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarFinanca(${f.id})" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                const saldoMese = (totalDizimos + totalOfertas) - totalDespesas;
-
-                document.getElementById('dashDizimos').textContent = `R$ ${totalDizimos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                document.getElementById('dashOfertas').textContent = `R$ ${totalOfertas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                document.getElementById('dashDespesas').textContent = `R$ ${totalDespesas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                
-                const txtSaldo = document.getElementById('dashSaldoTotal');
-                txtSaldo.textContent = `R$ ${saldoMese.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                txtSaldo.className = `text-2xl font-bold mt-1 ${saldoMese >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
-
-                lucide.createIcons();
-
-            } catch (err) {
-                console.error("Erro ao carregar livro caixa:", err.message);
-            }
-        }
-
-        async function deletarFinanca(id) {
-            if (confirm("Deseja realmente estornar/excluir este lançamento?")) {
-                const { error } = await _supabase.from('financeiro').delete().eq('id', id);
-                if (error) alert("Erro ao excluir"); else carregarFinancas();
-            }
-        }
+        
+        async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
 
 
         // ==========================================
         // ---    SISTEMA DE AGENDA SEMANAL       ---
         // ==========================================
+
+        function atualizarDiaSemanaAutomatico() {
+            const dataDigitada = document.getElementById('agenda_data').value;
+            const inputDiaSemana = document.getElementById('agenda_dia_semana');
+
+            if (!dataDigitada) {
+                inputDiaSemana.value = '';
+                return;
+            }
+
+            const dataObjeto = new Date(dataDigitada + 'T00:00:00');
+            const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            inputDiaSemana.value = diasOrdenados[dataObjeto.getDay()];
+        }
         
-        // Carrega os dados da tabela agenda_semanal ordenados por data
         async function carregarAgenda() {
             try {
-                const { data, error } = await _supabase
-                    .from('agenda_semanal')
-                    .select('*')
-                    .order('data', { ascending: true });
-
+                const { data, error } = await _supabase.from('agenda_semanal').select('*');
                 if (error) throw error;
 
                 const tbody = document.getElementById('tabelaAgenda');
@@ -976,11 +837,15 @@
 
                 data.forEach(ag => {
                     const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
+                    
+                    // Identifica se a propriedade retornou minúscula ou maiúscula do banco
+                    const dataReal = ag.data || ag.Data;
+
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4">
-                                <div class="font-medium text-slate-100">${formatarData(ag.data)}</div>
-                                <div class="text-xs text-amber-400">${ag.horario || ''}</div>
+                                <div class="font-medium text-slate-100">${formatarData(dataReal)}</div>
+                                <div class="text-xs text-amber-400 font-semibold">${ag.horario || ''}</div>
                             </td>
                             <td class="px-6 py-4 text-slate-200 text-sm font-semibold">${ag.tipo_evento || '-'}</td>
                             <td class="px-6 py-4 text-slate-300 text-sm">
@@ -993,20 +858,16 @@
                             </td>
                             <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarAgenda(${ag.id})" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarAgenda(${ag.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editarAgenda('${ag.id}')" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarAgenda('${ag.id}')" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>
                     `;
                 });
-
                 lucide.createIcons();
-            } catch (err) {
-                console.error("Erro ao carregar agenda:", err.message);
-            }
+            } catch (err) { console.error("Erro ao carregar agenda:", err.message); }
         }
 
-        // Submissão do formulário tratando Insert / Update com todos os 11 campos obrigatórios
         document.getElementById('formAgenda').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSalvarAgenda');
@@ -1014,27 +875,27 @@
 
             const dataInput = document.getElementById('agenda_data').value;
             let mesRef = 'Janeiro';
-            let anoRef = new Date().getFullYear();
 
             if (dataInput) {
                 const dataObj = new Date(dataInput + 'T00:00:00');
-                anoRef = dataObj.getFullYear();
                 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 mesRef = meses[dataObj.getMonth()];
             }
 
             const registroAgenda = {
-                data: dataInput,
                 tipo_evento: document.getElementById('agenda_tipo_evento').value,
                 horario: document.getElementById('agenda_horario').value,
                 escala_portaria: document.getElementById('agenda_escala_portaria').value || null,
                 pregador: document.getElementById('agenda_pregador').value || null,
                 escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
                 dirigente: document.getElementById('agenda_dirigente').value || null,
-                saida_visita: document.getElementById('agenda_saida_visita').value || null, // Rótulo Observação
-                mes_referencia: mesRef,
-                ano_referencia: parseInt(anoRef)
+                saida_visita: document.getElementById('agenda_saida_visita').value || null,
+                mes_referencia: mesRef
             };
+
+            // Envia como "data" ou "Data" dependendo do que o banco aceita
+            registroAgenda.data = dataInput;
+            registroAgenda.Data = dataInput;
 
             const { error } = editandoAgendaID 
                 ? await _supabase.from('agenda_semanal').update(registroAgenda).eq('id', editandoAgendaID)
@@ -1043,23 +904,24 @@
             if (error) {
                 alert("Erro ao salvar agenda: " + error.message);
             } else {
-                alert(editandoAgendaID ? "Agenda atualizada!" : "Agenda programada com sucesso!");
+                alert(editandoAgendaID ? "Agenda atualizada com sucesso!" : "Agenda programada com sucesso!");
                 resetarEstadoAgenda();
                 carregarAgenda();
             }
             btn.disabled = false;
         });
 
-        // Preenche o formulário para edição
         async function editarAgenda(id) {
             try {
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
                 if (error) throw error;
 
                 editandoAgendaID = id;
-                document.getElementById('agenda_data').value = data.data;
-                document.getElementById('agenda_tipo_evento').value = data.tipo_evento;
-                document.getElementById('agenda_horario').value = data.horario;
+                document.getElementById('agenda_data').value = data.data || data.Data;
+                atualizarDiaSemanaAutomatico();
+                
+                document.getElementById('agenda_tipo_evento').value = data.tipo_evento || '';
+                document.getElementById('agenda_horario').value = data.horario || '';
                 document.getElementById('agenda_dirigente').value = data.dirigente || '';
                 document.getElementById('agenda_pregador').value = data.pregador || '';
                 document.getElementById('agenda_escala_portaria').value = data.escala_portaria || '';
@@ -1071,31 +933,25 @@
                 document.getElementById('btnCancelarAgenda').classList.remove('hidden');
 
                 document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
-                lucide.createIcons();
-            } catch (err) {
-                alert("Erro ao buscar registro: " + err.message);
-            }
+            } catch (err) { alert("Erro ao buscar registro: " + err.message); }
         }
 
         function resetarEstadoAgenda() {
             editandoAgendaID = null;
             document.getElementById('formAgenda').reset();
-            document.getElementById('agenda_data').value = new Date().toISOString().split('T')[0];
             document.getElementById('tituloFormAgenda').innerText = "Programar Evento / Culto";
             document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Agenda";
             document.getElementById('btnCancelarAgenda').classList.add('hidden');
-            lucide.createIcons();
         }
 
         async function deletarAgenda(id) {
             if (confirm("Deseja realmente remover este evento da agenda?")) {
                 const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
-                if (error) alert("Erro ao excluir registro"); else carregarAgenda();
+                if (error) { alert("Erro ao excluir registro: " + error.message); } else { carregarAgenda(); }
             }
         }
 
-
-        // --- INICIALIZAÇÃO DO APP ---
+        // --- INICIALIZAÇÃO ---
         window.onload = function() {
             carregarMembros();
             lucide.createIcons();
@@ -1103,4 +959,3 @@
     </script>
 </body>
 </html>
-
