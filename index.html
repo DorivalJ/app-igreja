@@ -768,49 +768,45 @@
             }
         }
 
-document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const tipo = document.getElementById('fin_tipo').value;
-    let desc = '';
-    let dia = null;
-    // Captura o cargo diretamente do input da tela
-    let cargoMembro = document.getElementById('fin_membro_cargo').value || null;
+        document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tipo = document.getElementById('fin_tipo').value;
+            let descricao = '';
+            let diaSemana = null;
 
-    if(tipo === 'Dízimo') {
-        desc = document.getElementById('fin_membro_nome').value;
-    } else if(tipo === 'Oferta') {
-        const c = document.getElementById('fin_oferta_culto').value;
-        desc = c === 'Outro Culto' ? document.getElementById('fin_culto_manual').value : c;
-        dia = document.getElementById('fin_oferta_dia').value;
-        cargoMembro = null; // Ofertas não têm cargo atrelado
-    } else {
-        const df = document.getElementById('fin_despesa_fixa').value;
-        desc = df === 'Outras Despesas' ? document.getElementById('fin_despesa_manual').value : df;
-        cargoMembro = null; // Despesas não têm cargo atrelado
-    }
+            if (tipo === 'Dízimo') {
+                descricao = document.getElementById('fin_membro_nome').value;
+            } else if (tipo === 'Oferta') {
+                const cultoSel = document.getElementById('fin_oferta_culto').value;
+                descricao = (cultoSel === 'Outro Culto') ? document.getElementById('fin_culto_manual').value : cultoSel;
+                diaSemana = document.getElementById('fin_oferta_dia').value;
+            } else if (tipo === 'Despesa') {
+                const fixa = document.getElementById('fin_despesa_fixa').value;
+                descricao = (fixa === 'Outras Despesas') ? document.getElementById('fin_despesa_manual').value : fixa;
+            }
 
-    // Objeto ajustado para incluir a nova coluna 'cargo' do seu banco
-    const lanc = {
-        tipo, 
-        descricao: desc, 
-        cargo: cargoMembro, // <-- ESSA LINHA DIZ AO SUPABASE O QUE SALVAR NO BANCO
-        dia_semana: dia,
-        valor: parseFloat(document.getElementById('fin_valor').value),
-        data_lancamento: document.getElementById('fin_data').value,
-        observacao: document.getElementById('fin_observacao').value || null
-    };
+            const lancamento = {
+                tipo: tipo,
+                descricao: descricao,
+                valor: parseFloat(document.getElementById('fin_valor').value),
+                data_lancamento: document.getElementById('fin_data').value,
+                dia_semana: diaSemana,
+                observacao: document.getElementById('fin_observacao').value || null
+            };
 
-    const { error } = editandoFinanceiroID 
-        ? await _supabase.from('financeiro').update(lanc).eq('id', editandoFinanceiroID) 
-        : await _supabase.from('financeiro').insert([lanc]);
+            const { error } = editandoFinanceiroID 
+                ? await _supabase.from('financeiro').update(lancamento).eq('id', editandoFinanceiroID)
+                : await _supabase.from('financeiro').insert([lancamento]);
 
-    if (error) {
-        alert("Erro ao salvar: " + error.message);
-    } else {
-        resetarEstadoFinanceiro(); 
-        carregarFinancas();
-    }
-});
+            if (error) {
+                alert("Erro ao salvar lançamento: " + error.message);
+            } else {
+                alert(editandoFinanceiroID ? "Lançamento updated!" : "Lançamento realizado com sucesso!");
+                resetarEstadoFinanceiro();
+                carregarFinancas();
+            }
+        });
 
         async function editarFinanca(id) {
             try {
@@ -877,35 +873,77 @@ document.getElementById('formFinanceiro').addEventListener('submit', async (e) =
         }
 
         async function carregarFinancas() {
-    const { data } = await _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
-    const tbody = document.getElementById('tabelaFinanceiro');
-    tbody.innerHTML = '';
-    let d = 0, o = 0, de = 0;
+            try {
+                const filtroTipo = document.getElementById('filtroTipo').value;
+                
+                const agora = new Date();
+                const primeiroDia = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0];
+                const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    (data || []).forEach(f => {
-        if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
-        
-        // Formata a exibição para incluir o cargo abaixo do nome se ele existir
-        const exibicaoDescricao = f.cargo ? `<div>${f.descricao}</div><div class="text-xs text-slate-500 italic">${f.cargo}</div>` : f.descricao;
+                let query = _supabase.from('financeiro').select('*')
+                    .gte('data_lancamento', primeiroDia)
+                    .lte('data_lancamento', ultimoDia)
+                    .order('data_lancamento', { ascending: false });
 
-        tbody.innerHTML += `
-            <tr class="hover:bg-slate-800/30 transition-colors">
-                <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
-                <td class="px-6 py-4">${f.tipo}</td>
-                <td class="px-6 py-4">${exibicaoDescricao}</td>
-                <td class="px-6 py-4 text-xs">${f.observacao||'-'}</td>
-                <td class="px-6 py-4 text-right">R$ ${f.valor.toFixed(2)}</td>
-                <td class="px-6 py-4 text-right whitespace-nowrap">
-                    <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                    <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </td>
-            </tr>`;
-    });
-    document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
-    document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
-    document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
-    document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
-    lucide.createIcons();
+                if (filtroTipo) {
+                    query = query.eq('tipo', filtroTipo);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                const tbody = document.getElementById('tabelaFinanceiro');
+                tbody.innerHTML = '';
+
+                let totalDizimos = 0;
+                let totalOfertas = 0;
+                let totalDespesas = 0;
+
+                data.forEach(f => {
+                    if (f.tipo === 'Dízimo') totalDizimos += f.valor;
+                    else if (f.tipo === 'Oferta') totalOfertas += f.valor;
+                    else if (f.tipo === 'Despesa') totalDespesas += f.valor;
+
+                    const corBadge = f.tipo === 'Despesa' ? 'bg-rose-500/10 text-rose-400' : (f.tipo === 'Dízimo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-teal-500/10 text-teal-400');
+                    const sinalValor = f.tipo === 'Despesa' ? '-' : '+';
+                    const corTextoValor = f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400';
+
+                    const sufixoDia = (f.tipo === 'Oferta' && f.dia_semana) ? ` (${f.dia_semana})` : '';
+                    const textoObs = f.observacao ? f.observacao : '---';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(f.data_lancamento)}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded text-[10px] font-bold ${corBadge}">
+                                    ${f.tipo.toUpperCase()}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-200 text-sm font-medium">${f.descricao}${sufixoDia}</td>
+                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[180px] truncate" title="${textoObs}">${textoObs}</td>
+                            <td class="px-6 py-4 text-right ${corTextoValor} font-bold text-sm">
+                                ${sinalValor} R$ ${f.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                            </td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarFinanca(${f.id})" class="text-slate-500 hover:text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                const saldoMese = (totalDizimos + totalOfertas) - totalDespesas;
+
+                document.getElementById('dashDizimos').textContent = `R$ ${totalDizimos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                document.getElementById('dashOfertas').textContent = `R$ ${totalOfertas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                document.getElementById('dashDespesas').textContent = `R$ ${totalDespesas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                
+                const txtSaldo = document.getElementById('dashSaldoTotal');
+                txtSaldo.textContent = `R$ ${saldoMese.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                txtSaldo.className = `text-2xl font-bold mt-1 ${saldoMese >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+                lucide.createIcons();
+
             } catch (err) {
                 console.error("Erro ao carregar livro caixa:", err.message);
             }
