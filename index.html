@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #020617; scroll-behavior: smooth; }
         ::-webkit-scrollbar { width: 8px; }
@@ -409,9 +409,6 @@
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
                                     <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
-
-                                <input type="hidden" id="agenda_mes_referencia">
-                                <input type="hidden" id="agenda_ano_referencia">
                             </div>
 
                             <div class="mt-8 flex justify-end">
@@ -470,7 +467,7 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let editandoID = null;
         let editandoFinanceiroID = null; 
-        let editandoAgendaID = null;
+        let editandoAgendaID = null; // Guardará a string do UUID
         let listaMembrosCache = []; 
 
         // --- NAVEGAÇÃO DA SIDEBAR ---
@@ -804,7 +801,8 @@
         
         async function carregarAgenda() {
             try {
-                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
+                // Seleciona as colunas exatas da tabela mapeada (id, Data, tipo_evento, etc.)
+                const { data, error } = await _supabase.from('agenda_semanal').select('id, Data, tipo_evento, horario, escala_portaria, pregador, escala_ofertas, dirigente, saida_visita, mes_referencia').order('Data', { ascending: true });
                 if (error) throw error;
 
                 const tbody = document.getElementById('tabelaAgenda');
@@ -812,11 +810,12 @@
 
                 data.forEach(ag => {
                     const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
+                    // CORREÇÃO CRUCIAL: ag.id passado como string ('${ag.id}') por ser do tipo UUID
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4">
-                                <div class="font-medium text-slate-100">${formatarData(ag.data)}</div>
-                                <div class="text-xs text-amber-400 font-semibold">${ag.dia_semana || ''} - ${ag.horario || ''}</div>
+                                <div class="font-medium text-slate-100">${formatarData(ag.Data)}</div>
+                                <div class="text-xs text-amber-400 font-semibold">${ag.horario || ''}</div>
                             </td>
                             <td class="px-6 py-4 text-slate-200 text-sm font-semibold">${ag.tipo_evento || '-'}</td>
                             <td class="px-6 py-4 text-slate-300 text-sm">
@@ -829,8 +828,8 @@
                             </td>
                             <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarAgenda(${ag.id})" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarAgenda(${ag.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editarAgenda('${ag.id}')" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarAgenda('${ag.id}')" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>
                     `;
@@ -846,18 +845,16 @@
 
             const dataInput = document.getElementById('agenda_data').value;
             let mesRef = 'Janeiro';
-            let anoRef = new Date().getFullYear();
 
             if (dataInput) {
                 const dataObj = new Date(dataInput + 'T00:00:00');
-                anoRef = dataObj.getFullYear();
                 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 mesRef = meses[dataObj.getMonth()];
             }
 
+            // Mapeado de acordo com as colunas reais da sua tabela (Maiúsculas/Minúsculas respeitadas)
             const registroAgenda = {
-                data: dataInput,
-                dia_semana: document.getElementById('agenda_dia_semana').value, 
+                Data: dataInput,
                 tipo_evento: document.getElementById('agenda_tipo_evento').value,
                 horario: document.getElementById('agenda_horario').value,
                 escala_portaria: document.getElementById('agenda_escala_portaria').value || null,
@@ -865,8 +862,7 @@
                 escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
                 dirigente: document.getElementById('agenda_dirigente').value || null,
                 saida_visita: document.getElementById('agenda_saida_visita').value || null,
-                mes_referencia: mesRef,
-                ano_referencia: parseInt(anoRef)
+                mes_referencia: mesRef
             };
 
             const { error } = editandoAgendaID 
@@ -889,10 +885,11 @@
                 if (error) throw error;
 
                 editandoAgendaID = id;
-                document.getElementById('agenda_data').value = data.data;
-                document.getElementById('agenda_dia_semana').value = data.dia_semana || '';
-                document.getElementById('agenda_tipo_evento').value = data.tipo_evento;
-                document.getElementById('agenda_horario').value = data.horario;
+                document.getElementById('agenda_data').value = data.Data;
+                atualizarDiaSemanaAutomatico();
+                
+                document.getElementById('agenda_tipo_evento').value = data.tipo_evento || '';
+                document.getElementById('agenda_horario').value = data.horario || '';
                 document.getElementById('agenda_dirigente').value = data.dirigente || '';
                 document.getElementById('agenda_pregador').value = data.pregador || '';
                 document.getElementById('agenda_escala_portaria').value = data.escala_portaria || '';
