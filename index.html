@@ -358,13 +358,108 @@
                     </section>
                 </div>
 
-                <!-- 3. TELA DE AGENDA SEMANAL -->
+                <!-- ========================================== -->
+                <!-- 3. TELA DE AGENDA SEMANAL                  -->
+                <!-- ========================================== -->
                 <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
-                    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center">
-                        <i data-lucide="calendar" class="w-12 h-12 text-amber-500 mx-auto mb-4"></i>
-                        <h2 class="text-2xl font-bold text-white">Agenda Semanal da Igreja</h2>
-                        <p class="text-slate-400 mt-2">Módulo destinado aos Cultos, Ensaios, Oração e emissão de relatório para o mural.</p>
-                    </div>
+                    <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeFormAgenda" data-lucide="calendar-plus" class="w-5 h-5 text-amber-400"></i>
+                                <h2 id="tituloFormAgenda" class="font-semibold text-slate-100">Programar Evento / Culto</h2>
+                            </div>
+                            <button id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
+                        </div>
+                        
+                        <form id="formAgenda" class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <!-- Data (date) -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
+                                    <input type="date" id="agenda_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+
+                                <!-- tipo_evento (text) -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Evento</label>
+                                    <input type="text" id="agenda_tipo_evento" required placeholder="Ex: Culto de Ensino, Ensaio" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- horario (text) -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
+                                    <input type="text" id="agenda_horario" required placeholder="Ex: 19:30, 09:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- dirigente (text) -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dirigente</label>
+                                    <input type="text" id="agenda_dirigente" placeholder="Nome do dirigente" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- pregador (text) -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pregador</label>
+                                    <input type="text" id="agenda_pregador" placeholder="Nome do pregador" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- escala_portaria (text) -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Portaria</label>
+                                    <input type="text" id="agenda_escala_portaria" placeholder="Responsáveis pela portaria" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- escala_ofertas (text) -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Ofertas</label>
+                                    <input type="text" id="agenda_escala_ofertas" placeholder="Responsáveis pelo recolhimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- saida_visita (text) -> Rótulo Observação -->
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
+                                    <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <!-- mes_referencia (text) e ano_referencia (int4) controlados automaticamente em inputs ocultos -->
+                                <input type="hidden" id="agenda_mes_referencia">
+                                <input type="hidden" id="agenda_ano_referencia">
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button type="submit" id="btnSalvarAgenda" class="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-500 transition-all shadow-lg shadow-amber-600/20">
+                                    <i data-lucide="save" class="w-5 h-5"></i>
+                                    <span id="textoBtnSalvarAgenda">Salvar Agenda</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- TABELA DE EXIBIÇÃO DA AGENDA SEMANAL -->
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma da Agenda Semanal
+                            </h2>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Data / Hora</th>
+                                        <th class="px-6 py-4">Evento</th>
+                                        <th class="px-6 py-4">Dirigente / Pregador</th>
+                                        <th class="px-6 py-4">Portaria / Ofertas</th>
+                                        <th class="px-6 py-4">Observação</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaAgenda" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
 
                 <!-- 4. TELA DE DOCUMENTOS -->
@@ -390,6 +485,7 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let editandoID = null;
         let editandoFinanceiroID = null; 
+        let editandoAgendaID = null;
         let listaMembrosCache = []; 
 
         // --- SISTEMA DE NAVEGAÇÃO DA SIDEBAR ---
@@ -434,6 +530,9 @@
                 topbarTitulo.innerText = "Agenda Semanal";
                 topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-900/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
+                
+                resetarEstadoAgenda();
+                carregarAgenda();
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas e Convites";
@@ -572,8 +671,6 @@
         // ==========================================
         // --- SISTEMA DA TESOURARIA (FINANCEIRO) ---
         // ==========================================
-
-        // Controla de forma inteligente quais blocos de campos aparecem baseados no Tipo de Fluxo
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
             
@@ -583,7 +680,6 @@
             const containerOfertaCulto = document.getElementById('container-oferta-culto');
             const containerOfertaDia = document.getElementById('container-oferta-dia');
 
-            // Esconde tudo primeiro por segurança
             containerMembro.classList.add('hidden');
             containerCargo.classList.add('hidden');
             containerDespesa.classList.add('hidden');
@@ -604,7 +700,6 @@
             }
         }
 
-        // Se escolher "Outro Culto", abre campo de texto livre
         function verificarCultoOutros() {
             const cultoSel = document.getElementById('fin_oferta_culto').value;
             const inputManual = document.getElementById('fin_culto_manual');
@@ -620,7 +715,6 @@
             }
         }
 
-        // Se escolher "Outras Despesas", abre campo livre
         function verificarDespesaOutros() {
             const despesaFixa = document.getElementById('fin_despesa_fixa').value;
             const inputManual = document.getElementById('fin_despesa_manual');
@@ -674,7 +768,6 @@
             }
         }
 
-        // Realiza o salvamento tratando dízimos, ofertas e despesas de formas diferentes
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -709,13 +802,12 @@
             if (error) {
                 alert("Erro ao salvar lançamento: " + error.message);
             } else {
-                alert(editandoFinanceiroID ? "Lançamento atualizado!" : "Lançamento realizado com sucesso!");
+                alert(editandoFinanceiroID ? "Lançamento updated!" : "Lançamento realizado com sucesso!");
                 resetarEstadoFinanceiro();
                 carregarFinancas();
             }
         });
 
-        // Puxa a linha da tabela de volta para o formulário ajustando os campos corretos
         async function editarFinanca(id) {
             try {
                 const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
@@ -754,7 +846,6 @@
                 document.getElementById('fin_data').value = data.data_lancamento;
                 document.getElementById('fin_observacao').value = data.observacao || '';
 
-                // Muda o visual para modo Edição (Âmbar)
                 document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
                 document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
                 document.getElementById('btnSalvarFinanceiro').classList.replace('bg-emerald-600', 'bg-amber-600');
@@ -817,7 +908,6 @@
                     const sinalValor = f.tipo === 'Despesa' ? '-' : '+';
                     const corTextoValor = f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400';
 
-                    // Formata a exibição do nome do culto junto com o dia se for Oferta
                     const sufixoDia = (f.tipo === 'Oferta' && f.dia_semana) ? ` (${f.dia_semana})` : '';
                     const textoObs = f.observacao ? f.observacao : '---';
 
@@ -865,6 +955,145 @@
                 if (error) alert("Erro ao excluir"); else carregarFinancas();
             }
         }
+
+
+        // ==========================================
+        // ---    SISTEMA DE AGENDA SEMANAL       ---
+        // ==========================================
+        
+        // Carrega os dados da tabela agenda_semanal ordenados por data
+        async function carregarAgenda() {
+            try {
+                const { data, error } = await _supabase
+                    .from('agenda_semanal')
+                    .select('*')
+                    .order('data', { ascending: true });
+
+                if (error) throw error;
+
+                const tbody = document.getElementById('tabelaAgenda');
+                tbody.innerHTML = '';
+
+                data.forEach(ag => {
+                    const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-slate-100">${formatarData(ag.data)}</div>
+                                <div class="text-xs text-amber-400">${ag.horario || ''}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-200 text-sm font-semibold">${ag.tipo_evento || '-'}</td>
+                            <td class="px-6 py-4 text-slate-300 text-sm">
+                                <div><span class="text-slate-500 text-xs">Dir:</span> ${ag.dirigente || '-'}</div>
+                                <div><span class="text-slate-500 text-xs">Preg:</span> ${ag.pregador || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-300 text-sm">
+                                <div><span class="text-slate-500 text-xs">Port:</span> ${ag.escala_portaria || '-'}</div>
+                                <div><span class="text-slate-500 text-xs">Ofert:</span> ${ag.escala_ofertas || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button onclick="editarAgenda(${ag.id})" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarAgenda(${ag.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Erro ao carregar agenda:", err.message);
+            }
+        }
+
+        // Submissão do formulário tratando Insert / Update com todos os 11 campos obrigatórios
+        document.getElementById('formAgenda').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSalvarAgenda');
+            btn.disabled = true;
+
+            const dataInput = document.getElementById('agenda_data').value;
+            let mesRef = 'Janeiro';
+            let anoRef = new Date().getFullYear();
+
+            if (dataInput) {
+                const dataObj = new Date(dataInput + 'T00:00:00');
+                anoRef = dataObj.getFullYear();
+                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                mesRef = meses[dataObj.getMonth()];
+            }
+
+            const registroAgenda = {
+                data: dataInput,
+                tipo_evento: document.getElementById('agenda_tipo_evento').value,
+                horario: document.getElementById('agenda_horario').value,
+                escala_portaria: document.getElementById('agenda_escala_portaria').value || null,
+                pregador: document.getElementById('agenda_pregador').value || null,
+                escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
+                dirigente: document.getElementById('agenda_dirigente').value || null,
+                saida_visita: document.getElementById('agenda_saida_visita').value || null, // Rótulo Observação
+                mes_referencia: mesRef,
+                ano_referencia: parseInt(anoRef)
+            };
+
+            const { error } = editandoAgendaID 
+                ? await _supabase.from('agenda_semanal').update(registroAgenda).eq('id', editandoAgendaID)
+                : await _supabase.from('agenda_semanal').insert([registroAgenda]);
+
+            if (error) {
+                alert("Erro ao salvar agenda: " + error.message);
+            } else {
+                alert(editandoAgendaID ? "Agenda atualizada!" : "Agenda programada com sucesso!");
+                resetarEstadoAgenda();
+                carregarAgenda();
+            }
+            btn.disabled = false;
+        });
+
+        // Preenche o formulário para edição
+        async function editarAgenda(id) {
+            try {
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
+                if (error) throw error;
+
+                editandoAgendaID = id;
+                document.getElementById('agenda_data').value = data.data;
+                document.getElementById('agenda_tipo_evento').value = data.tipo_evento;
+                document.getElementById('agenda_horario').value = data.horario;
+                document.getElementById('agenda_dirigente').value = data.dirigente || '';
+                document.getElementById('agenda_pregador').value = data.pregador || '';
+                document.getElementById('agenda_escala_portaria').value = data.escala_portaria || '';
+                document.getElementById('agenda_escala_ofertas').value = data.escala_ofertas || '';
+                document.getElementById('agenda_saida_visita').value = data.saida_visita || '';
+
+                document.getElementById('tituloFormAgenda').innerText = "Editando Cronograma da Agenda";
+                document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Agenda";
+                document.getElementById('btnCancelarAgenda').classList.remove('hidden');
+
+                document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
+                lucide.createIcons();
+            } catch (err) {
+                alert("Erro ao buscar registro: " + err.message);
+            }
+        }
+
+        function resetarEstadoAgenda() {
+            editandoAgendaID = null;
+            document.getElementById('formAgenda').reset();
+            document.getElementById('agenda_data').value = new Date().toISOString().split('T')[0];
+            document.getElementById('tituloFormAgenda').innerText = "Programar Evento / Culto";
+            document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Agenda";
+            document.getElementById('btnCancelarAgenda').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        async function deletarAgenda(id) {
+            if (confirm("Deseja realmente remover este evento da agenda?")) {
+                const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
+                if (error) alert("Erro ao excluir registro"); else carregarAgenda();
+            }
+        }
+
 
         // --- INICIALIZAÇÃO DO APP ---
         window.onload = function() {
