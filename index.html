@@ -445,7 +445,7 @@
                                 <thead>
                                     <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
                                         <th class="px-6 py-4">Data / Dia</th>
-                                        <th class="px-6 py-4">Evento</th>
+                                        <th class="px-6 py-4">Eventos</th>
                                         <th class="px-6 py-4">Dirigente / Pregador</th>
                                         <th class="px-6 py-4">Portaria / Ofertas</th>
                                         <th class="px-6 py-4">Observação</th>
@@ -523,7 +523,7 @@
             } else if (idTela === 'agenda') {
                 botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
                 topbarTitulo.innerText = "Agenda Semanal";
-                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-900/20";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
                 resetarEstadoAgenda();
                 carregarAgenda();
@@ -739,7 +739,7 @@
         // ---    SISTEMA DE AGENDA SEMANAL       ---
         // ==========================================
 
-        // RECURSO SOLICITADO: Transforma automaticamente a data no Dia da Semana em português
+        // Transforma automaticamente a data no Dia da Semana em português
         function atualizarDiaSemanaAutomatico() {
             const dataDigitada = document.getElementById('agenda_data').value;
             const inputDiaSemana = document.getElementById('agenda_dia_semana');
@@ -749,7 +749,6 @@
                 return;
             }
 
-            // O sufixo T00:00:00 impede que o JavaScript mude o fuso horário para o dia anterior
             const dataObjeto = new Date(dataDigitada + 'T00:00:00');
             
             const diasOrdenados = [
@@ -828,7 +827,7 @@
 
             const registroAgenda = {
                 data: dataInput,
-                dia_semana: document.getElementById('agenda_dia_semana').value, // CAMPO ADICIONADO E INTEGRADO
+                dia_semana: document.getElementById('agenda_dia_semana').value, 
                 tipo_evento: document.getElementById('agenda_tipo_evento').value,
                 horario: document.getElementById('agenda_horario').value,
                 escala_portaria: document.getElementById('agenda_escala_portaria').value || null,
@@ -847,7 +846,7 @@
             if (error) {
                 alert("Erro ao salvar agenda: " + error.message);
             } else {
-                alert(editandoAgendaID ? "Agenda atualizada!" : "Agenda programada com sucesso!");
+                alert(editandoAgendaID ? "Agenda atualizada com sucesso!" : "Agenda programada com sucesso!");
                 resetarEstadoAgenda();
                 carregarAgenda();
             }
@@ -884,8 +883,6 @@
         function resetarEstadoAgenda() {
             editandoAgendaID = null;
             document.getElementById('formAgenda').reset();
-            document.getElementById('agenda_data').value = new Date().toISOString().split('T')[0];
-            atualizarDiaSemanaAutomatico(); // Calcula o dia atual por padrão
             document.getElementById('tituloFormAgenda').innerText = "Programar Evento / Culto";
             document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Agenda";
             document.getElementById('btnCancelarAgenda').classList.add('hidden');
@@ -895,7 +892,11 @@
         async function deletarAgenda(id) {
             if (confirm("Deseja realmente remover este evento da agenda?")) {
                 const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
-                if (error) alert("Erro ao excluir registro"); else carregarAgenda();
+                if (error) {
+                    alert("Erro ao excluir registro: " + error.message);
+                } else {
+                    carregarAgenda();
+                }
             }
         }
 
