@@ -123,7 +123,7 @@
                                 </div>
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
-                                    <input type="text" id="cargo" placeholder="Ex: Diácono, Membro, Pastor" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <input type="text" id="cargo" placeholder="Ex: Pastor Dirigente, Presbítero, Diácono, Auxiliar" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Membresia</label>
@@ -451,16 +451,23 @@
                 </div>
 
                 <!-- ========================================== -->
-                <!-- 4. TELA MURAL DE ATRIBUIÇÕES (NOVA!)       -->
+                <!-- 4. TELA MURAL DE ATRIBUIÇÕES (CORRIGIDA)   -->
                 <!-- ========================================== -->
                 <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-6 border-b border-slate-800 bg-slate-900/50">
-                            <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="layout-dashboard" class="w-6 h-6 text-indigo-400"></i> 
-                                QUADRO DE ATRIBUIÇÕES E OFICIAIS
-                            </h2>
-                            <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
+                        <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                    <i data-lucide="layout-dashboard" class="w-6 h-6 text-indigo-400"></i> 
+                                    QUADRO DE ATRIBUIÇÕES E OFICIAIS
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
+                            </div>
+                            <!-- NOVO BOTÃO DE IMPRESSÃO PROFISSIONAL -->
+                            <button onclick="imprimirFluxogramaMural()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                <span>Ver Fluxograma de Atribuições</span>
+                            </button>
                         </div>
                         
                         <div class="p-6 md:p-8">
@@ -574,14 +581,47 @@
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
 
-        // Mapeamento das listas enviadas por você
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
             Memorando: ['Desligamento', 'Reintegração', 'Integração', 'Suspensão', 'Exclusão', 'Memorando Interno', 'Apresentação na Sede'],
             Convite: ['Preletores', 'Cantores', 'Igrejas', 'Abadguar', 'Congresso Com Jovens', 'Congresso Com Adolescentes', 'Congresso Com as Irmãs', 'Outros Cultos']
         };
 
-        // --- NAVEGAÇÃO DA SIDEBAR CORRIGIDA ---
+        // --- CONFIGURAÇÃO DE CARGOS DO CORPO DE OBREIROS ---
+        const estruturaCargosEclesiasticos = [
+            { 
+                chaves: ['pastor dirigente', 'pastor local', 'dirigente'], 
+                titulo: 'Pastor Dirigente', 
+                cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', 
+                icone: 'user-check' 
+            },
+            { 
+                chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], 
+                titulo: 'Co-Pastor', 
+                cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', 
+                icone: 'shield' 
+            },
+            { 
+                chaves: ['presbitero', 'presbítero'], 
+                titulo: 'Corpo de Presbíteros', 
+                cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', 
+                icone: 'award' 
+            },
+            { 
+                chaves: ['diacono', 'diácono', 'diaconisa'], 
+                titulo: 'Corpo de Diáconos / Diaconisas', 
+                cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', 
+                icone: 'heart' 
+            },
+            { 
+                chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], 
+                titulo: 'Auxiliares da Obra', 
+                cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', 
+                icone: 'help-circle' 
+            }
+        ];
+
+        // --- NAVEGAÇÃO DA SIDEBAR ---
         function navegarPara(idTela) {
             document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
@@ -647,21 +687,18 @@
                 const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
                 if (error) throw error;
 
-                const cargosMural = [
-                    { cargo: 'Pastor', titulo: 'Pastor Presidente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
-                    { cargo: 'Pastor Auxiliar', titulo: 'Pastor Auxiliar', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
-                    { cargo: 'Presbítero', titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
-                    { cargo: 'Diácono', titulo: 'Corpo de Diáconos', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
-                    { cargo: 'Cooperador', titulo: 'Cooperadores da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' },
-                    { cargo: 'Secretário', titulo: 'Secretaria Geral', cor: 'border-teal-500/30 text-teal-400 bg-teal-500/5', icone: 'file-text' },
-                    { cargo: 'Tesoureiro', titulo: 'Departamento Financeiro', cor: 'border-cyan-500/30 text-cyan-400 bg-cyan-500/5', icone: 'dollar-sign' }
-                ];
-
                 const container = document.getElementById('containerFluxogramaMural');
                 container.innerHTML = '';
 
-                cargosMural.forEach(c => {
-                    const oficiais = membros.filter(m => m.cargo && m.cargo.toLowerCase().trim() === c.cargo.toLowerCase().trim());
+                estruturaCargosEclesiasticos.forEach(c => {
+                    const oficiais = membros.filter(m => {
+                        if (!m.cargo) return false;
+                        const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                        return c.chaves.some(chave => {
+                            const chaveLimpa = chave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                            return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
+                        });
+                    });
                     
                     let listaNomes = '';
                     if (oficiais.length === 0) {
@@ -673,6 +710,7 @@
                                 <li class="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-850">
                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
                                     <span class="font-medium">${o.nome}</span>
+                                    <span class="text-[10px] text-slate-500 ml-auto italic">${o.cargo}</span>
                                 </li>`;
                         });
                         listaNomes += `</ul>`;
@@ -699,7 +737,91 @@
             }
         }
 
-        // --- SISTEMA DE DOCUMENTOS (DINÂMICO) ---
+        // --- SISTEMA DE IMPRESSÃO DO FLUXOGRAMA ---
+        async function imprimirFluxogramaMural() {
+            try {
+                const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
+                if (error) throw error;
+
+                let conteudoHtml = '';
+
+                estruturaCargosEclesiasticos.forEach(c => {
+                    const oficiais = membros.filter(m => {
+                        if (!m.cargo) return false;
+                        const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                        return c.chaves.some(chave => {
+                            const chaveLimpa = chave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                            return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
+                        });
+                    });
+
+                    conteudoHtml += `
+                        <div class="bloco-cargo">
+                            <h2>${c.titulo.toUpperCase()} (${oficiais.length})</h2>
+                            <div class="grade-oficiais">
+                    `;
+
+                    if (oficiais.length === 0) {
+                        conteudoHtml += `<p class="vazio">Nenhum oficial escalado neste setor.</p>`;
+                    } else {
+                        oficiais.forEach(o => {
+                            conteudoHtml += `
+                                <div class="item-oficial">
+                                    <span class="ponto">•</span>
+                                    <strong>${o.nome}</strong> 
+                                    <span class="cargo-sub">(${o.cargo})</span>
+                                </div>`;
+                        });
+                    }
+
+                    conteudoHtml += `</div></div>`;
+                });
+
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Mural - Corpo de Obreiros e Oficiais</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; line-height: 1.5; }
+                            .header { text-align: center; border-bottom: 3px double #475569; padding-bottom: 20px; margin-bottom: 30px; }
+                            .header h1 { margin: 0; font-size: 26px; color: #0f172a; tracking-wide; }
+                            .header p { margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; }
+                            .bloco-cargo { margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+                            .bloco-cargo h2 { background-color: #f1f5f9; margin: 0; padding: 12px 15px; font-size: 14px; letter-spacing: 1px; color: #1e293b; border-bottom: 1px solid #cbd5e1; }
+                            .grade-oficiais { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+                            .item-oficial { font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px; }
+                            .item-oficial .ponto { color: #4f46e5; font-size: 16px; }
+                            .item-oficial .cargo-sub { color: #64748b; font-size: 11px; font-style: italic; }
+                            .vazio { font-style: italic; color: #94a3b8; font-size: 12px; margin: 0; padding: 5px; }
+                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+                            @media print {
+                                body { margin: 20px; }
+                                .btn-print { display: none; }
+                            }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Quadro</button>
+                        <div class="header">
+                            <h1>FLUXOGRAMA DE ATRIBUIÇÕES E OFICIAIS</h1>
+                            <p>Corpo de Obreiros e Ministério Local</p>
+                        </div>
+                        ${conteudoHtml}
+                        <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+
+            } catch (err) {
+                alert("Erro ao preparar documento de impressão: " + err.message);
+            }
+        }
+
+        // --- SISTEMA DE DOCUMENTOS ---
         function atualizarTiposDocumento() {
             const categoria = document.getElementById('doc_categoria').value;
             const selectTipo = document.getElementById('doc_tipo');
@@ -727,7 +849,6 @@
             
             const boxHora = document.getElementById('box-doc-hora');
 
-            // Reset padrão de exibição
             boxLocal.classList.add('hidden');
             boxData.classList.add('hidden');
             boxHora.classList.add('hidden');
@@ -1107,7 +1228,6 @@
                 saida_visita: document.getElementById('agenda_saida_visita').value || null,
                 mes_referencia: mesRef,
                 data: dataInput
-               
             };
 
             const { error } = editandoAgendaID 
