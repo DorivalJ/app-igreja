@@ -427,10 +427,15 @@
                     </section>
 
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
                                 <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma da Agenda Semanal
                             </h2>
+                            <!-- NOVO BOTÃO DE IMPRESSÃO DA AGENDA -->
+                            <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-sm rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                <span>Imprimir Agenda para Mural</span>
+                            </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
@@ -451,7 +456,7 @@
                 </div>
 
                 <!-- ========================================== -->
-                <!-- 4. TELA MURAL DE ATRIBUIÇÕES (CORRIGIDA)   -->
+                <!-- 4. TELA MURAL DE ATRIBUIÇÕES               -->
                 <!-- ========================================== -->
                 <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
@@ -463,7 +468,6 @@
                                 </h2>
                                 <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
                             </div>
-                            <!-- NOVO BOTÃO DE IMPRESSÃO PROFISSIONAL -->
                             <button onclick="imprimirFluxogramaMural()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10">
                                 <i data-lucide="printer" class="w-4 h-4"></i>
                                 <span>Ver Fluxograma de Atribuições</span>
@@ -661,7 +665,7 @@
             } else if (idTela === 'agenda') {
                 botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
                 topbarTitulo.innerText = "Agenda Semanal";
-                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-900/20";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
                 resetarEstadoAgenda();
                 carregarAgenda();
@@ -818,6 +822,117 @@
 
             } catch (err) {
                 alert("Erro ao preparar documento de impressão: " + err.message);
+            }
+        }
+
+        // --- SISTEMA DE IMPRESSÃO DA AGENDA SEMANAL ---
+        async function imprimirAgendaSemanal() {
+            try {
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    alert("Não há programações agendadas para gerar a impressão mural.");
+                    return;
+                }
+
+                let linhasTabelaHtml = '';
+                const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+                data.forEach(ag => {
+                    const dataReal = ag.data || '';
+                    let diaSemanaExibicao = '';
+                    if (dataReal) {
+                        const dataObj = new Date(dataReal + 'T00:00:00');
+                        diaSemanaExibicao = diasOrdenados[dataObj.getDay()];
+                    }
+
+                    linhasTabelaHtml += `
+                        <tr>
+                            <td class="col-data">
+                                <strong>${formatarData(dataReal)}</strong><br>
+                                <span class="dia-semana">${diaSemanaExibicao}</span>
+                            </td>
+                            <td class="col-horario">${ag.horario || '-'}</td>
+                            <td class="col-evento"><strong>${ag.tipo_evento || '-'}</strong></td>
+                            <td class="col-escalas">
+                                <div><strong>Dirigente:</strong> ${ag.dirigente || '-'}</div>
+                                <div><strong>Pregador:</strong> ${ag.pregador || '-'}</div>
+                            </td>
+                            <td class="col-escalas">
+                                <div><strong>Portaria:</strong> ${ag.escala_portaria || '-'}</div>
+                                <div><strong>Ofertas:</strong> ${ag.escala_ofertas || '-'}</div>
+                            </td>
+                            <td class="col-obs">${ag.saida_visita || '-'}</td>
+                        </tr>
+                    `;
+                });
+
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Agenda Semanal de Atividades</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 30px; background-color: #fff; }
+                            .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px; }
+                            .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; color: #0f172a; }
+                            .header p { margin: 6px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 3px; color: #475569; font-weight: 600; }
+                            
+                            table { w-full; width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
+                            tr { page-break-inside: avoid; page-break-after: auto; }
+                            th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 12px 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
+                            
+                            .col-data { width: 12%; }
+                            .col-horario { width: 8%; font-weight: bold; color: #b45309; }
+                            .col-evento { width: 25%; font-size: 14px; color: #1e293b; }
+                            .col-escalas { width: 20%; font-size: 12px; line-height: 1.6; }
+                            .col-obs { width: 15%; font-size: 11px; color: #64748b; font-style: italic; }
+                            
+                            .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+                            
+                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+                            
+                            @media print {
+                                body { margin: 15px; }
+                                .btn-print { display: none; }
+                                th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background 0.2s; }
+                            .btn-print:hover { background: #b45309; }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Agenda para o Mural</button>
+                        <div class="header">
+                            <h1>CRONOGRAMA E AGENDA SEMANAL</h1>
+                            <p>Escala de Cultos, Eventos e Atividades Oficiais</p>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data / Dia</th>
+                                    <th>Horário</th>
+                                    <th>Programação / Evento</th>
+                                    <th>Ministério Eclesiástico</th>
+                                    <th>Escala de Apoio</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${linhasTabelaHtml}
+                            </tbody>
+                        </table>
+                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+
+            } catch (err) {
+                alert("Erro ao puxar dados da agenda para impressão: " + err.message);
             }
         }
 
@@ -1171,14 +1286,14 @@
         
         async function carregarAgenda() {
             try {
-                const { data, error } = await _supabase.from('agenda_semanal').select('*');
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
                 if (error) throw error;
                 const tbody = document.getElementById('tabelaAgenda');
                 tbody.innerHTML = '';
 
                 data.forEach(ag => {
                     const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
-                    const dataReal = ag.data || ag.data;
+                    const dataReal = ag.data || '';
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4">
@@ -1244,7 +1359,7 @@
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
                 if (error) throw error;
                 editandoAgendaID = id;
-                document.getElementById('agenda_data').value = data.data || data.Data;
+                document.getElementById('agenda_data').value = data.data || '';
                 atualizarDiaSemanaAutomatico();
                 document.getElementById('agenda_tipo_evento').value = data.tipo_evento || '';
                 document.getElementById('agenda_horario').value = data.horario || '';
