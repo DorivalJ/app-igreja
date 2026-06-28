@@ -431,7 +431,6 @@
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
                                 <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma da Agenda Semanal
                             </h2>
-                            <!-- NOVO BOTÃO DE IMPRESSÃO DA AGENDA -->
                             <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-sm rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
                                 <i data-lucide="printer" class="w-4 h-4"></i>
                                 <span>Imprimir Agenda para Mural</span>
@@ -495,7 +494,6 @@
                         <form id="formDocumento" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
                                 
-                                <!-- Seletor da Categoria Principal -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
                                     <select id="doc_categoria" onchange="atualizarTiposDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
@@ -505,41 +503,34 @@
                                     </select>
                                 </div>
 
-                                <!-- Seletor do Tipo Dinâmico -->
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo Específico</label>
                                     <select id="doc_tipo" onchange="ajustarFormularioDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                                        <!-- Preenchido via JavaScript -->
                                     </select>
                                 </div>
 
                                 <div class="md:col-span-6 border-t border-slate-800/60 my-2"></div>
 
-                                <!-- CAMPO COMUM: Seleção ou Digitação do Nome principal -->
                                 <div class="md:col-span-3" id="box-doc-alvo">
                                     <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Membro / Destinatário</label>
                                     <input type="text" id="doc_alvo" required placeholder="Nome completo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- CAMPO EXTRA 1: Igreja / Local / Departamento -->
                                 <div class="md:col-span-3 hidden" id="box-doc-local">
                                     <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Igreja de Destino / Local</label>
                                     <input type="text" id="doc_local" placeholder="Ex: Sede, Congregação X, Igreja Y" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- CAMPO EXTRA 2: Data do Evento / Vigência -->
                                 <div class="md:col-span-2 hidden" id="box-doc-data">
                                     <label id="label-doc-data" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data do Evento / Vigência</label>
                                     <input type="date" id="doc_data" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
                                 </div>
 
-                                <!-- CAMPO EXTRA 3: Horário do Evento -->
                                 <div class="md:col-span-2 hidden" id="box-doc-hora">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
                                     <input type="text" id="doc_hora" placeholder="Ex: 19:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <!-- CAMPO COMUM: Texto/Conteúdo da correspondência -->
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Texto Adicional / Observações Importantes</label>
                                     <textarea id="doc_texto" rows="4" placeholder="Digite detalhes que devam constar no documento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
@@ -555,7 +546,6 @@
                         </form>
                     </section>
 
-                    <!-- Histórico de Documentos Gerados (Rascunhos para futura impressão) -->
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
@@ -591,7 +581,6 @@
             Convite: ['Preletores', 'Cantores', 'Igrejas', 'Abadguar', 'Congresso Com Jovens', 'Congresso Com Adolescentes', 'Congresso Com as Irmãs', 'Outros Cultos']
         };
 
-        // --- CONFIGURAÇÃO DE CARGOS DO CORPO DE OBREIROS ---
         const estruturaCargosEclesiasticos = [
             { 
                 chaves: ['pastor dirigente', 'pastor local', 'dirigente'], 
@@ -625,7 +614,6 @@
             }
         ];
 
-        // --- NAVEGAÇÃO DA SIDEBAR ---
         function navegarPara(idTela) {
             document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
@@ -678,14 +666,13 @@
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
             }
             lucide.createIcons();
         }
 
-        // --- ATUALIZAÇÃO DO MURAL DE ATRIBUIÇÕES ---
         async function atualizarFluxogramaMural() {
             try {
                 const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
@@ -741,7 +728,6 @@
             }
         }
 
-        // --- SISTEMA DE IMPRESSÃO DO FLUXOGRAMA ---
         async function imprimirFluxogramaMural() {
             try {
                 const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
@@ -790,7 +776,7 @@
                         <style>
                             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; line-height: 1.5; }
                             .header { text-align: center; border-bottom: 3px double #475569; padding-bottom: 20px; margin-bottom: 30px; }
-                            .header h1 { margin: 0; font-size: 26px; color: #0f172a; tracking-wide; }
+                            .header h1 { margin: 0; font-size: 26px; color: #0f172a; }
                             .header p { margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; }
                             .bloco-cargo { margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
                             .bloco-cargo h2 { background-color: #f1f5f9; margin: 0; padding: 12px 15px; font-size: 14px; letter-spacing: 1px; color: #1e293b; border-bottom: 1px solid #cbd5e1; }
@@ -825,7 +811,7 @@
             }
         }
 
-        // --- SISTEMA DE IMPRESSÃO DA AGENDA SEMANAL ---
+        // --- SISTEMA DE IMPRESSÃO DA AGENDA SEMANAL (ATUALIZADO PARA MODO PAISAGEM) ---
         async function imprimirAgendaSemanal() {
             try {
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
@@ -875,32 +861,39 @@
                     <head>
                         <title>Agenda Semanal de Atividades</title>
                         <style>
-                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 30px; background-color: #fff; }
-                            .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px; }
-                            .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; color: #0f172a; }
-                            .header p { margin: 6px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 3px; color: #475569; font-weight: 600; }
+                            /* FORÇA O MODO PAISAGEM NA IMPRESSORA */
+                            @page { 
+                                size: landscape; 
+                                margin: 10mm 15mm 10mm 15mm;
+                            }
                             
-                            table { w-full; width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
+                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 10px; background-color: #fff; }
+                            .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; }
+                            .header h1 { margin: 0; font-size: 30px; letter-spacing: 1px; color: #0f172a; }
+                            .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; color: #475569; font-weight: 600; }
+                            
+                            table { width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
                             tr { page-break-inside: avoid; page-break-after: auto; }
-                            th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 12px 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
                             td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
                             
-                            .col-data { width: 12%; }
+                            /* DISTRIBUIÇÃO OTIMIZADA PARA LARGURA HORIZONTAL */
+                            .col-data { width: 14%; }
                             .col-horario { width: 8%; font-weight: bold; color: #b45309; }
-                            .col-evento { width: 25%; font-size: 14px; color: #1e293b; }
-                            .col-escalas { width: 20%; font-size: 12px; line-height: 1.6; }
-                            .col-obs { width: 15%; font-size: 11px; color: #64748b; font-style: italic; }
+                            .col-evento { width: 26%; font-size: 14px; color: #1e293b; }
+                            .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; }
+                            .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
                             
                             .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
                             
-                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+                            .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
                             
                             @media print {
-                                body { margin: 15px; }
+                                body { margin: 0; }
                                 .btn-print { display: none; }
                                 th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                             }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background 0.2s; }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background 0.2s; z-index: 9999; }
                             .btn-print:hover { background: #b45309; }
                         </style>
                     </head>
@@ -936,13 +929,12 @@
             }
         }
 
-        // --- SISTEMA DE DOCUMENTOS ---
         function atualizarTiposDocumento() {
-            const categoria = document.getElementById('doc_categoria').value;
+            const category = document.getElementById('doc_categoria').value;
             const selectTipo = document.getElementById('doc_tipo');
             
             selectTipo.innerHTML = '';
-            opcoesDocumentos[categoria].forEach(tipo => {
+            opcoesDocumentos[category].forEach(tipo => {
                 selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
             });
             
@@ -1005,7 +997,6 @@
             return `${dia}/${mes}/${ano}`;
         }
 
-        // --- SISTEMA DE MEMBROS ---
         async function carregarMembros() {
             try {
                 const termo = document.getElementById('busca').value;
@@ -1105,7 +1096,6 @@
             if (confirm("Excluir membro?")) { await _supabase.from('membros').delete().eq('id', id); carregarMembros(); }
         }
 
-        // --- SISTEMA DA TESOURARIA ---
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
             document.getElementById('container-descricao-membro').classList.add('hidden');
@@ -1274,7 +1264,6 @@
         
         async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
 
-        // --- SISTEMA DE AGENDA SEMANAL ---
         function atualizarDiaSemanaAutomatico() {
             const dataDigitada = document.getElementById('agenda_data').value;
             const inputDiaSemana = document.getElementById('agenda_dia_semana');
@@ -1390,7 +1379,6 @@
             }
         }
 
-        // --- INICIALIZAÇÃO OBRIGATÓRIA ---
         window.onload = function() {
             carregarMembros();
             lucide.createIcons();
