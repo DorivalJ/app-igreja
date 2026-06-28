@@ -14,38 +14,6 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         [color-scheme:dark] { color-scheme: dark; }
-        /* Regra mágica para impressão limpa do mural */
-        @media print {
-            aside, header, #btn-imprimir-mural, #secao-inputs-atribuicoes, .no-print {
-                display: none !important;
-            }
-            main {
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .flex-1 {
-                margin-left: 0 !important;
-            }
-            body {
-                background-color: white !important;
-                color: black !important;
-            }
-            .bg-slate-900, .bg-slate-800, .bg-slate-950 {
-                background-color: #f8fafc !important;
-                border-color: #cbd5e1 !important;
-            }
-            .text-slate-100, .text-slate-200, .text-white, .text-indigo-400, .text-amber-400 {
-                color: #0f172a !important;
-            }
-            .text-slate-400, .text-slate-500 {
-                color: #475569 !important;
-            }
-            .border-indigo-500, .border-blue-500, .border-amber-500, .border-emerald-500, .border-purple-500 {
-                border-color: #0f172a !important;
-                border-width: 2px !important;
-            }
-        }
     </style>
 </head>
 <body class="text-slate-200">
@@ -79,14 +47,14 @@
                         <span>Agenda Semanal</span>
                     </button>
 
+                    <button id="btn-menu-mural" onclick="navegarPara('mural')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <span>Atribuições Mural</span>
+                    </button>
+
                     <button id="btn-menu-documentos" onclick="navegarPara('documentos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <i data-lucide="file-text" class="w-5 h-5"></i>
                         <span>Cartas e Convites</span>
-                    </button>
-                    
-                    <button id="btn-menu-atribuicoes" onclick="navegarPara('atribuicoes')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                        <i data-lucide="sitemap" class="w-5 h-5"></i>
-                        <span>Atribuições Mural</span>
                     </button>
                 </nav>
             </div>
@@ -445,7 +413,7 @@
 
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                                    <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <input type="text" id="agenda_saida_visita" placeholder="Notes adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
@@ -483,7 +451,28 @@
                 </div>
 
                 <!-- ========================================== -->
-                <!-- 4. TELA DE DOCUMENTOS (Cofre Secreto)       -->
+                <!-- 4. TELA MURAL DE ATRIBUIÇÕES (NOVA!)       -->
+                <!-- ========================================== -->
+                <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-6 border-b border-slate-800 bg-slate-900/50">
+                            <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="layout-dashboard" class="w-6 h-6 text-indigo-400"></i> 
+                                QUADRO DE ATRIBUIÇÕES E OFICIAIS
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="containerFluxogramaMural">
+                                <!-- Os cards dinâmicos serão injetados aqui via JS -->
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 5. TELA DE DOCUMENTOS                      -->
                 <!-- ========================================== -->
                 <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
@@ -572,143 +561,6 @@
         </div>
     </div>
 
-                <!-- ========================================== -->
-                <!-- 5. TELA: QUADRO DE ATRIBUIÇÕES             -->
-                <!-- ========================================== -->
-                <div id="tela-atribuicoes" class="hidden space-y-8 dynamic-screen">
-                    
-                    <!-- Painel de Preenchimento (Não sai na impressão) -->
-                    <section id="secao-inputs-atribuicoes" class="bg-slate-900 rounded-2xl border border-slate-800 p-6 md:p-8 shadow-2xl">
-                        <div class="flex items-center gap-2 mb-6 border-b border-slate-800 pb-4">
-                            <i data-lucide="sliders" class="w-5 h-5 text-purple-400"></i>
-                            <h2 class="font-semibold text-slate-100">Escalar Oficiais do Fluxograma</h2>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                            <div class="md:col-span-6">
-                                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-1">Pastor Titular</label>
-                                <input type="text" id="input-pastor" oninput="atualizarFluxogramaMural()" placeholder="Nome do Pastor" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                            </div>
-                            <div class="md:col-span-6">
-                                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider mb-1">Co-Pastor</label>
-                                <input type="text" id="input-copastor" oninput="atualizarFluxogramaMural()" placeholder="Nome do Co-Pastor" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                            </div>
-                            
-                            <div class="md:col-span-6 border-t border-slate-800 pt-3 mt-2 grid grid-cols-1 gap-2">
-                                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider">Presbíteros (2)</label>
-                                <input type="text" id="input-presb-1" oninput="atualizarFluxogramaMural()" placeholder="Presbítero 1" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-presb-2" oninput="atualizarFluxogramaMural()" placeholder="Presbítero 2" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                            </div>
-
-                            <div class="md:col-span-6 border-t border-slate-800 pt-3 mt-2 grid grid-cols-1 gap-2">
-                                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider">Auxiliares (3)</label>
-                                <input type="text" id="input-aux-1" oninput="atualizarFluxogramaMural()" placeholder="Auxiliar 1" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-aux-2" oninput="atualizarFluxogramaMural()" placeholder="Auxiliar 2" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-aux-3" oninput="atualizarFluxogramaMural()" placeholder="Auxiliar 3" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                            </div>
-
-                            <div class="md:col-span-12 border-t border-slate-800 pt-3 mt-2 grid grid-cols-1 md:grid-cols-5 gap-2">
-                                <label class="block text-xs font-bold uppercase text-slate-400 tracking-wider md:col-span-5">Diáconos (5)</label>
-                                <input type="text" id="input-diac-1" oninput="atualizarFluxogramaMural()" placeholder="Diácono 1" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-diac-2" oninput="atualizarFluxogramaMural()" placeholder="Diácono 2" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-diac-3" oninput="atualizarFluxogramaMural()" placeholder="Diácono 3" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-diac-4" oninput="atualizarFluxogramaMural()" placeholder="Diácono 4" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                                <input type="text" id="input-diac-5" oninput="atualizarFluxogramaMural()" placeholder="Diácono 5" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div class="mt-6 flex justify-end">
-                            <button id="btn-imprimir-mural" onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-500 transition-all shadow-lg">
-                                <i data-lucide="printer" class="w-4 h-4"></i>
-                                <span>Imprimir para o Mural</span>
-                            </button>
-                        </div>
-                    </section>
-
-                    <!-- VISUALIZAÇÃO DO FLUXOGRAMA -->
-                    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl space-y-8 text-center max-w-4xl mx-auto">
-                        <div>
-                            <h2 class="text-2xl font-bold tracking-wide text-white">QUADRO DE ATRIBUIÇÕES E OFICIAIS</h2>
-                            <p class="text-xs text-slate-400 font-medium tracking-widest uppercase mt-1">Escala Organizacional de Atividades</p>
-                            <div class="w-24 h-1 bg-purple-500 mx-auto mt-4 rounded-full"></div>
-                        </div>
-
-                        <!-- 1. PASTOR -->
-                        <div class="flex justify-center">
-                            <div class="w-72 border-2 border-indigo-500 bg-slate-950/40 p-4 rounded-2xl shadow-xl">
-                                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block mb-1">Pastor Presidente</span>
-                                <div id="mural-pastor" class="text-lg font-bold text-white italic">---</div>
-                            </div>
-                        </div>
-
-                        <div class="text-slate-700 font-light text-xl -my-4">↓</div>
-
-                        <!-- 2. CO-PASTOR -->
-                        <div class="flex justify-center">
-                            <div class="w-64 border-2 border-blue-500 bg-slate-950/40 p-4 rounded-2xl shadow-xl">
-                                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest block mb-1">Co-Pastor</span>
-                                <div id="mural-copastor" class="text-base font-bold text-white italic">---</div>
-                            </div>
-                        </div>
-
-                        <div class="text-slate-700 font-light text-xl -my-4">↓</div>
-
-                        <!-- 3. PRESBÍTEROS -->
-                        <div>
-                            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest block mb-3">Corpo de Presbíteros</span>
-                            <div class="flex flex-wrap justify-center gap-4">
-                                <div class="w-52 border border-amber-500/60 bg-slate-950/30 p-3 rounded-xl">
-                                    <div id="mural-presb-1" class="text-sm font-semibold text-slate-200 italic">---</div>
-                                </div>
-                                <div class="w-52 border border-amber-500/60 bg-slate-950/30 p-3 rounded-xl">
-                                    <div id="mural-presb-2" class="text-sm font-semibold text-slate-200 italic">---</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-slate-700 font-light text-xl -my-4">↓</div>
-
-                        <!-- 4. DIÁCONOS -->
-                        <div>
-                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block mb-3">Corpo de Diáconos</span>
-                            <div class="flex flex-wrap justify-center gap-3">
-                                <div class="w-40 border border-emerald-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-diac-1" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                                <div class="w-40 border border-emerald-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-diac-2" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                                <div class="w-40 border border-emerald-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-diac-3" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                                <div class="w-40 border border-emerald-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-diac-4" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                                <div class="w-40 border border-emerald-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-diac-5" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-slate-700 font-light text-xl -my-4">↓</div>
-
-                        <!-- 5. AUXILIARES -->
-                        <div>
-                            <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-3">Auxiliares de Trabalho</span>
-                            <div class="flex flex-wrap justify-center gap-4">
-                                <div class="w-48 border border-purple-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-aux-1" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                                <div class="w-48 border border-purple-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-aux-2" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                                <div class="w-48 border border-purple-500/40 bg-slate-950/20 p-2.5 rounded-xl">
-                                    <div id="mural-aux-3" class="text-xs font-semibold text-slate-300 italic">---</div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
     <!-- ========================================== -->
     <!--                  LÓGICA JAVASCRIPT         -->
     <!-- ========================================== -->
@@ -729,8 +581,7 @@
             Convite: ['Preletores', 'Cantores', 'Igrejas', 'Abadguar', 'Congresso Com Jovens', 'Congresso Com Adolescentes', 'Congresso Com as Irmãs', 'Outros Cultos']
         };
 
-        // --- NAVEGAÇÃO DA SIDEBAR ---
-// --- NAVEGAÇÃO DA SIDEBAR EXPANDIDA ---
+        // --- NAVEGAÇÃO DA SIDEBAR CORRIGIDA ---
         function navegarPara(idTela) {
             document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
@@ -739,8 +590,8 @@
                 membros: document.getElementById('btn-menu-membros'),
                 financeiro: document.getElementById('btn-menu-financeiro'),
                 agenda: document.getElementById('btn-menu-agenda'),
-                documentos: document.getElementById('btn-menu-documentos'),
-                atribuicoes: document.getElementById('btn-menu-atribuicoes')
+                mural: document.getElementById('btn-menu-mural'),
+                documentos: document.getElementById('btn-menu-documentos')
             };
 
             Object.keys(botoesMenu).forEach(chave => {
@@ -758,50 +609,94 @@
                 topbarTitulo.innerText = "Gestão de Membros";
                 topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
                 iconeHeader.setAttribute('data-lucide', 'users');
+                carregarMembros();
             } else if (idTela === 'financeiro') {
                 botoesMenu.financeiro.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-emerald-600 text-white shadow-lg shadow-emerald-900/20";
                 topbarTitulo.innerText = "Tesouraria & Fluxo de Caixa";
                 topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
                 iconeHeader.setAttribute('data-lucide', 'dollar-sign');
+                resetarEstadoFinanceiro();
+                atualizarListaMembrosNoFormFinanceiro();
+                carregarFinancas();
             } else if (idTela === 'agenda') {
                 botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
                 topbarTitulo.innerText = "Agenda Semanal";
-                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-900/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
+                resetarEstadoAgenda();
+                carregarAgenda();
+            } else if (idTela === 'mural') {
+                botoesMenu.mural.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
+                topbarTitulo.innerText = "Mural de Atribuições";
+                topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
+                iconeHeader.setAttribute('data-lucide', 'layout-dashboard');
+                atualizarFluxogramaMural();
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
                 topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
-            } else if (idTela === 'atribuicoes') {
-                botoesMenu.atribuicoes.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-purple-600 text-white shadow-lg shadow-purple-900/20";
-                topbarTitulo.innerText = "Quadro de Atribuições para o Mural";
-                topbarIconContainer.className = "bg-purple-600 p-2 rounded-lg text-white shadow-lg shadow-purple-500/20";
-                iconeHeader.setAttribute('data-lucide', 'sitemap');
-                atualizarFluxogramaMural();
+                atualizarTiposDocumento();
             }
             lucide.createIcons();
         }
 
-        // --- ATUALIZAÇÃO EM TEMPO REAL DO MURAL ---
-        function atualizarFluxogramaMural() {
-            const atualizarCampo = (idInput, idMural) => {
-                const val = document.getElementById(idInput).value.trim();
-                document.getElementById(idMural).innerText = val !== "" ? val : "---";
-            };
+        // --- ATUALIZAÇÃO DO MURAL DE ATRIBUIÇÕES ---
+        async function atualizarFluxogramaMural() {
+            try {
+                const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
+                if (error) throw error;
 
-            atualizarCampo('input-pastor', 'mural-pastor');
-            atualizarCampo('input-copastor', 'mural-copastor');
-            atualizarCampo('input-presb-1', 'mural-presb-1');
-            atualizarCampo('input-presb-2', 'mural-presb-2');
-            atualizarCampo('input-diac-1', 'mural-diac-1');
-            atualizarCampo('input-diac-2', 'mural-diac-2');
-            atualizarCampo('input-diac-3', 'mural-diac-3');
-            atualizarCampo('input-diac-4', 'mural-diac-4');
-            atualizarCampo('input-diac-5', 'mural-diac-5');
-            atualizarCampo('input-aux-1', 'mural-aux-1');
-            atualizarCampo('input-aux-2', 'mural-aux-2');
-            atualizarCampo('input-aux-3', 'mural-aux-3');
+                const cargosMural = [
+                    { cargo: 'Pastor', titulo: 'Pastor Presidente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
+                    { cargo: 'Pastor Auxiliar', titulo: 'Pastor Auxiliar', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
+                    { cargo: 'Presbítero', titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
+                    { cargo: 'Diácono', titulo: 'Corpo de Diáconos', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
+                    { cargo: 'Cooperador', titulo: 'Cooperadores da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' },
+                    { cargo: 'Secretário', titulo: 'Secretaria Geral', cor: 'border-teal-500/30 text-teal-400 bg-teal-500/5', icone: 'file-text' },
+                    { cargo: 'Tesoureiro', titulo: 'Departamento Financeiro', cor: 'border-cyan-500/30 text-cyan-400 bg-cyan-500/5', icone: 'dollar-sign' }
+                ];
+
+                const container = document.getElementById('containerFluxogramaMural');
+                container.innerHTML = '';
+
+                cargosMural.forEach(c => {
+                    const oficiais = membros.filter(m => m.cargo && m.cargo.toLowerCase().trim() === c.cargo.toLowerCase().trim());
+                    
+                    let listaNomes = '';
+                    if (oficiais.length === 0) {
+                        listaNomes = `<p class="text-xs text-slate-600 italic">Nenhum oficial ativo escalado</p>`;
+                    } else {
+                        listaNomes = `<ul class="space-y-1.5">`;
+                        oficiais.forEach(o => {
+                            listaNomes += `
+                                <li class="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-850">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                    <span class="font-medium">${o.nome}</span>
+                                </li>`;
+                        });
+                        listaNomes += `</ul>`;
+                    }
+
+                    container.innerHTML += `
+                        <div class="bg-slate-950/40 rounded-xl p-5 border ${c.cor} flex flex-col gap-4 shadow-xl hover:scale-[1.01] transition-all duration-200">
+                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                                <h3 class="font-bold text-sm uppercase tracking-wider">${c.titulo}</h3>
+                                <i data-lucide="${c.icone}" class="w-5 h-5 opacity-80"></i>
+                            </div>
+                            <div class="flex-1 overflow-y-auto max-h-[160px] pr-1">
+                                ${listaNomes}
+                            </div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest text-right">
+                                Total: ${oficiais.length} ativo(s)
+                            </div>
+                        </div>`;
+                });
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Erro ao carregar mural:", err.message);
+            }
         }
 
         // --- SISTEMA DE DOCUMENTOS (DINÂMICO) ---
