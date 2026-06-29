@@ -14,48 +14,6 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         [color-scheme:dark] { color-scheme: dark; }
-
-        /* Estilos específicos para o relatório de impressão */
-        #relatorio-impressao { display: none; }
-
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 10mm;
-            }
-            body * {
-                visibility: hidden;
-            }
-            #relatorio-impressao, #relatorio-impressao * {
-                visibility: visible;
-            }
-            #relatorio-impressao {
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                color: #000 !important;
-                background-color: #fff !important;
-                font-family: Arial, sans-serif;
-                font-size: 11px;
-                line-height: 1.3;
-            }
-            .print-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 5px; }
-            .print-header h1 { font-size: 18px; font-weight: bold; margin: 0; text-transform: uppercase; }
-            .print-header p { font-size: 11px; margin: 3px 0 0 0; font-weight: bold; }
-            .print-section-title { font-size: 11px; font-weight: bold; background-color: #f2f2f2 !important; padding: 4px; margin-top: 10px; margin-bottom: 5px; border: 1px solid #000; text-transform: uppercase; }
-            .print-table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
-            .print-table th, .print-table td { border: 1px solid #000; padding: 4px 6px; text-align: left; }
-            .print-table th { background-color: #f9f9f9 !important; font-weight: bold; text-transform: uppercase; font-size: 10px; }
-            .text-right { text-align: right !important; }
-            .font-bold { font-weight: bold; }
-            .resumo-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; margin-bottom: 15px; }
-            .resumo-card { border: 1px solid #000; padding: 6px; text-align: center; background-color: #fafafa !important; }
-            .resumo-card p { margin: 0; font-size: 10px; text-transform: uppercase; font-weight: bold; }
-            .resumo-card h3 { margin: 3px 0 0 0; font-size: 13px; font-weight: bold; }
-            .print-footer { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 9px; font-weight: bold; border-top: 1px dashed #000; padding-top: 5px; }
-        }
     </style>
 </head>
 <body class="text-slate-200">
@@ -367,20 +325,16 @@
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
                                 <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i> Livro Caixa (Mês Vigente)
                             </h2>
-                            <div class="flex items-center gap-3">
-                                <!-- Ícone visual de filtro inserido ao lado esquerdo -->
-                                <div class="flex items-center gap-2 bg-slate-950 border border-slate-700 px-3 py-2 rounded-xl">
-                                    <i data-lucide="filter" class="w-4 h-4 text-emerald-400"></i>
-                                    <select id="filtroTipo" onchange="filtrarTabelaLocal()" class="bg-transparent text-xs text-slate-300 focus:outline-none cursor-pointer">
-                                        <option value="">Todos os Fluxos</option>
-                                        <option value="Dízimo">Apenas Dízimos</option>
-                                        <option value="Oferta">Apenas Ofertas</option>
-                                        <option value="Despesa">Apenas Despesas</option>
-                                    </select>
-                                </div>
-                                <button onclick="dispararImpressaoFluxoCaixa()" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold text-sm rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-600/10">
+                            <div class="flex gap-2">
+                                <select id="filtroTipo" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Fluxos</option>
+                                    <option value="Dízimo">Apenas Dízimos</option>
+                                    <option value="Oferta">Apenas Ofertas</option>
+                                    <option value="Despesa">Apenas Despesas</option>
+                                </select>
+                                <button onclick="imprimirRelatorioFinanceiro()" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold text-xs rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-600/10">
                                     <i data-lucide="printer" class="w-4 h-4"></i>
-                                    <span>Imprimir Relatório</span>
+                                    <span>Imprimir Relatório Mensal</span>
                                 </button>
                             </div>
                         </div>
@@ -390,7 +344,7 @@
                                     <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
                                         <th class="px-6 py-4">Data</th>
                                         <th class="px-6 py-4">Tipo</th>
-                                        <th class="px-6 py-4">Dizimista / Descrição</th>
+                                        <th class="px-6 py-4">Dizimista</th>
                                         <th class="px-6 py-4">Cargo</th>
                                         <th class="px-6 py-4">Obs</th>
                                         <th class="px-6 py-4 text-right">Valor</th>
@@ -462,7 +416,7 @@
 
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                                    <input type="text" id="agenda_saida_visita" placeholder="Notes adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <input type="text" id="agenda_saida_visita" placeholder="Notes adicionais sobre o event..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
@@ -610,55 +564,6 @@
     </div>
 
     <!-- ========================================== -->
-    <!--  ESTRUTURA DE IMPRESSÃO (OCULTA EM TELA)   -->
-    <!-- ========================================== -->
-    <div id="relatorio-impressao">
-        <div class="print-header">
-            <h1>Relatório Final de Fluxo de Caixa</h1>
-            <p>SISTEMA IGREJA DIGITAL — BALANÇO MENSAL INTEGRADO</p>
-        </div>
-
-        <div class="resumo-cards">
-            <div class="resumo-card">
-                <p>Total Dízimos</p>
-                <h3 id="print-total-dizimos">R$ 0,00</h3>
-            </div>
-            <div class="resumo-card">
-                <p>Total Ofertas</p>
-                <h3 id="print-total-ofertas">R$ 0,00</h3>
-            </div>
-            <div class="resumo-card">
-                <p>Total Despesas</p>
-                <h3 id="print-total-despesas">R$ 0,00</h3>
-            </div>
-            <div class="resumo-card" style="border: 1.5px solid #000 !important; background-color: #eaeaea !important;">
-                <p>Saldo Líquido</p>
-                <h3 id="print-saldo-total">R$ 0,00</h3>
-            </div>
-        </div>
-
-        <div class="print-section-title">Detalhamento dos Fluxos Computados</div>
-        <table class="print-table">
-            <thead>
-                <tr>
-                    <th style="width: 12%;">Data</th>
-                    <th style="width: 15%;">Fluxo</th>
-                    <th>Descrição / Histórico</th>
-                    <th style="width: 20%;">Cargo/Obs</th>
-                    <th style="width: 15%; text-align: right;">Valor</th>
-                </tr>
-            </thead>
-            <tbody id="print-tabela-corpo">
-                <!-- Inserido via JS -->
-            </tbody>
-        </table>
-
-        <div class="print-footer">
-            Gerado em 29/06/2026 por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.
-        </div>
-    </div>
-
-    <!-- ========================================== -->
     <!--                  LÓGICA JAVASCRIPT         -->
     <!-- ========================================== -->
     <script>
@@ -670,7 +575,6 @@
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
-        let cacheFinancasGlobal = []; // Guarda todos os fluxos carregados do mês para filtro local rápido
 
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
@@ -959,12 +863,132 @@
                             </thead>
                             <tbody>${linhasTabelaHtml}</tbody>
                         </table>
-                        <div class="footer">Quadro Oficial de Avisos - Gerado em 29/06/2026 por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
                 janelaImpressao.document.close();
             } catch (err) { alert("Erro ao puxar dados da agenda para impressão: " + err.message); }
+        }
+
+        async function imprimirRelatorioFinanceiro() {
+            try {
+                const tipoFiltro = document.getElementById('filtroTipo').value;
+                let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: true });
+                
+                if (tipoFiltro) {
+                    query = query.eq('tipo', tipoFiltro);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    alert("Não há registros lançados para gerar o relatório.");
+                    return;
+                }
+
+                let d = 0, o = 0, de = 0;
+                let linhasTabelaHtml = '';
+
+                data.forEach(f => {
+                    if (f.tipo === 'Dízimo') d += f.valor; 
+                    else if (f.tipo === 'Oferta') o += f.valor; 
+                    else de += f.valor;
+
+                    const corValor = f.tipo === 'Despesa' ? 'text-danger' : 'text-success';
+                    const sinal = f.tipo === 'Despesa' ? '-' : '';
+
+                    linhasTabelaHtml += `
+                        <tr>
+                            <td>${formatarData(f.data_lancamento)}</td>
+                            <td><strong>${f.tipo}</strong></td>
+                            <td>${f.descricao || '-'}</td>
+                            <td><span class="tag-cargo">${f.cargo || '-'}</span></td>
+                            <td>${f.observacao || '-'}</td>
+                            <td class="text-right ${corValor}">${sinal} R$ ${f.valor.toFixed(2)}</td>
+                        </tr>`;
+                });
+
+                const saldoTotal = d + o - de;
+                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                const mesAtual = meses[new Date().getMonth()];
+                const anoAtual = new Date().getFullYear();
+
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Relatório Financeiro - Livro Caixa</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                            .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
+                            .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                            .header p { margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; font-weight: bold; }
+                            
+                            .cards-resumo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+                            .card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: #f8fafc; }
+                            .card p { margin: 0; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+                            .card h3 { margin: 5px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 700; }
+                            
+                            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                            th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
+                            tr:nth-child(even) { background-color: #f8fafc; }
+                            
+                            .text-right { text-align: right; }
+                            .text-success { color: #16a34a; font-weight: 600; }
+                            .text-danger { color: #dc2626; font-weight: 600; }
+                            .tag-cargo { font-size: 10px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+                            
+                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+                            .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
+                            .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                            
+                            @media print { body { margin: 20px; } .btn-print { display: none; } }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+                        <div class="header">
+                            <h1>RELATÓRIO MENSAL - LIVRO CAIXA</h1>
+                            <p>Demostrativo de Entradas e Saídas Financeiras — Competência: ${mesAtual} de ${anoAtual}</p>
+                        </div>
+                        
+                        <div class="cards-resumo">
+                            <div class="card"><p>Dízimos (+)</p><h3 style="color: #16a34a;">R$ ${d.toFixed(2)}</h3></div>
+                            <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toFixed(2)}</h3></div>
+                            <div class="card"><p>Despesas (-)</p><h3 style="color: #dc2626;">R$ ${de.toFixed(2)}</h3></div>
+                            <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toFixed(2)}</h3></div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição / Contribuinte</th>
+                                    <th>Cargo</th>
+                                    <th>Observação</th>
+                                    <th class="text-right">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>${linhasTabelaHtml}</tbody>
+                        </table>
+
+                        <div class="assinaturas">
+                            <div class="linha-assinatura">Tesouraria Local</div>
+                            <div class="linha-assinatura">Pastor Dirigente</div>
+                        </div>
+
+                        <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+            } catch (err) { alert("Erro ao gerar o relatório financeiro: " + err.message); }
         }
 
         function atualizarTiposDocumento() {
@@ -1200,31 +1224,20 @@
         });
 
         async function carregarFinancas() {
-            const { data } = await _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
-            cacheFinancasGlobal = data || [];
+            const tipoFiltro = document.getElementById('filtroTipo').value;
+            let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
             
-            // Força a renderização inicial completa da tabela e dos dashboards
-            processarDadosFinancas(cacheFinancasGlobal);
-        }
+            if (tipoFiltro) {
+                query = query.eq('tipo', tipoFiltro);
+            }
 
-        function processarDadosFinancas(dados) {
+            const { data } = await query;
             const tbody = document.getElementById('tabelaFinanceiro');
             tbody.innerHTML = '';
             let d = 0, o = 0, de = 0;
 
-            // Calcula totais baseados em TODOS os fluxos reais do banco, mantendo os cards sempre consolidados
-            cacheFinancasGlobal.forEach(f => {
+            (data || []).forEach(f => {
                 if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
-            });
-
-            // Atualiza dashboards em tela
-            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
-            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
-            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
-            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
-
-            // Renderiza as linhas visíveis na tabela com base no filtro selecionado
-            dados.forEach(f => {
                 const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
 
                 tbody.innerHTML += `
@@ -1241,57 +1254,11 @@
                         </td>
                     </tr>`;
             });
+            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
+            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
+            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
+            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
             lucide.createIcons();
-        }
-
-        // Função para tratamento e correto filtro do select local ("Todos os fluxos" inclusivo)
-        function filtrarTabelaLocal() {
-            const filtro = document.getElementById('filtroTipo').value;
-            if (filtro === "") {
-                processarDadosFinancas(cacheFinancasGlobal);
-            } else {
-                const dadosFiltrados = cacheFinancasGlobal.filter(f => f.tipo === filtro);
-                processarDadosFinancas(dadosFiltrados);
-            }
-        }
-
-        // Prepara e dispara a janela interna estruturada para impressão A4 Retrato
-        function dispararImpressaoFluxoCaixa() {
-            let d = 0, o = 0, de = 0;
-            const printTbody = document.getElementById('print-tabela-corpo');
-            printTbody.innerHTML = '';
-
-            if(cacheFinancasGlobal.length === 0) {
-                alert("Não há dados cadastrados neste mês para emitir o relatório.");
-                return;
-            }
-
-            cacheFinancasGlobal.forEach(f => {
-                if(f.tipo === 'Dízimo') d += f.valor; 
-                else if(f.tipo === 'Oferta') o += f.valor; 
-                else de += f.valor;
-
-                const colComplemento = f.cargo ? f.cargo : (f.observacao ? f.observacao : '---');
-
-                printTbody.innerHTML += `
-                    <tr>
-                        <td>${formatarData(f.data_lancamento)}</td>
-                        <td class="font-bold">${f.tipo.toUpperCase()}</td>
-                        <td>${f.descricao}</td>
-                        <td>${colComplemento}</td>
-                        <td class="text-right font-bold">R$ ${f.valor.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            // Alimenta os campos de somatório do escopo de impressão
-            document.getElementById('print-total-dizimos').textContent = `R$ ${d.toFixed(2)}`;
-            document.getElementById('print-total-ofertas').textContent = `R$ ${o.toFixed(2)}`;
-            document.getElementById('print-total-despesas').textContent = `R$ ${de.toFixed(2)}`;
-            document.getElementById('print-saldo-total').textContent = `R$ ${(d + o - de).toFixed(2)}`;
-
-            // Dispara o comando de impressão nativo do navegador
-            window.print();
         }
 
         async function editarFinanca(id) {
@@ -1349,10 +1316,10 @@
         async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
 
         function atualizarDiaSemanaAutomatico() {
-            const dataDigitada = document.getElementById('agenda_data').value;
+            const dataInput = document.getElementById('agenda_data').value;
             const inputDiaSemana = document.getElementById('agenda_dia_semana');
-            if (!dataDigitada) { inputDiaSemana.value = ''; return; }
-            const dataObjeto = new Date(dataDigitada + 'T00:00:00');
+            if (!dataInput) { inputDiaSemana.value = ''; return; }
+            const dataObjeto = new Date(dataInput + 'T00:00:00');
             const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
             inputDiaSemana.value = diasOrdenados[dataObjeto.getDay()];
         }
@@ -1422,7 +1389,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda atualizada!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
