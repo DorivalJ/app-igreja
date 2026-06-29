@@ -539,9 +539,9 @@
                             </div>
 
                             <div class="mt-8 flex justify-end">
-                                <button type="button" onclick="alert('Funcionalidade de rascunho temporário configurada!')" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
-                                    <i data-lucide="file-check" class="w-5 h-5"></i>
-                                    <span>Preparar Documento</span>
+                                <button type="button" onclick="gerarEImprimirDocumento()" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
+                                    <i data-lucide="printer" class="w-5 h-5"></i>
+                                    <span>Gerar e Imprimir Documento</span>
                                 </button>
                             </div>
                         </form>
@@ -550,11 +550,11 @@
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="history" class="w-5 h-5 text-blue-400"></i> Últimas Emissões (Fila de Impressão)
+                                <i data-lucide="history" class="w-5 h-5 text-blue-400"></i> Informações do Emissor
                             </h2>
                         </div>
-                        <div class="p-8 text-center text-slate-500 text-sm italic">
-                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
+                        <div class="p-6 text-slate-400 text-sm">
+                            <p>Os documentos impressos por este módulo seguem a formatação e as regras do Ministério Local. Certifique-se de preencher todos os campos necessários antes do envio para a fila de impressão.</p>
                         </div>
                     </section>
                 </div>
@@ -1042,6 +1042,81 @@
             }
         }
 
+        function gerarEImprimirDocumento() {
+            const categoria = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            const alvo = document.getElementById('doc_alvo').value;
+            const local = document.getElementById('doc_local').value;
+            const dataDoc = document.getElementById('doc_data').value;
+            const horaDoc = document.getElementById('doc_hora').value;
+            const textoAdicional = document.getElementById('doc_texto').value;
+
+            if (!alvo) {
+                alert("Por favor, preencha o campo principal de identificação (Membro / Destinatário).");
+                return;
+            }
+
+            const dataFormatada = dataDoc ? formatarData(dataDoc) : new Date().toLocaleDateString('pt-BR');
+            let corpoTexto = '';
+
+            if (categoria === 'Carta') {
+                if (tipo === 'Apresentação') {
+                    corpoTexto = `Vimos por meio desta apresentar o(a) nosso(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que se encontra em plena comunhão com a nossa igreja local, para que o recebam no Senhor como convém aos santos.`;
+                } else {
+                    corpoTexto = `Solicitamos/Comunicamos a movimentação de membresia por motivo de <strong>${tipo}</strong> do(a) irmão(ã) <strong>${alvo}</strong> para a igreja localizada em <strong>${local || 'Não Informado'}</strong>. Rogamos as ricas bênçãos de Deus sobre sua vida nesta nova jornada.`;
+                }
+            } else if (categoria === 'Memorando') {
+                corpoTexto = `Certificamos que o procedimento administrativo de <strong>${tipo}</strong> referente a <strong>${alvo}</strong> foi processado na data de <strong>${dataFormatada}</strong> em conformidade com o regimento interno desta instituição.`;
+                if (tipo === 'Memorando Interno') {
+                    corpoTexto = `Dirigido a: <strong>${alvo}</strong>.<br><br>Comunicamos formalmente as diretrizes administrativas estabelecidas pela liderança ministerial para o fiel cumprimento de vossas atividades eclesiásticas locais.`;
+                }
+            } else if (categoria === 'Convite') {
+                corpoTexto = `Temos a honra de convidar cordialmente <strong>${alvo}</strong> para estar conosco ministrando/participando no evento <strong>${local || 'Programação Especial'}</strong>, que será realizado no dia <strong>${dataFormatada}</strong> às <strong>${horaDoc || 'Horário Oficial'}</strong>. Será um privilégio contar com vossa honrosa presença.`;
+            }
+
+            if (textoAdicional.trim() !== '') {
+                corpoTexto += `<br><br><strong>Observações Adicionais:</strong> ${textoAdicional}`;
+            }
+
+            const janelaDocumento = window.open('', '_blank');
+            janelaDocumento.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${categoria} Oficial - ${tipo}</title>
+                    <style>
+                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.8; background-color: #fff; font-size: 16px; }
+                        .timbre { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 40px; }
+                        .timbre h1 { margin: 0; font-size: 24px; font-weight: bold; font-family: sans-serif; letter-spacing: 1px; }
+                        .timbre p { margin: 4px 0 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-family: sans-serif; }
+                        .titulo-doc { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; text-decoration: underline; }
+                        .conteudo { text-align: justify; text-indent: 50px; margin-bottom: 60px; }
+                        .data-local { text-align: right; margin-bottom: 80px; font-style: italic; }
+                        .assinaturas { display: flex; justify-content: space-around; margin-top: 50px; }
+                        .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
+                        @media print { .no-print { display: none; } body { margin: 30px 40px; } }
+                        .no-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                    </style>
+                </head>
+                <body>
+                    <button class="no-print" onclick="window.print()">Imprimir via Física</button>
+                    <div class="timbre">
+                        <h1>IGREJA DIGITAL LOCAL</h1>
+                        <p>Secretaria Geral Administrativa e de Correspondência Ministerial</p>
+                    </div>
+                    <div class="titulo-doc">${categoria}: ${tipo}</div>
+                    <div class="conteudo">${corpoTexto}</div>
+                    <div class="data-local">Emissão do Sistema, ${new Date().toLocaleDateString('pt-BR')}</div>
+                    <div class="assinaturas">
+                        <div class="linha">Secretaria Local</div>
+                        <div class="linha">Pastor Dirigente<br>Ministério Eclesiástico</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            janelaDocumento.document.close();
+        }
+
         function formatarData(dataString) {
             if (!dataString) return '-';
             const [ano, mes, dia] = dataString.split('-');
@@ -1389,7 +1464,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda atualizada!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
