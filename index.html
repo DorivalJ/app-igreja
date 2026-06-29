@@ -1153,36 +1153,44 @@
         });
 
         async function carregarFinancas() {
-            if (listaMembrosCache.length === 0) await carregarCacheMembros();
-            
-            const { data } = await _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
-            const tbody = document.getElementById('tabelaFinanceiro');
-            tbody.innerHTML = '';
-            let d = 0, o = 0, de = 0;
+    const { data } = await _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
+    const tbody = document.getElementById('tabelaFinanceiro');
+    tbody.innerHTML = '';
+    let d = 0, o = 0, de = 0;
 
-            (data || []).forEach(f => {
-                if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
-                const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
+    // Captura o valor selecionado no filtro (Dízimo, Oferta ou Despesa)
+    const filtroSelecionado = document.getElementById('filtroTipo').value;
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/30 transition-colors">
-                        <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
-                        <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
-                        <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
-                        <td class="px-6 py-4">${exibicaoCargo}</td>
-                        <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
-                        <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toFixed(2)}</td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                            <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
-            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
-            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
-            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
-            lucide.createIcons();
+    (data || []).forEach(f => {
+        // Acumula os valores nos cards independentemente do filtro da tabela
+        if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
+        
+        // SE o filtro estiver preenchido E for diferente do tipo do registro atual, pula para o próximo (não renderiza)
+        if (filtroSelecionado && f.tipo !== filtroSelecionado) {
+            return;
+        }
+
+        const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-slate-800/30 transition-colors">
+                <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
+                <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
+                <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
+                <td class="px-6 py-4">${exibicaoCargo}</td>
+                <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
+                <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toFixed(2)}</td>
+                <td class="px-6 py-4 text-right whitespace-nowrap">
+                    <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                    <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </td>
+            </tr>`;
+    });
+    document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
+    document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
+    document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
+    document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
+    lucide.createIcons();
         }
 
         async function editarFinanca(id) {
