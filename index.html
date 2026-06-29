@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -583,11 +583,11 @@
         };
 
         const estruturaCargosEclesiasticos = [
-            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
-            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
-            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
-            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
-            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
+            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-slate-700/60 text-rose-400 bg-rose-500/5', icone: 'user-check' },
+            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-slate-700/60 text-orange-400 bg-orange-500/5', icone: 'shield' },
+            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-slate-700/60 text-amber-400 bg-amber-500/5', icone: 'award' },
+            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-slate-700/60 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
+            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-slate-700/60 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
         ];
 
         function navegarPara(idTela) {
@@ -1389,7 +1389,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda atualizada!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
