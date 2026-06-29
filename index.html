@@ -60,7 +60,7 @@
             </div>
 
             <div class="p-4 border-t border-slate-800">
-                <button class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition">
+                <button onclick="alert('Logout efetuado temporariamente rascunhado.')" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                     <span>Sair do Sistema</span>
                 </button>
@@ -197,7 +197,6 @@
                 <!-- 2. TELA FINANCEIRA                         -->
                 <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
-                    
                     <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
                             <div class="flex items-center gap-2">
@@ -225,7 +224,7 @@
                                     <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
                                         <option value="Contribuinte Geral">Geral / Anônimo</option>
                                     </select>
-                               </div>
+                                </div>
                                 <div class="md:col-span-2" id="container-cargo-membro">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
                                     <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
@@ -475,7 +474,6 @@
                         
                         <div class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="containerFluxogramaMural">
-                                <!-- Os cards dinâmicos serão injetados aqui via JS -->
                             </div>
                         </div>
                     </section>
@@ -493,7 +491,6 @@
                         
                         <form id="formDocumento" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                                
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
                                     <select id="doc_categoria" onchange="atualizarTiposDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
@@ -538,7 +535,7 @@
                             </div>
 
                             <div class="mt-8 flex justify-end">
-                                <button type="button" onclick="alert('Funcionalidade de rascunho temporário configurada! Pronto para a fase de relatórios e impressão.')" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
+                                <button type="button" onclick="alert('Funcionalidade de rascunho temporário configurada!')" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
                                     <i data-lucide="file-check" class="w-5 h-5"></i>
                                     <span>Preparar Documento</span>
                                 </button>
@@ -582,36 +579,11 @@
         };
 
         const estruturaCargosEclesiasticos = [
-            { 
-                chaves: ['pastor dirigente', 'pastor local', 'dirigente'], 
-                titulo: 'Pastor Dirigente', 
-                cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', 
-                icone: 'user-check' 
-            },
-            { 
-                chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], 
-                titulo: 'Co-Pastor', 
-                cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', 
-                icone: 'shield' 
-            },
-            { 
-                chaves: ['presbitero', 'presbítero'], 
-                titulo: 'Corpo de Presbíteros', 
-                cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', 
-                icone: 'award' 
-            },
-            { 
-                chaves: ['diacono', 'diácono', 'diaconisa'], 
-                titulo: 'Corpo de Diáconos / Diaconisas', 
-                cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', 
-                icone: 'heart' 
-            },
-            { 
-                chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], 
-                titulo: 'Auxiliares da Obra', 
-                cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', 
-                icone: 'help-circle' 
-            }
+            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
+            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
+            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
+            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
+            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
         ];
 
         function navegarPara(idTela) {
@@ -786,10 +758,7 @@
                             .item-oficial .cargo-sub { color: #64748b; font-size: 11px; font-style: italic; }
                             .vazio { font-style: italic; color: #94a3b8; font-size: 12px; margin: 0; padding: 5px; }
                             .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-                            @media print {
-                                body { margin: 20px; }
-                                .btn-print { display: none; }
-                            }
+                            @media print { body { margin: 20px; } .btn-print { display: none; } }
                             .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
                         </style>
                     </head>
@@ -805,13 +774,9 @@
                     </html>
                 `);
                 janelaImpressao.document.close();
-
-            } catch (err) {
-                alert("Erro ao preparar documento de impressão: " + err.message);
-            }
+            } catch (err) { alert("Erro ao preparar documento de impressão: " + err.message); }
         }
 
-        // --- SISTEMA DE IMPRESSÃO DA AGENDA SEMANAL (ATUALIZADO PARA MODO PAISAGEM) ---
         async function imprimirAgendaSemanal() {
             try {
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
@@ -850,8 +815,7 @@
                                 <div><strong>Ofertas:</strong> ${ag.escala_ofertas || '-'}</div>
                             </td>
                             <td class="col-obs">${ag.saida_visita || '-'}</td>
-                        </tr>
-                    `;
+                        </tr>`;
                 });
 
                 const janelaImpressao = window.open('', '_blank');
@@ -861,40 +825,19 @@
                     <head>
                         <title>Agenda Semanal de Atividades</title>
                         <style>
-                            /* FORÇA O MODO PAISAGEM NA IMPRESSORA */
-                            @page { 
-                                size: landscape; 
-                                margin: 10mm 15mm 10mm 15mm;
-                            }
-                            
+                            @page { size: landscape; margin: 10mm 15mm 10mm 15mm; }
                             body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 10px; background-color: #fff; }
                             .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; }
                             .header h1 { margin: 0; font-size: 30px; letter-spacing: 1px; color: #0f172a; }
                             .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; color: #475569; font-weight: 600; }
-                            
-                            table { width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
-                            tr { page-break-inside: avoid; page-break-after: auto; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
                             th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
                             td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
-                            
-                            /* DISTRIBUIÇÃO OTIMIZADA PARA LARGURA HORIZONTAL */
-                            .col-data { width: 14%; }
-                            .col-horario { width: 8%; font-weight: bold; color: #b45309; }
-                            .col-evento { width: 26%; font-size: 14px; color: #1e293b; }
-                            .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; }
-                            .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
-                            
+                            .col-data { width: 14%; } .col-horario { width: 8%; font-weight: bold; color: #b45309; } .col-evento { width: 26%; font-size: 14px; color: #1e293b; } .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; } .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
                             .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-                            
                             .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
-                            
-                            @media print {
-                                body { margin: 0; }
-                                .btn-print { display: none; }
-                                th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                            }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background 0.2s; z-index: 9999; }
-                            .btn-print:hover { background: #b45309; }
+                            @media print { body { margin: 0; } .btn-print { display: none; } th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
                         </style>
                     </head>
                     <body>
@@ -914,46 +857,35 @@
                                     <th>Observações</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${linhasTabelaHtml}
-                            </tbody>
+                            <tbody>${linhasTabelaHtml}</tbody>
                         </table>
                         <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
                 janelaImpressao.document.close();
-
-            } catch (err) {
-                alert("Erro ao puxar dados da agenda para impressão: " + err.message);
-            }
+            } catch (err) { alert("Erro ao puxar dados da agenda para impressão: " + err.message); }
         }
 
         function atualizarTiposDocumento() {
             const category = document.getElementById('doc_categoria').value;
             const selectTipo = document.getElementById('doc_tipo');
-            
             selectTipo.innerHTML = '';
             opcoesDocumentos[category].forEach(tipo => {
                 selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
             });
-            
             ajustarFormularioDocumento();
         }
 
         function ajustarFormularioDocumento() {
             const category = document.getElementById('doc_categoria').value;
             const tipo = document.getElementById('doc_tipo').value;
-
             const lblAlvo = document.getElementById('label-doc-alvo');
             const inpAlvo = document.getElementById('doc_alvo');
-            
             const boxLocal = document.getElementById('box-doc-local');
             const lblLocal = document.getElementById('label-doc-local');
-            
             const boxData = document.getElementById('box-doc-data');
             const lblData = document.getElementById('label-doc-data');
-            
             const boxHora = document.getElementById('box-doc-hora');
 
             boxLocal.classList.add('hidden');
@@ -965,11 +897,9 @@
                 inpAlvo.placeholder = "Ex: Nome Completo do Irmão/Irmã";
                 boxLocal.classList.remove('hidden');
                 lblLocal.innerText = "Igreja de Destino";
-            } 
-            else if (category === 'Memorando') {
+            } else if (category === 'Memorando') {
                 lblAlvo.innerText = "Membro Alvo / Assunto";
                 inpAlvo.placeholder = "Ex: Nome do Membro ou Departamento Coberto";
-                
                 if(tipo === 'Memorando Interno') {
                     lblAlvo.innerText = "Destinatário Interno";
                     inpAlvo.placeholder = "Ex: Ao Departamento de Louvor / Secretaria Geral";
@@ -977,14 +907,11 @@
                     boxData.classList.remove('hidden');
                     lblData.innerText = "Data de Vigência / Ocorrência";
                 }
-            } 
-            else if (category === 'Convite') {
+            } else if (category === 'Convite') {
                 lblAlvo.innerText = "Convidado / Instituição";
                 inpAlvo.placeholder = "Ex: Pr. Cláudio Duarte / Ministério de Louvor X";
-                
                 boxLocal.classList.remove('hidden');
                 lblLocal.innerText = "Evento / Departamento Coberto";
-                
                 boxData.classList.remove('hidden');
                 lblData.innerText = "Data do Evento";
                 boxHora.classList.remove('hidden');
@@ -1136,16 +1063,14 @@
             listaMembrosCache = data || [];
             const sel = document.getElementById('fin_membro_nome');
             sel.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
-            listaMembrosCache.forEach(m => { sel.innerHTML += `<option value="${m.nome}">${m.nome}</option>'; });
+            listaMembrosCache.forEach(m => { sel.innerHTML += `<option value="${m.nome}">${m.nome}</option>`; });
             autopreencherCargoMembro();
         }
 
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
             const tipo = document.getElementById('fin_tipo').value;
-            let desc = '';
-            let dia = null;
-            let cargoMembro = null;
+            let desc = ''; let dia = null; let cargoMembro = null;
 
             if(tipo === 'Dízimo') {
                 desc = document.getElementById('fin_membro_nome').value;
@@ -1160,10 +1085,7 @@
             }
 
             const lanc = {
-                tipo, 
-                descricao: desc, 
-                cargo: cargoMembro, 
-                dia_semana: dia,
+                tipo, descricao: desc, cargo: cargoMembro, dia_semana: dia,
                 valor: parseFloat(document.getElementById('fin_valor').value),
                 data_lancamento: document.getElementById('fin_data').value,
                 observacao: document.getElementById('fin_observacao').value || null
@@ -1212,7 +1134,6 @@
             try {
                 const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
                 if (error) throw error;
-
                 editandoFinanceiroID = id;
                 document.getElementById('fin_tipo').value = data.tipo;
                 ajustarCamposFinancas();
@@ -1242,7 +1163,6 @@
                         inputManual.value = data.descricao;
                     }
                 }
-
                 document.getElementById('fin_valor').value = data.valor;
                 document.getElementById('fin_data').value = data.data_lancamento;
                 document.getElementById('fin_observacao').value = data.observacao || '';
@@ -1330,8 +1250,7 @@
                 escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
                 dirigente: document.getElementById('agenda_dirigente').value || null,
                 saida_visita: document.getElementById('agenda_saida_visita').value || null,
-                mes_referencia: mesRef,
-                data: dataInput
+                mes_referencia: mesRef, data: dataInput
             };
 
             const { error } = editandoAgendaID 
@@ -1339,7 +1258,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda updated successfully!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda atualizada!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
