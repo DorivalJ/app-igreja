@@ -19,6 +19,9 @@
 <body class="text-slate-200">
     <div class="min-h-screen flex">
         
+        <!-- ========================================== -->
+        <!--        PAINEL LATERAL (SIDEBAR)            -->
+        <!-- ========================================== -->
         <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
             <div>
                 <div class="p-6 border-b border-slate-800">
@@ -64,6 +67,9 @@
             </div>
         </aside>
 
+        <!-- ========================================== -->
+        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
+        <!-- ========================================== -->
         <div class="flex-1 ml-64 flex flex-col min-h-screen">
             
             <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
@@ -82,6 +88,9 @@
 
             <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
                 
+                <!-- ========================================== -->
+                <!-- 1. TELA DE MEMBROS                         -->
+                <!-- ========================================== -->
                 <div id="tela-membros" class="space-y-8 dynamic-screen">
                     <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -184,6 +193,9 @@
                     </section>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- 2. TELA FINANCEIRA                         -->
+                <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -345,6 +357,9 @@
                     </section>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- 3. TELA DE AGENDA SEMANAL                  -->
+                <!-- ========================================== -->
                 <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -401,7 +416,7 @@
 
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                                    <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <input type="text" id="agenda_saida_visita" placeholder="Notes adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
@@ -442,6 +457,9 @@
                     </section>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- 4. TELA MURAL DE ATRIBUIÇÕES               -->
+                <!-- ========================================== -->
                 <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -465,6 +483,9 @@
                     </section>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- 5. TELA DE DOCUMENTOS                      -->
+                <!-- ========================================== -->
                 <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
@@ -533,7 +554,7 @@
                             </h2>
                         </div>
                         <div id="filaDocumentos" class="p-8 text-center text-slate-500 text-sm italic">
-                            Carregando histórico...
+                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
                         </div>
                     </section>
                 </div>
@@ -542,6 +563,9 @@
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!--                  LÓGICA JAVASCRIPT         -->
+    <!-- ========================================== -->
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
@@ -551,6 +575,7 @@
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
+        let filaDocumentosCache = [];
 
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
@@ -618,10 +643,10 @@
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
-                carregarDocumentos();
+                renderizarFilaDocumentos();
             }
             lucide.createIcons();
         }
@@ -840,7 +865,7 @@
                             </thead>
                             <tbody>${linhasTabelaHtml}</tbody>
                         </table>
-                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVELVEDOR: DORIVAL J.</div>
+                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
@@ -861,7 +886,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    alert("Não há registros lançados para gerar the relatório.");
+                    alert("Não há registros lançados para gerar o relatório.");
                     return;
                 }
 
@@ -1019,12 +1044,12 @@
             }
         }
 
-        async function gerarDocumentoParaImpressao() {
+        function gerarDocumentoParaImpressao() {
             const categoria = document.getElementById('doc_categoria').value;
             const tipo = document.getElementById('doc_tipo').value;
             const alvo = document.getElementById('doc_alvo').value;
             const local = document.getElementById('doc_local').value || '';
-            const dataInput = document.getElementById('doc_data').value || null;
+            const dataInput = document.getElementById('doc_data').value || '';
             const hora = document.getElementById('doc_hora').value || '';
             const textoAdicional = document.getElementById('doc_texto').value || '';
 
@@ -1033,29 +1058,17 @@
                 return;
             }
 
-            // Salva no banco de dados
-            try {
-                const { error } = await _supabase.from('documentos').insert([{
-                    categoria,
-                    tipo,
-                    alvo,
-                    local: local || null,
-                    data_evento: dataInput,
-                    horario: hora || null,
-                    texto_adicional: textoAdicional || null,
-                    data_emissao: new Date().toISOString().split('T')[0]
-                }]);
+            const novoDoc = {
+                id: Date.now(),
+                categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
+                data_emissao: new Date().toLocaleDateString('pt-BR')
+            };
 
-                if(error) throw error;
-                carregarDocumentos();
-            } catch (err) {
-                console.error("Erro ao salvar no banco:", err.message);
-                // Deixamos um aviso discreto no console para não atrapalhar o fluxo do usuário
-            }
+            filaDocumentosCache.unshift(novoDoc);
+            renderizarFilaDocumentos();
 
-            const dataEmissaoFormatada = new Date().toLocaleDateString('pt-BR');
-            const dataFormatada = dataInput ? formatarData(dataInput) : '';
             let corpoTemplate = '';
+            const dataFormatada = dataInput ? formatarData(dataInput) : '';
 
             if (categoria === 'Carta') {
                 corpoTemplate = `
@@ -1067,11 +1080,11 @@
             } else if (categoria === 'Memorando') {
                 corpoTemplate = `
                     <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${tipo}</p>
-                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || dataEmissaoFormatada}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
-                    <p>Decisionamento este que visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
+                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
+                    <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
                     <p>${textoAdicional}</p>
                 `;
-            } else if (category === 'Convite') {
+            } else if (categoria === 'Convite') {
                 corpoTemplate = `
                     <p>Graça e Paz!</p>
                     <p>Temos a honra de convidar cordialmente <strong>${alvo}</strong> para cooperar conosco no evento <strong>${local}</strong>.</p>
@@ -1087,36 +1100,31 @@
                 <head>
                     <title>${categoria} - ${tipo}</title>
                     <style>
-                        /* Forçamos os estilos CSS inline diretamente para garantir o cabeçalho visível */
                         body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; }
-                        .header-oficial { text-align: center; margin-bottom: 40px; border-bottom: 3px double #000; padding-bottom: 15px; display: block !important; visibility: visible !important; }
-                        .header-oficial h1 { margin: 0; font-size: 24px; text-transform: uppercase; font-weight: bold; color: #000; }
-                        .header-oficial p { margin: 5px 0; font-size: 12px; font-style: italic; letter-spacing: 1px; color: #000; }
+                        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+                        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; font-weight: bold; line-height: 1.3; }
+                        .header .sub-titulo { font-size: 15px; font-weight: bold; margin-top: 3px; }
+                        .header p { margin: 4px 0 0 0; font-size: 12px; font-style: italic; letter-spacing: 0.5px; }
                         .titulo-doc { text-align: center; margin: 30px 0; font-size: 18px; font-weight: bold; text-transform: uppercase; text-decoration: underline; }
                         .corpo { text-align: justify; margin-bottom: 50px; text-indent: 40px; }
                         .corpo p { margin-bottom: 15px; }
                         .data-local { text-align: right; margin-bottom: 60px; font-style: italic; }
                         .assinaturas { display: flex; justify-content: space-around; margin-top: 80px; }
                         .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
-                        
-                        @media print { 
-                            .btn-print { display: none; } 
-                            .header-oficial { display: block !important; visibility: visible !important; }
-                        }
+                        @media print { .btn-print { display: none; } }
                         .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: sans-serif; }
                     </style>
                 </head>
                 <body>
                     <button class="btn-print" onclick="window.print()">Imprimir Correspondência</button>
-                    
-                    <div class="header-oficial clearfix">
-                        <h1>MINISTÉRIO REUNIDO - IGREJA DIGITAL</h1>
-                        <p>Secretaria Eclesiástica Central de Atas e Expedientes</p>
+                    <div class="header">
+                        <h1>Igreja Evangélica Assembleia de Deus Ministério Madureira</h1>
+                        <div class="sub-titulo">Sub Congregação Jd. Marilena</div>
+                        <p>Rua Guaraton, 47 Jd. Marilena - Guarulhos - SP</p>
                     </div>
-                    
                     <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
                     <div class="corpo">${corpoTemplate}</div>
-                    <div class="data-local">Emitido na sede local, em ${dataEmissaoFormatada}.</div>
+                    <div class="data-local">Emitido na sede local, em ${novoDoc.data_emissao}.</div>
                     <div class="assinaturas">
                         <div class="linha">Secretaria Executiva</div>
                         <div class="linha">Pastor Dirigente</div>
@@ -1129,41 +1137,31 @@
             atualizarTiposDocumento();
         }
 
-        async function carregarDocumentos() {
-            try {
-                const { data, error } = await _supabase.from('documentos').select('*').order('id', { ascending: false }).limit(15);
-                if (error) throw error;
-
-                const container = document.getElementById('filaDocumentos');
-                if(!data || data.length === 0) {
-                    container.className = "p-8 text-center text-slate-500 text-sm italic";
-                    container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
-                    return;
-                }
-
-                container.className = "divide-y divide-slate-800 border-t border-slate-800";
-                container.innerHTML = '';
-                
-                data.forEach(doc => {
-                    const dataEmissaoFormatada = doc.data_emissao ? formatarData(doc.data_emissao) : '-';
-                    container.innerHTML += `
-                        <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
-                            <div>
-                                <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
-                                <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
-                            </div>
-                            <div class="text-right text-xs">
-                                <div class="text-slate-500">Emitido em ${dataEmissaoFormatada}</div>
-                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                const container = document.getElementById('filaDocumentos');
+        function renderizarFilaDocumentos() {
+            const container = document.getElementById('filaDocumentos');
+            if(filaDocumentosCache.length === 0) {
                 container.className = "p-8 text-center text-slate-500 text-sm italic";
-                container.innerHTML = "Tabela de histórico ausente no banco (Apenas a impressão local está ativa).";
+                container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
+                return;
             }
+
+            container.className = "divide-y divide-slate-800 border-t border-slate-800";
+            container.innerHTML = '';
+            
+            filaDocumentosCache.forEach(doc => {
+                container.innerHTML += `
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
+                        <div>
+                            <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
+                            <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
+                        </div>
+                        <div class="text-right text-xs">
+                            <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
+                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         function formatarData(dataString) {
@@ -1513,7 +1511,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda atualizada com sucesso!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
