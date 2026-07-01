@@ -643,7 +643,7 @@
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
                 renderizarFilaDocumentos();
@@ -870,7 +870,7 @@
                     </html>
                 `);
                 janelaImpressao.document.close();
-            } catch (err) { alert("Erro ao puxar dados da agenda para impressão: " + err.message); }
+            } catch (err) { alert("Erro ao fluxo dados da agenda para impressão: " + err.message); }
         }
 
         async function imprimirRelatorioFinanceiro() {
@@ -1058,10 +1058,15 @@
                 return;
             }
 
+            // Gerando string de data dinâmica: "Guarulhos, DD de Mês de AAAA."
+            const dataHoje = new Date();
+            const mesesPorExtenso = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
+
             const novoDoc = {
                 id: Date.now(),
                 categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
-                data_emissao: new Date().toLocaleDateString('pt-BR')
+                data_emissao: dataHoje.toLocaleDateString('pt-BR')
             };
 
             filaDocumentosCache.unshift(novoDoc);
@@ -1124,9 +1129,9 @@
                     </div>
                     <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
                     <div class="corpo">${corpoTemplate}</div>
-                    <div class="data-local">Emitido na sede local, em ${novoDoc.data_emissao}.</div>
+                    <div class="data-local">${localEDataDinamica}</div>
                     <div class="assinaturas">
-                        <div class="linha">Secretaria Executiva</div>
+                        <div class="linha">Secretário(a)</div>
                         <div class="linha">Pastor Dirigente</div>
                     </div>
                 </body>
