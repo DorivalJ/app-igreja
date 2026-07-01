@@ -416,7 +416,7 @@
 
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
-                                    <input type="text" id="agenda_saida_visita" placeholder="Notes adicionais sobre o event..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <input type="text" id="agenda_saida_visita" placeholder="Notas adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
@@ -493,7 +493,7 @@
                             <h2 class="font-semibold text-slate-100">Redigir Nova Correspondência</h2>
                         </div>
                         
-                        <form id="formDocumento" class="p-6 md:p-8" onsubmit="event.preventDefault(); processarGeracaoDocumento();">
+                        <form id="formDocumento" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
@@ -539,9 +539,9 @@
                             </div>
 
                             <div class="mt-8 flex justify-end">
-                                <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
+                                <button type="button" onclick="gerarDocumentoParaImpressao()" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
                                     <i data-lucide="file-check" class="w-5 h-5"></i>
-                                    <span>Preparar Documento</span>
+                                    <span>Emitir e Imprimir</span>
                                 </button>
                             </div>
                         </form>
@@ -553,24 +553,8 @@
                                 <i data-lucide="history" class="w-5 h-5 text-blue-400"></i> Últimas Emissões (Fila de Impressão)
                             </h2>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                        <th class="px-6 py-4">Data Emissão</th>
-                                        <th class="px-6 py-4">Categoria / Tipo</th>
-                                        <th class="px-6 py-4">Destinatário / Alvo</th>
-                                        <th class="px-6 py-4 text-right">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabelaDocumentosFila" class="divide-y divide-slate-800">
-                                    <tr>
-                                        <td colspan="4" class="p-8 text-center text-slate-500 text-sm italic">
-                                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div id="filaDocumentos" class="p-8 text-center text-slate-500 text-sm italic">
+                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
                         </div>
                     </section>
                 </div>
@@ -591,7 +575,7 @@
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
-        let filaDocumentosMemoria = []; // Fila temporária para gerenciar as emissões de documentos
+        let filaDocumentosCache = [];
 
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
@@ -666,189 +650,6 @@
             }
             lucide.createIcons();
         }
-
-        /* ========================================================= */
-        /*   LOGICA DE GERAÇÃO E IMPRESSÃO DE DOCUMENTOS             */
-        /* ========================================================= */
-
-        function processarGeracaoDocumento() {
-            const categoria = document.getElementById('doc_categoria').value;
-            const tipo = document.getElementById('doc_tipo').value;
-            const alvo = document.getElementById('doc_alvo').value;
-            const local = document.getElementById('doc_local').value || '';
-            const dataDoc = document.getElementById('doc_data').value || '';
-            const hora = document.getElementById('doc_hora').value || '';
-            const textoAdicional = document.getElementById('doc_texto').value || '';
-
-            let textoGerado = '';
-            const dataFormatada = dataDoc ? formatarData(dataDoc) : new Date().toLocaleDateString('pt-BR');
-
-            // 1. Gerador Automático de Modelos de Texto
-            if (categoria === 'Carta') {
-                if (tipo === 'Mudança' || tipo === 'Transferência') {
-                    textoGerado = `Pelo presente instrumento, recomendamos à comunhão dos irmãos na <strong>${local || 'igreja co-irmã'}</strong> o(a) nosso(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que até a presente data pertenceu ao nosso rol de membros, portando-se com testemunho cristão fiel, ativo em seus deveres e obrigações eclesiásticas. Rogamos as ricas bênçãos do Senhor sobre sua nova jornada ministerial e residencial.`;
-                } else { // Apresentação
-                    textoGerado = `Cumprimentando-vos com a santa paz de Cristo, apresentamos à vossa amada congregação o(a) irmão(ã) <strong>${alvo}</strong>. O(A) mesmo(a) encontra-se em plena comunhão com nosso ministério e viaja a vosso encontro por motivos de caráter temporário/pessoal. Recomendamos que o(a) recebais no Senhor.`;
-                }
-            } else if (categoria === 'Memorando') {
-                if (tipo === 'Memorando Interno') {
-                    textoGerado = `Prezados, servimo-nos deste expediente interno para encaminhar orientações gerais acerca do assunto/departamento <strong>${alvo}</strong>. Solicitamos especial atenção à regularização das atividades descritas e o cumprimento das normas operacionais estabelecidas por esta secretaria.`;
-                } else {
-                    textoGerado = `Notificamos por meio deste instrumento oficial que, a partir da data de vigência em <strong>${dataFormatada}</strong>, a situação cadastral e operacional do membro/assunto <strong>${alvo}</strong> foi formalmente alterada para fins de <strong>${tipo}</strong> do rol administrativo desta igreja de forma irrevogável.`;
-                }
-            } else if (categoria === 'Convite') {
-                textoGerado = `Temos a honra e a alegria de convidar formalmente o(a) amado(a) <strong>${alvo}</strong> para estar conosco participando do evento/departamento <strong>${local}</strong>. A programação oficial ocorrerá no dia <strong>${dataFormatada}</strong> às <strong>${hora || '19:30'}</strong>. Será um privilégio contar com vossa honrosa presença e cooperação para a edificação do corpo de Cristo.`;
-            }
-
-            if (textoAdicional.trim() !== '') {
-                textoGerado += `<br><br><strong>Observações Adicionais:</strong> ${textoAdicional}`;
-            }
-
-            // 2. Criação do Objeto do Documento
-            const novoDoc = {
-                id: Date.now(),
-                dataEmissao: new Date().toLocaleDateString('pt-BR'),
-                categoria,
-                tipo,
-                alvo,
-                local,
-                dataFormatada,
-                hora,
-                corpoTexto: textoGerado
-            };
-
-            filaDocumentosMemoria.unshift(novoDoc);
-            alert(`Documento (${categoria} de ${tipo}) preparado com sucesso e enviado para a fila!`);
-            
-            // Limpa o formulário e atualiza a lista
-            document.getElementById('doc_alvo').value = '';
-            document.getElementById('doc_local').value = '';
-            document.getElementById('doc_data').value = '';
-            document.getElementById('doc_hora').value = '';
-            document.getElementById('doc_texto').value = '';
-            
-            renderizarFilaDocumentos();
-        }
-
-        function renderizarFilaDocumentos() {
-            const tbody = document.getElementById('tabelaDocumentosFila');
-            if (filaDocumentosMemoria.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="p-8 text-center text-slate-500 text-sm italic">
-                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
-                        </td>
-                    </tr>`;
-                return;
-            }
-
-            tbody.innerHTML = '';
-            filaDocumentosMemoria.forEach(doc => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/30 transition-colors">
-                        <td class="px-6 py-4 text-sm text-slate-300">${doc.dataEmissao}</td>
-                        <td class="px-6 py-4">
-                            <span class="font-medium text-slate-100">${doc.categoria}</span>
-                            <span class="text-xs text-slate-500 block">${doc.tipo}</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-slate-300">${doc.alvo}</td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <button onclick="imprimirDocumentoOficial(${doc.id})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all shadow-md mr-2">
-                                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
-                            </button>
-                            <button onclick="removerDocumentoFila(${doc.id})" class="text-rose-400 hover:scale-110 p-1.5 transition-transform">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-            });
-            lucide.createIcons();
-        }
-
-        function removerDocumentoFila(id) {
-            if (confirm("Remover este documento preparado da fila?")) {
-                filaDocumentosMemoria = filaDocumentosMemoria.filter(d => d.id !== id);
-                renderizarFilaDocumentos();
-            }
-        }
-
-        function imprimirDocumentoOficial(id) {
-            const doc = filaDocumentosMemoria.find(d => d.id === id);
-            if (!doc) return;
-
-            const janelaImpressao = window.open('', '_blank');
-            janelaImpressao.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>${doc.categoria} - ${doc.tipo}</title>
-                    <style>
-                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.8; background-color: #fff; }
-                        .papel-timbrado { border: 1px solid #fff; min-height: 100%; display: flex; flex-col; justify-content: space-between; }
-                        .header-igreja { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 40px; }
-                        .header-igreja h1 { margin: 0; font-size: 26px; font-weight: bold; font-family: Arial, sans-serif; letter-spacing: 1px; }
-                        .header-igreja p { margin: 4px 0 0 0; font-size: 11px; text-transform: uppercase; font-family: Arial, sans-serif; letter-spacing: 2px; color: #333; }
-                        
-                        .titulo-documento { text-align: center; margin-bottom: 45px; font-family: Arial, sans-serif; }
-                        .titulo-documento h2 { font-size: 20px; font-weight: bold; text-transform: uppercase; text-decoration: underline; margin: 0; }
-                        
-                        .corpo-texto { text-align: justify; font-size: 16px; margin-bottom: 60px; text-indent: 50px; }
-                        
-                        .data-local { text-align: right; font-size: 15px; margin-bottom: 80px; font-style: italic; }
-                        
-                        .bloco-assinaturas { display: flex; justify-content: space-around; margin-top: 50px; page-break-inside: avoid; }
-                        .campo-assinatura { text-align: center; width: 250px; font-size: 14px; font-family: Arial, sans-serif; }
-                        .linha { border-top: 1px solid #000; margin-bottom: 6px; }
-                        
-                        .footer-doc { text-align: center; font-size: 10px; font-family: Arial, sans-serif; color: #777; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 100px; text-transform: uppercase; }
-                        @media print { body { margin: 30px 40px; } .btn-print-float { display: none; } }
-                        .btn-print-float { position: fixed; top: 20px; right: 20px; padding: 12px 25px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-family: Arial, sans-serif; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-                    </style>
-                </head>
-                <body>
-                    <button class="btn-print-float" onclick="window.print()">Imprimir Correspondência</button>
-                    <div class="papel-timbrado">
-                        <div class="header-igreja">
-                            <h1>IGREJA DIGITAL</h1>
-                            <p>Secretaria Geral Administrativa • Ministério Local</p>
-                        </div>
-                        
-                        <div class="titulo-documento">
-                            <h2>${doc.categoria.toUpperCase()} DE ${doc.tipo.toUpperCase()}</h2>
-                        </div>
-                        
-                        <div class="corpo-texto">
-                            ${doc.corpoTexto}
-                        </div>
-                        
-                        <div class="data-local">
-                            Emitido em, ${doc.dataEmissao}.
-                        </div>
-                        
-                        <div class="bloco-assinaturas">
-                            <div class="campo-assinatura">
-                                <div class="linha"></div>
-                                <strong>Secretaria Local</strong><br>Igreja Digital
-                            </div>
-                            <div class="campo-assinatura">
-                                <div class="linha"></div>
-                                <strong>Pastor Dirigente</strong><br>Ministério Pastoral
-                            </div>
-                        </div>
-                        
-                        <div class="footer-doc">
-                            Documento Oficial Interno - Gerado Eletronicamente pelo Sistema Igreja Digital - Desenvolvido por Dorival J.
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
-            janelaImpressao.document.close();
-        }
-
-        /* ========================================================= */
-        /*   FIM DA LOGICA EXCLUSIVA DE DOCUMENTOS                   */
-        /* ========================================================= */
 
         async function atualizarFluxogramaMural() {
             try {
@@ -1155,7 +956,7 @@
                         <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
                         <div class="header">
                             <h1>RELATÓRIO MENSAL - LIVRO CAIXA</h1>
-                            <p>Demostrativo de Entradas e Saídas Financeiras — Competência: ${mesAtual} de ${anoAtual}</p>
+                            <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${mesAtual} de ${anoAtual}</p>
                         </div>
                         
                         <div class="cards-resumo">
@@ -1241,6 +1042,124 @@
                 lblData.innerText = "Data do Evento";
                 boxHora.classList.remove('hidden');
             }
+        }
+
+        function gerarDocumentoParaImpressao() {
+            const categoria = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            const alvo = document.getElementById('doc_alvo').value;
+            const local = document.getElementById('doc_local').value || '';
+            const dataInput = document.getElementById('doc_data').value || '';
+            const hora = document.getElementById('doc_hora').value || '';
+            const textoAdicional = document.getElementById('doc_texto').value || '';
+
+            if(!alvo) {
+                alert('Por favor, defina o campo do destinatário/membro principal.');
+                return;
+            }
+
+            const novoDoc = {
+                id: Date.now(),
+                categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
+                data_emissao: new Date().toLocaleDateString('pt-BR')
+            };
+
+            filaDocumentosCache.unshift(novoDoc);
+            renderizarFilaDocumentos();
+
+            let corpoTemplate = '';
+            const dataFormatada = dataInput ? formatarData(dataInput) : '';
+
+            if (categoria === 'Carta') {
+                corpoTemplate = `
+                    <p>Prezados Irmãos em Cristo,</p>
+                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que está se deslocando para a localidade de <strong>${local}</strong>.</p>
+                    <p>Solicitamos que o(a) recebam na paz do Senhor e prestem o auxílio e comunhão necessários para o seu bom desenvolvimento espiritual na nova comunidade.</p>
+                    <p>${textoAdicional}</p>
+                `;
+            } else if (categoria === 'Memorando') {
+                corpoTemplate = `
+                    <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${tipo}</p>
+                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
+                    <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
+                    <p>${textoAdicional}</p>
+                `;
+            } else if (categoria === 'Convite') {
+                corpoTemplate = `
+                    <p>Graça e Paz!</p>
+                    <p>Temos a honra de convidar cordialmente <strong>${alvo}</strong> para cooperar conosco no evento <strong>${local}</strong>.</p>
+                    <p>O cronograma oficial está previsto para o dia <strong>${dataFormatada}</strong> às <strong>${hora}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                    <p>${textoAdicional}</p>
+                `;
+            }
+
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${categoria} - ${tipo}</title>
+                    <style>
+                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; }
+                        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+                        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; font-weight: bold; }
+                        .header p { margin: 5px 0; font-size: 12px; font-style: italic; letter-spacing: 1px; }
+                        .titulo-doc { text-align: center; margin: 30px 0; font-size: 18px; font-weight: bold; text-transform: uppercase; text-decoration: underline; }
+                        .corpo { text-align: justify; margin-bottom: 50px; text-indent: 40px; }
+                        .corpo p { margin-bottom: 15px; }
+                        .data-local { text-align: right; margin-bottom: 60px; font-style: italic; }
+                        .assinaturas { display: flex; justify-content: space-around; margin-top: 80px; }
+                        .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
+                        @media print { .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: sans-serif; }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Correspondência</button>
+                    <div class="header">
+                        <h1>MINISTÉRIO REUNIDO - IGREJA DIGITAL</h1>
+                        <p>Secretaria Eclesiástica Central de Atas e Expedientes</p>
+                    </div>
+                    <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
+                    <div class="corpo">${corpoTemplate}</div>
+                    <div class="data-local">Emitido na sede local, em ${novoDoc.data_emissao}.</div>
+                    <div class="assinaturas">
+                        <div class="linha">Secretaria Executiva</div>
+                        <div class="linha">Pastor Dirigente</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
+            document.getElementById('formDocumento').reset();
+            atualizarTiposDocumento();
+        }
+
+        function renderizarFilaDocumentos() {
+            const container = document.getElementById('filaDocumentos');
+            if(filaDocumentosCache.length === 0) {
+                container.className = "p-8 text-center text-slate-500 text-sm italic";
+                container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
+                return;
+            }
+
+            container.className = "divide-y divide-slate-800 border-t border-slate-800";
+            container.innerHTML = '';
+            
+            filaDocumentosCache.forEach(doc => {
+                container.innerHTML += `
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
+                        <div>
+                            <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
+                            <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
+                        </div>
+                        <div class="text-right text-xs">
+                            <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
+                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         function formatarData(dataString) {
@@ -1590,7 +1509,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda atualizada!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
