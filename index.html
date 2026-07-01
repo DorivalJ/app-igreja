@@ -19,9 +19,6 @@
 <body class="text-slate-200">
     <div class="min-h-screen flex">
         
-        <!-- ========================================== -->
-        <!--        PAINEL LATERAL (SIDEBAR)            -->
-        <!-- ========================================== -->
         <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
             <div>
                 <div class="p-6 border-b border-slate-800">
@@ -67,9 +64,6 @@
             </div>
         </aside>
 
-        <!-- ========================================== -->
-        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
-        <!-- ========================================== -->
         <div class="flex-1 ml-64 flex flex-col min-h-screen">
             
             <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
@@ -88,9 +82,6 @@
 
             <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
                 
-                <!-- ========================================== -->
-                <!-- 1. TELA DE MEMBROS                         -->
-                <!-- ========================================== -->
                 <div id="tela-membros" class="space-y-8 dynamic-screen">
                     <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -193,9 +184,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 2. TELA FINANCEIRA                         -->
-                <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -357,9 +345,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 3. TELA DE AGENDA SEMANAL                  -->
-                <!-- ========================================== -->
                 <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -457,9 +442,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 4. TELA MURAL DE ATRIBUIÇÕES               -->
-                <!-- ========================================== -->
                 <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -483,9 +465,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 5. TELA DE DOCUMENTOS                      -->
-                <!-- ========================================== -->
                 <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
@@ -563,9 +542,6 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!--                  LÓGICA JAVASCRIPT         -->
-    <!-- ========================================== -->
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
@@ -885,7 +861,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    alert("Não há registros lançados para gerar o relatório.");
+                    alert("Não há registros lançados para gerar the relatório.");
                     return;
                 }
 
@@ -1057,7 +1033,7 @@
                 return;
             }
 
-            // Envia para o Supabase
+            // Salva no banco de dados
             try {
                 const { error } = await _supabase.from('documentos').insert([{
                     categoria,
@@ -1071,12 +1047,10 @@
                 }]);
 
                 if(error) throw error;
-                
-                // Recarrega o histórico
                 carregarDocumentos();
             } catch (err) {
-                console.error("Erro ao persistir documento:", err.message);
-                alert("Erro ao salvar histórico do documento, mas a impressão continuará.");
+                console.error("Erro ao salvar no banco:", err.message);
+                // Deixamos um aviso discreto no console para não atrapalhar o fluxo do usuário
             }
 
             const dataEmissaoFormatada = new Date().toLocaleDateString('pt-BR');
@@ -1097,7 +1071,7 @@
                     <p>Decisionamento este que visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
                     <p>${textoAdicional}</p>
                 `;
-            } else if (categoria === 'Convite') {
+            } else if (category === 'Convite') {
                 corpoTemplate = `
                     <p>Graça e Paz!</p>
                     <p>Temos a honra de convidar cordialmente <strong>${alvo}</strong> para cooperar conosco no evento <strong>${local}</strong>.</p>
@@ -1113,26 +1087,33 @@
                 <head>
                     <title>${categoria} - ${tipo}</title>
                     <style>
+                        /* Forçamos os estilos CSS inline diretamente para garantir o cabeçalho visível */
                         body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; }
-                        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 15px; }
-                        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; font-weight: bold; }
-                        .header p { margin: 5px 0; font-size: 12px; font-style: italic; letter-spacing: 1px; }
+                        .header-oficial { text-align: center; margin-bottom: 40px; border-bottom: 3px double #000; padding-bottom: 15px; display: block !important; visibility: visible !important; }
+                        .header-oficial h1 { margin: 0; font-size: 24px; text-transform: uppercase; font-weight: bold; color: #000; }
+                        .header-oficial p { margin: 5px 0; font-size: 12px; font-style: italic; letter-spacing: 1px; color: #000; }
                         .titulo-doc { text-align: center; margin: 30px 0; font-size: 18px; font-weight: bold; text-transform: uppercase; text-decoration: underline; }
                         .corpo { text-align: justify; margin-bottom: 50px; text-indent: 40px; }
                         .corpo p { margin-bottom: 15px; }
                         .data-local { text-align: right; margin-bottom: 60px; font-style: italic; }
                         .assinaturas { display: flex; justify-content: space-around; margin-top: 80px; }
                         .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
-                        @media print { .btn-print { display: none; } }
+                        
+                        @media print { 
+                            .btn-print { display: none; } 
+                            .header-oficial { display: block !important; visibility: visible !important; }
+                        }
                         .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: sans-serif; }
                     </style>
                 </head>
                 <body>
                     <button class="btn-print" onclick="window.print()">Imprimir Correspondência</button>
-                    <div class="header">
+                    
+                    <div class="header-oficial clearfix">
                         <h1>MINISTÉRIO REUNIDO - IGREJA DIGITAL</h1>
                         <p>Secretaria Eclesiástica Central de Atas e Expedientes</p>
                     </div>
+                    
                     <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
                     <div class="corpo">${corpoTemplate}</div>
                     <div class="data-local">Emitido na sede local, em ${dataEmissaoFormatada}.</div>
@@ -1179,7 +1160,9 @@
                     `;
                 });
             } catch (err) {
-                console.error("Erro ao listar fila de documentos:", err.message);
+                const container = document.getElementById('filaDocumentos');
+                container.className = "p-8 text-center text-slate-500 text-sm italic";
+                container.innerHTML = "Tabela de histórico ausente no banco (Apenas a impressão local está ativa).";
             }
         }
 
@@ -1530,7 +1513,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda atualizada com sucesso!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
