@@ -493,7 +493,7 @@
                             <h2 class="font-semibold text-slate-100">Redigir Nova Correspondência</h2>
                         </div>
                         
-                        <form id="formDocumento" class="p-6 md:p-8">
+                        <form id="formDocumento" class="p-6 md:p-8" onsubmit="event.preventDefault(); processarGeracaoDocumento();">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
@@ -539,7 +539,7 @@
                             </div>
 
                             <div class="mt-8 flex justify-end">
-                                <button type="button" onclick="alert('Funcionalidade de rascunho temporário configurada!')" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
+                                <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
                                     <i data-lucide="file-check" class="w-5 h-5"></i>
                                     <span>Preparar Documento</span>
                                 </button>
@@ -553,8 +553,24 @@
                                 <i data-lucide="history" class="w-5 h-5 text-blue-400"></i> Últimas Emissões (Fila de Impressão)
                             </h2>
                         </div>
-                        <div class="p-8 text-center text-slate-500 text-sm italic">
-                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Data Emissão</th>
+                                        <th class="px-6 py-4">Categoria / Tipo</th>
+                                        <th class="px-6 py-4">Destinatário / Alvo</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaDocumentosFila" class="divide-y divide-slate-800">
+                                    <tr>
+                                        <td colspan="4" class="p-8 text-center text-slate-500 text-sm italic">
+                                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </section>
                 </div>
@@ -575,6 +591,7 @@
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
+        let filaDocumentosMemoria = []; // Fila temporária para gerenciar as emissões de documentos
 
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
@@ -583,11 +600,11 @@
         };
 
         const estruturaCargosEclesiasticos = [
-            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-slate-700/60 text-rose-400 bg-rose-500/5', icone: 'user-check' },
-            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-slate-700/60 text-orange-400 bg-orange-500/5', icone: 'shield' },
-            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-slate-700/60 text-amber-400 bg-amber-500/5', icone: 'award' },
-            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-slate-700/60 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
-            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-slate-700/60 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
+            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
+            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
+            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
+            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
+            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
         ];
 
         function navegarPara(idTela) {
@@ -645,9 +662,193 @@
                 topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
+                renderizarFilaDocumentos();
             }
             lucide.createIcons();
         }
+
+        /* ========================================================= */
+        /*   LOGICA DE GERAÇÃO E IMPRESSÃO DE DOCUMENTOS             */
+        /* ========================================================= */
+
+        function processarGeracaoDocumento() {
+            const categoria = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            const alvo = document.getElementById('doc_alvo').value;
+            const local = document.getElementById('doc_local').value || '';
+            const dataDoc = document.getElementById('doc_data').value || '';
+            const hora = document.getElementById('doc_hora').value || '';
+            const textoAdicional = document.getElementById('doc_texto').value || '';
+
+            let textoGerado = '';
+            const dataFormatada = dataDoc ? formatarData(dataDoc) : new Date().toLocaleDateString('pt-BR');
+
+            // 1. Gerador Automático de Modelos de Texto
+            if (categoria === 'Carta') {
+                if (tipo === 'Mudança' || tipo === 'Transferência') {
+                    textoGerado = `Pelo presente instrumento, recomendamos à comunhão dos irmãos na <strong>${local || 'igreja co-irmã'}</strong> o(a) nosso(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que até a presente data pertenceu ao nosso rol de membros, portando-se com testemunho cristão fiel, ativo em seus deveres e obrigações eclesiásticas. Rogamos as ricas bênçãos do Senhor sobre sua nova jornada ministerial e residencial.`;
+                } else { // Apresentação
+                    textoGerado = `Cumprimentando-vos com a santa paz de Cristo, apresentamos à vossa amada congregação o(a) irmão(ã) <strong>${alvo}</strong>. O(A) mesmo(a) encontra-se em plena comunhão com nosso ministério e viaja a vosso encontro por motivos de caráter temporário/pessoal. Recomendamos que o(a) recebais no Senhor.`;
+                }
+            } else if (categoria === 'Memorando') {
+                if (tipo === 'Memorando Interno') {
+                    textoGerado = `Prezados, servimo-nos deste expediente interno para encaminhar orientações gerais acerca do assunto/departamento <strong>${alvo}</strong>. Solicitamos especial atenção à regularização das atividades descritas e o cumprimento das normas operacionais estabelecidas por esta secretaria.`;
+                } else {
+                    textoGerado = `Notificamos por meio deste instrumento oficial que, a partir da data de vigência em <strong>${dataFormatada}</strong>, a situação cadastral e operacional do membro/assunto <strong>${alvo}</strong> foi formalmente alterada para fins de <strong>${tipo}</strong> do rol administrativo desta igreja de forma irrevogável.`;
+                }
+            } else if (categoria === 'Convite') {
+                textoGerado = `Temos a honra e a alegria de convidar formalmente o(a) amado(a) <strong>${alvo}</strong> para estar conosco participando do evento/departamento <strong>${local}</strong>. A programação oficial ocorrerá no dia <strong>${dataFormatada}</strong> às <strong>${hora || '19:30'}</strong>. Será um privilégio contar com vossa honrosa presença e cooperação para a edificação do corpo de Cristo.`;
+            }
+
+            if (textoAdicional.trim() !== '') {
+                textoGerado += `<br><br><strong>Observações Adicionais:</strong> ${textoAdicional}`;
+            }
+
+            // 2. Criação do Objeto do Documento
+            const novoDoc = {
+                id: Date.now(),
+                dataEmissao: new Date().toLocaleDateString('pt-BR'),
+                categoria,
+                tipo,
+                alvo,
+                local,
+                dataFormatada,
+                hora,
+                corpoTexto: textoGerado
+            };
+
+            filaDocumentosMemoria.unshift(novoDoc);
+            alert(`Documento (${categoria} de ${tipo}) preparado com sucesso e enviado para a fila!`);
+            
+            // Limpa o formulário e atualiza a lista
+            document.getElementById('doc_alvo').value = '';
+            document.getElementById('doc_local').value = '';
+            document.getElementById('doc_data').value = '';
+            document.getElementById('doc_hora').value = '';
+            document.getElementById('doc_texto').value = '';
+            
+            renderizarFilaDocumentos();
+        }
+
+        function renderizarFilaDocumentos() {
+            const tbody = document.getElementById('tabelaDocumentosFila');
+            if (filaDocumentosMemoria.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-slate-500 text-sm italic">
+                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            filaDocumentosMemoria.forEach(doc => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/30 transition-colors">
+                        <td class="px-6 py-4 text-sm text-slate-300">${doc.dataEmissao}</td>
+                        <td class="px-6 py-4">
+                            <span class="font-medium text-slate-100">${doc.categoria}</span>
+                            <span class="text-xs text-slate-500 block">${doc.tipo}</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-300">${doc.alvo}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <button onclick="imprimirDocumentoOficial(${doc.id})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all shadow-md mr-2">
+                                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+                            </button>
+                            <button onclick="removerDocumentoFila(${doc.id})" class="text-rose-400 hover:scale-110 p-1.5 transition-transform">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+            lucide.createIcons();
+        }
+
+        function removerDocumentoFila(id) {
+            if (confirm("Remover este documento preparado da fila?")) {
+                filaDocumentosMemoria = filaDocumentosMemoria.filter(d => d.id !== id);
+                renderizarFilaDocumentos();
+            }
+        }
+
+        function imprimirDocumentoOficial(id) {
+            const doc = filaDocumentosMemoria.find(d => d.id === id);
+            if (!doc) return;
+
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${doc.categoria} - ${doc.tipo}</title>
+                    <style>
+                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.8; background-color: #fff; }
+                        .papel-timbrado { border: 1px solid #fff; min-height: 100%; display: flex; flex-col; justify-content: space-between; }
+                        .header-igreja { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 40px; }
+                        .header-igreja h1 { margin: 0; font-size: 26px; font-weight: bold; font-family: Arial, sans-serif; letter-spacing: 1px; }
+                        .header-igreja p { margin: 4px 0 0 0; font-size: 11px; text-transform: uppercase; font-family: Arial, sans-serif; letter-spacing: 2px; color: #333; }
+                        
+                        .titulo-documento { text-align: center; margin-bottom: 45px; font-family: Arial, sans-serif; }
+                        .titulo-documento h2 { font-size: 20px; font-weight: bold; text-transform: uppercase; text-decoration: underline; margin: 0; }
+                        
+                        .corpo-texto { text-align: justify; font-size: 16px; margin-bottom: 60px; text-indent: 50px; }
+                        
+                        .data-local { text-align: right; font-size: 15px; margin-bottom: 80px; font-style: italic; }
+                        
+                        .bloco-assinaturas { display: flex; justify-content: space-around; margin-top: 50px; page-break-inside: avoid; }
+                        .campo-assinatura { text-align: center; width: 250px; font-size: 14px; font-family: Arial, sans-serif; }
+                        .linha { border-top: 1px solid #000; margin-bottom: 6px; }
+                        
+                        .footer-doc { text-align: center; font-size: 10px; font-family: Arial, sans-serif; color: #777; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 100px; text-transform: uppercase; }
+                        @media print { body { margin: 30px 40px; } .btn-print-float { display: none; } }
+                        .btn-print-float { position: fixed; top: 20px; right: 20px; padding: 12px 25px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-family: Arial, sans-serif; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print-float" onclick="window.print()">Imprimir Correspondência</button>
+                    <div class="papel-timbrado">
+                        <div class="header-igreja">
+                            <h1>IGREJA DIGITAL</h1>
+                            <p>Secretaria Geral Administrativa • Ministério Local</p>
+                        </div>
+                        
+                        <div class="titulo-documento">
+                            <h2>${doc.categoria.toUpperCase()} DE ${doc.tipo.toUpperCase()}</h2>
+                        </div>
+                        
+                        <div class="corpo-texto">
+                            ${doc.corpoTexto}
+                        </div>
+                        
+                        <div class="data-local">
+                            Emitido em, ${doc.dataEmissao}.
+                        </div>
+                        
+                        <div class="bloco-assinaturas">
+                            <div class="campo-assinatura">
+                                <div class="linha"></div>
+                                <strong>Secretaria Local</strong><br>Igreja Digital
+                            </div>
+                            <div class="campo-assinatura">
+                                <div class="linha"></div>
+                                <strong>Pastor Dirigente</strong><br>Ministério Pastoral
+                            </div>
+                        </div>
+                        
+                        <div class="footer-doc">
+                            Documento Oficial Interno - Gerado Eletronicamente pelo Sistema Igreja Digital - Desenvolvido por Dorival J.
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
+        }
+
+        /* ========================================================= */
+        /*   FIM DA LOGICA EXCLUSIVA DE DOCUMENTOS                   */
+        /* ========================================================= */
 
         async function atualizarFluxogramaMural() {
             try {
