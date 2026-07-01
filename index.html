@@ -554,7 +554,7 @@
                             </h2>
                         </div>
                         <div id="filaDocumentos" class="p-8 text-center text-slate-500 text-sm italic">
-                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
+                            Carregando histórico...
                         </div>
                     </section>
                 </div>
@@ -575,7 +575,6 @@
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
-        let filaDocumentosCache = [];
 
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
@@ -643,10 +642,10 @@
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
-                renderizarFilaDocumentos();
+                carregarDocumentos();
             }
             lucide.createIcons();
         }
@@ -865,7 +864,7 @@
                             </thead>
                             <tbody>${linhasTabelaHtml}</tbody>
                         </table>
-                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVELVEDOR: DORIVAL J.</div>
                     </body>
                     </html>
                 `);
@@ -1044,12 +1043,12 @@
             }
         }
 
-        function gerarDocumentoParaImpressao() {
+        async function gerarDocumentoParaImpressao() {
             const categoria = document.getElementById('doc_categoria').value;
             const tipo = document.getElementById('doc_tipo').value;
             const alvo = document.getElementById('doc_alvo').value;
             const local = document.getElementById('doc_local').value || '';
-            const dataInput = document.getElementById('doc_data').value || '';
+            const dataInput = document.getElementById('doc_data').value || null;
             const hora = document.getElementById('doc_hora').value || '';
             const textoAdicional = document.getElementById('doc_texto').value || '';
 
@@ -1058,17 +1057,31 @@
                 return;
             }
 
-            const novoDoc = {
-                id: Date.now(),
-                categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
-                data_emissao: new Date().toLocaleDateString('pt-BR')
-            };
+            // Envia para o Supabase
+            try {
+                const { error } = await _supabase.from('documentos').insert([{
+                    categoria,
+                    tipo,
+                    alvo,
+                    local: local || null,
+                    data_evento: dataInput,
+                    horario: hora || null,
+                    texto_adicional: textoAdicional || null,
+                    data_emissao: new Date().toISOString().split('T')[0]
+                }]);
 
-            filaDocumentosCache.unshift(novoDoc);
-            renderizarFilaDocumentos();
+                if(error) throw error;
+                
+                // Recarrega o histórico
+                carregarDocumentos();
+            } catch (err) {
+                console.error("Erro ao persistir documento:", err.message);
+                alert("Erro ao salvar histórico do documento, mas a impressão continuará.");
+            }
 
-            let corpoTemplate = '';
+            const dataEmissaoFormatada = new Date().toLocaleDateString('pt-BR');
             const dataFormatada = dataInput ? formatarData(dataInput) : '';
+            let corpoTemplate = '';
 
             if (categoria === 'Carta') {
                 corpoTemplate = `
@@ -1080,8 +1093,8 @@
             } else if (categoria === 'Memorando') {
                 corpoTemplate = `
                     <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${tipo}</p>
-                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
-                    <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
+                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || dataEmissaoFormatada}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
+                    <p>Decisionamento este que visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
                     <p>${textoAdicional}</p>
                 `;
             } else if (categoria === 'Convite') {
@@ -1122,7 +1135,7 @@
                     </div>
                     <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
                     <div class="corpo">${corpoTemplate}</div>
-                    <div class="data-local">Emitido na sede local, em ${novoDoc.data_emissao}.</div>
+                    <div class="data-local">Emitido na sede local, em ${dataEmissaoFormatada}.</div>
                     <div class="assinaturas">
                         <div class="linha">Secretaria Executiva</div>
                         <div class="linha">Pastor Dirigente</div>
@@ -1135,31 +1148,39 @@
             atualizarTiposDocumento();
         }
 
-        function renderizarFilaDocumentos() {
-            const container = document.getElementById('filaDocumentos');
-            if(filaDocumentosCache.length === 0) {
-                container.className = "p-8 text-center text-slate-500 text-sm italic";
-                container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
-                return;
-            }
+        async function carregarDocumentos() {
+            try {
+                const { data, error } = await _supabase.from('documentos').select('*').order('id', { ascending: false }).limit(15);
+                if (error) throw error;
 
-            container.className = "divide-y divide-slate-800 border-t border-slate-800";
-            container.innerHTML = '';
-            
-            filaDocumentosCache.forEach(doc => {
-                container.innerHTML += `
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
-                        <div>
-                            <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
-                            <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
+                const container = document.getElementById('filaDocumentos');
+                if(!data || data.length === 0) {
+                    container.className = "p-8 text-center text-slate-500 text-sm italic";
+                    container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
+                    return;
+                }
+
+                container.className = "divide-y divide-slate-800 border-t border-slate-800";
+                container.innerHTML = '';
+                
+                data.forEach(doc => {
+                    const dataEmissaoFormatada = doc.data_emissao ? formatarData(doc.data_emissao) : '-';
+                    container.innerHTML += `
+                        <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
+                            <div>
+                                <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
+                                <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
+                            </div>
+                            <div class="text-right text-xs">
+                                <div class="text-slate-500">Emitido em ${dataEmissaoFormatada}</div>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
+                            </div>
                         </div>
-                        <div class="text-right text-xs">
-                            <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } catch (err) {
+                console.error("Erro ao listar fila de documentos:", err.message);
+            }
         }
 
         function formatarData(dataString) {
@@ -1509,7 +1530,7 @@
                 : await _supabase.from('agenda_semanal').insert([r]);
 
             if (error) alert("Erro: " + error.message);
-            else { alert("Agenda atualizada!"); resetarEstadoAgenda(); carregarAgenda(); }
+            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
             btn.disabled = false;
         });
 
