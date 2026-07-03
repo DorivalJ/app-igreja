@@ -19,9 +19,6 @@
 <body class="text-slate-200">
     <div class="min-h-screen flex">
         
-        <!-- ========================================== -->
-        <!--        PAINEL LATERAL (SIDEBAR)            -->
-        <!-- ========================================== -->
         <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
             <div>
                 <div class="p-6 border-b border-slate-800">
@@ -67,9 +64,6 @@
             </div>
         </aside>
 
-        <!-- ========================================== -->
-        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
-        <!-- ========================================== -->
         <div class="flex-1 ml-64 flex flex-col min-h-screen">
             
             <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
@@ -86,11 +80,8 @@
                 </div>
             </header>
 
-            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8 flex-1">
+            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
                 
-                <!-- ========================================== -->
-                <!-- 1. TELA DE MEMBROS                         -->
-                <!-- ========================================== -->
                 <div id="tela-membros" class="space-y-8 dynamic-screen">
                     <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -193,9 +184,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 2. TELA FINANCEIRA                         -->
-                <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -357,9 +345,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 3. TELA DE AGENDA SEMANAL                  -->
-                <!-- ========================================== -->
                 <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -432,11 +417,11 @@
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma da Agenda Semanal
+                                <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma de Atividades
                             </h2>
-                            <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-sm rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
+                            <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-xs rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
                                 <i data-lucide="printer" class="w-4 h-4"></i>
-                                <span>Imprimir Agenda para Mural</span>
+                                <span>Imprimir Painel Semanal</span>
                             </button>
                         </div>
                         <div class="overflow-x-auto">
@@ -444,10 +429,10 @@
                                 <thead>
                                     <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
                                         <th class="px-6 py-4">Data / Dia</th>
-                                        <th class="px-6 py-4">Eventos</th>
-                                        <th class="px-6 py-4">Dirigente / Pregador</th>
-                                        <th class="px-6 py-4">Portaria / Ofertas</th>
-                                        <th class="px-6 py-4">Observação</th>
+                                        <th class="px-6 py-4">Evento / Culto</th>
+                                        <th class="px-6 py-4">Ministério</th>
+                                        <th class="px-6 py-4">Equipe Apoio</th>
+                                        <th class="px-6 py-4">Obs</th>
                                         <th class="px-6 py-4 text-right">Ações</th>
                                     </tr>
                                 </thead>
@@ -457,16 +442,12 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 4. TELA MURAL DE ATRIBUIÇÕES               -->
-                <!-- ========================================== -->
                 <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
                             <div>
-                                <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                                    <i data-lucide="layout-dashboard" class="w-6 h-6 text-indigo-400"></i> 
-                                    QUADRO DE ATRIBUIÇÕES E OFICIAIS
+                                <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5 text-indigo-400"></i> CORPO DE OBREIROS E OFICIAIS
                                 </h2>
                                 <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
                             </div>
@@ -475,7 +456,6 @@
                                 <span>Ver Fluxograma de Atribuições</span>
                             </button>
                         </div>
-                        
                         <div class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="containerFluxogramaMural">
                             </div>
@@ -483,47 +463,39 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 5. TELA DE DOCUMENTOS                      -->
-                <!-- ========================================== -->
                 <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
                             <i data-lucide="file-plus" class="w-5 h-5 text-blue-400"></i>
                             <h2 class="font-semibold text-slate-100">Redigir Nova Correspondência</h2>
                         </div>
-                        
                         <form id="formDocumento" class="p-6 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
-                                    <select id="doc_categoria" onchange="atualizarTiposDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                                    <select id="doc_categoria" onchange="atualizarTiposDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
                                         <option value="Carta">Carta</option>
                                         <option value="Memorando">Memorando</option>
                                         <option value="Convite">Convite</option>
                                     </select>
                                 </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Subtipo / Finalidade</label>
+                                    <select id="doc_tipo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none"></select>
+                                </div>
 
                                 <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo Específico</label>
-                                    <select id="doc_tipo" onchange="ajustarFormularioDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                                    </select>
+                                    <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro</label>
+                                    <input type="text" id="doc_alvo" required placeholder="Nome do irmão" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <div class="md:col-span-6 border-t border-slate-800/60 my-2"></div>
-
-                                <div class="md:col-span-3" id="box-doc-alvo">
-                                    <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Membro / Destinatário</label>
-                                    <input type="text" id="doc_alvo" required placeholder="Nome completo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
-                                </div>
-
-                                <div class="md:col-span-3 hidden" id="box-doc-local">
-                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Igreja de Destino / Local</label>
-                                    <input type="text" id="doc_local" placeholder="Ex: Sede, Congregação X, Igreja Y" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                <div class="md:col-span-3" id="box-doc-local">
+                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Local / Igreja</label>
+                                    <input type="text" id="doc_local" placeholder="Destino" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
                                 <div class="md:col-span-2 hidden" id="box-doc-data">
-                                    <label id="label-doc-data" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data do Evento / Vigência</label>
+                                    <label id="label-doc-data" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
                                     <input type="date" id="doc_data" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
                                 </div>
 
@@ -533,15 +505,14 @@
                                 </div>
 
                                 <div class="md:col-span-6">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Texto Adicional / Observações Importantes</label>
-                                    <textarea id="doc_texto" rows="4" placeholder="Digite detalhes que devam constar no documento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Conteúdo Adicional / Texto Livre (Opcional)</label>
+                                    <textarea id="doc_texto_adicional" rows="3" placeholder="Informações que complementam o texto padrão do documento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
                                 </div>
                             </div>
-
                             <div class="mt-8 flex justify-end">
-                                <button type="button" onclick="gerarDocumentoParaImpressao()" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
-                                    <i data-lucide="file-check" class="w-5 h-5"></i>
-                                    <span>Emitir e Imprimir</span>
+                                <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
+                                    <i data-lucide="printer" class="w-5 h-5"></i>
+                                    <span>Gerar e Imprimir</span>
                                 </button>
                             </div>
                         </form>
@@ -560,30 +531,19 @@
                 </div>
 
             </main>
-
-            <!-- ========================================== -->
-            <!--                  RODAPÉ ATUALIZADO         -->
-            <!-- ========================================== -->
-            <footer class="w-full text-center py-4 border-t border-slate-800/40 mt-auto">
-                <p class="text-[10px] text-slate-500 font-medium tracking-wide uppercase">
-                    Gerado em 03/07/2026 por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.
-                </p>
-            </footer>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!--                  LÓGICA JAVASCRIPT         -->
-    <!-- ========================================== -->
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
-
+        const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let editandoID = null;
-        let editandoFinanceiroID = null; 
-        let editandoAgendaID = null; 
-        let listaMembrosCache = []; 
+        let editandoFinanceiroID = null;
+        let editandoAgendaID = null;
+        
+        let listaMembrosCache = [];
         let filaDocumentosCache = [];
 
         const opcoesDocumentos = {
@@ -593,15 +553,23 @@
         };
 
         const estruturaCargosEclesiasticos = [
-            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
-            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
-            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
-            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
-            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
+            { chaves: ['pastor dirigente', 'pastor local', 'pastor'], titulo: 'Pastores' },
+            { chaves: ['presbitero'], titulo: 'Presbíteros' },
+            { chaves: ['diacono', 'diaconisa'], titulo: 'Diáconos' },
+            { chaves: ['auxiliar', 'auxiliar de trabalho', 'cooperador'], titulo: 'Auxiliares' }
         ];
 
+        // Função utilitária para capturar a data de hoje formatada em tempo de execução
+        function obterDataAtualFormatada() {
+            const hoje = new Date();
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const ano = hoje.getFullYear();
+            return `${dia}/${mes}/${ano}`;
+        }
+
         function navegarPara(idTela) {
-            document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
+            document.querySelectorAll('.dynamic-screen').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
 
             const botoesMenu = {
@@ -612,14 +580,12 @@
                 documentos: document.getElementById('btn-menu-documentos')
             };
 
-            Object.keys(botoesMenu).forEach(chave => {
-                if(botoesMenu[chave]) {
-                    botoesMenu[chave].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
-                }
+            Object.values(botoesMenu).forEach(btn => {
+                btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
             });
 
-            const topbarIconContainer = document.getElementById('iconeDinamicoTopbar');
             const topbarTitulo = document.getElementById('tituloTopbar');
+            const topbarIconContainer = document.getElementById('iconeDinamicoTopbar');
             const iconeHeader = document.getElementById('iconeHeader');
 
             if (idTela === 'membros') {
@@ -630,7 +596,7 @@
                 carregarMembros();
             } else if (idTela === 'financeiro') {
                 botoesMenu.financeiro.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-emerald-600 text-white shadow-lg shadow-emerald-900/20";
-                topbarTitulo.innerText = "Tesouraria & Fluxo de Caixa";
+                topbarTitulo.innerText = "Movimentações Financeiras";
                 topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
                 iconeHeader.setAttribute('data-lucide', 'dollar-sign');
                 resetarEstadoFinanceiro();
@@ -651,25 +617,23 @@
                 atualizarFluxogramaMural();
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
-                topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
+                topbarTitulo.innerText = "Secretaria e Expedição";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
-                renderizarFilaDocumentos();
             }
             lucide.createIcons();
         }
 
         async function atualizarFluxogramaMural() {
             try {
-                const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
+                const { data, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo').order('nome', { ascending: true });
                 if (error) throw error;
-
                 const container = document.getElementById('containerFluxogramaMural');
                 container.innerHTML = '';
-
+                
                 estruturaCargosEclesiasticos.forEach(c => {
-                    const oficiais = membros.filter(m => {
+                    const oficiais = data.filter(m => {
                         if (!m.cargo) return false;
                         const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
                         return c.chaves.some(chave => {
@@ -677,134 +641,118 @@
                             return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
                         });
                     });
-                    
-                    let listaNomes = '';
+
+                    let cartaoHtml = `
+                        <div class="bg-slate-950/60 border border-slate-850 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                                    <h4 class="font-bold text-slate-100 tracking-wide">${c.titulo}</h4>
+                                    <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full font-bold border border-indigo-500/20">${oficiais.length}</span>
+                                </div>
+                                <ul class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                    `;
                     if (oficiais.length === 0) {
-                        listaNomes = `<p class="text-xs text-slate-600 italic">Nenhum oficial ativo escalado</p>`;
+                        cartaoHtml += `<li class="text-xs text-slate-600 italic">Nenhum membro ativo listado.</li>`;
                     } else {
-                        listaNomes = `<ul class="space-y-1.5">`;
                         oficiais.forEach(o => {
-                            listaNomes += `
-                                <li class="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-850">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                            cartaoHtml += `
+                                <li class="text-sm text-slate-300 flex items-center gap-2">
+                                    <span class="w-1 h-1 rounded-full bg-indigo-500"></span>
                                     <span class="font-medium">${o.nome}</span>
-                                    <span class="text-[10px] text-slate-500 ml-auto italic">${o.cargo}</span>
                                 </li>`;
                         });
-                        listaNomes += `</ul>`;
                     }
-
-                    container.innerHTML += `
-                        <div class="bg-slate-950/40 rounded-xl p-5 border ${c.cor} flex flex-col gap-4 shadow-xl hover:scale-[1.01] transition-all duration-200">
-                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                                <h3 class="font-bold text-sm uppercase tracking-wider">${c.titulo}</h3>
-                                <i data-lucide="${c.icone}" class="w-5 h-5 opacity-80"></i>
-                            </div>
-                            <div class="flex-1 overflow-y-auto max-h-[160px] pr-1">
-                                ${listaNomes}
-                            </div>
-                            <div class="text-[10px] text-slate-500 uppercase tracking-widest text-right">
-                                Total: ${oficiais.length} ativo(s)
-                            </div>
-                        </div>`;
+                    cartaoHtml += `</ul></div></div>`;
+                    container.innerHTML += cartaoHtml;
                 });
-
-                lucide.createIcons();
-            } catch (err) {
-                console.error("Erro ao carregar mural:", err.message);
-            }
+            } catch(e) { console.error(e); }
         }
 
-        async function imprimirFluxogramaMural() {
-            try {
-                const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
-                if (error) throw error;
-
-                let conteudoHtml = '';
-
-                estruturaCargosEclesiasticos.forEach(c => {
-                    const oficiais = membros.filter(m => {
-                        if (!m.cargo) return false;
-                        const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-                        return c.chaves.some(chave => {
-                            const chaveLimpa = chave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                            return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
-                        });
+        function imprimirFluxogramaMural() {
+            const dataFm = listaMembrosCache.length > 0 ? listaMembrosCache : [];
+            if(dataFm.length === 0) {
+                alert("Carregue a listagem ou verifique se há membros no banco para imprimir.");
+                return;
+            }
+            let conteudoHtml = '';
+            
+            estruturaCargosEclesiasticos.forEach(c => {
+                const oficiais = dataFm.filter(m => {
+                    if (!m.cargo) return false;
+                    const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    return c.chaves.some(chave => {
+                        const chaveLimpa = chave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
                     });
-
-                    conteudoHtml += `
-                        <div class="bloco-cargo">
-                            <h2>${c.titulo.toUpperCase()} (${oficiais.length})</h2>
-                            <div class="grade-oficiais">
-                    `;
-
-                    if (oficiais.length === 0) {
-                        conteudoHtml += `<p class="vazio">Nenhum oficial escalado neste setor.</p>`;
-                    } else {
-                        oficiais.forEach(o => {
-                            conteudoHtml += `
-                                <div class="item-oficial">
-                                    <span class="ponto">•</span>
-                                    <strong>${o.nome}</strong> 
-                                    <span class="cargo-sub">(${o.cargo})</span>
-                                </div>`;
-                        });
-                    }
-
-                    conteudoHtml += `</div></div>`;
                 });
 
-                const janelaImpressao = window.open('', '_blank');
-                janelaImpressao.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Mural - Corpo de Obreiros e Oficiais</title>
-                        <style>
-                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; line-height: 1.5; }
-                            .header { text-align: center; border-bottom: 3px double #475569; padding-bottom: 20px; margin-bottom: 30px; }
-                            .header h1 { margin: 0; font-size: 26px; color: #0f172a; }
-                            .header p { margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; }
-                            .bloco-cargo { margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
-                            .bloco-cargo h2 { background-color: #f1f5f9; margin: 0; padding: 12px 15px; font-size: 14px; letter-spacing: 1px; color: #1e293b; border-bottom: 1px solid #cbd5e1; }
-                            .grade-oficiais { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
-                            .item-oficial { font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px; }
-                            .item-oficial .ponto { color: #4f46e5; font-size: 16px; }
-                            .item-oficial .cargo-sub { color: #64748b; font-size: 11px; font-style: italic; }
-                            .vazio { font-style: italic; color: #94a3b8; font-size: 12px; margin: 0; padding: 5px; }
-                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-                            @media print { body { margin: 20px; } .btn-print { display: none; } }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-                        </style>
-                    </head>
-                    <body>
-                        <button class="btn-print" onclick="window.print()">Imprimir Quadro</button>
-                        <div class="header">
-                            <h1>FLUXOGRAMA DE ATRIBUIÇÕES E OFICIAIS</h1>
-                            <p>Corpo de Obreiros e Ministério Local</p>
-                        </div>
-                        ${conteudoHtml}
-                        <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital</div>
-                    </body>
-                    </html>
-                `);
-                janelaImpressao.document.close();
-            } catch (err) { alert("Erro ao preparar documento de impressão: " + err.message); }
+                conteudoHtml += `
+                    <div class="bloco-cargo">
+                        <h2>${c.titulo.toUpperCase()} (${oficiais.length})</h2>
+                        <div class="grade-oficiais">
+                `;
+                if (oficiais.length === 0) {
+                    conteudoHtml += `<p class="vazio">Nenhum oficial escalado neste setor.</p>`;
+                } else {
+                    oficiais.forEach(o => {
+                        conteudoHtml += `
+                            <div class="item-oficial">
+                                <span class="ponto">•</span>
+                                <strong>${o.nome}</strong>
+                                <span class="cargo-sub">(${o.cargo})</span>
+                            </div>`;
+                    });
+                }
+                conteudoHtml += `</div></div>`;
+            });
+
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Mural - Corpo de Obreiros e Oficiais</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; line-height: 1.5; padding-bottom: 60px; }
+                        .header { text-align: center; border-bottom: 3px double #cbd5e1; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #0f172a; font-weight: 800; letter-spacing: 0.5px; }
+                        .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+                        .bloco-cargo { margin-bottom: 25px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+                        .bloco-cargo h2 { background: #f8fafc; margin: 0; padding: 12px 20px; font-size: 14px; border-b: 1px solid #e2e8f0; color: #334155; font-weight: 700; }
+                        .grade-oficiais { padding: 15px 20px; display: grid; grid-template-cols: repeat(2, 1fr); gap: 10px; }
+                        .item-oficial { font-size: 13px; display: flex; items-center: center; gap: 6px; }
+                        .ponto { color: #6366f1; font-weight: bold; }
+                        .cargo-sub { color: #64748b; font-size: 11px; font-style: italic; }
+                        .vazio { font-size: 12px; color: #94a3b8; italic: true; margin: 5px 0; }
+                        .footer-mural { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 11px; font-family: Arial, sans-serif; color: #475569; border-top: 1px solid #cbd5e1; padding: 10px 0; background: #fff; }
+                        @media print { .btn-print-top { display: none !important; } }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print-top" onclick="window.print()" style="position: fixed; top: 15px; right: 15px; padding: 10px 20px; background: #4f46e5; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">Imprimir Listagem</button>
+                    <div class="header">
+                        <h1>CORPO DE OBREIROS E OFICIAIS ATIVOS</h1>
+                        <p>Quadro Geral de Atribuições Eclesiásticas</p>
+                    </div>
+                    ${conteudoHtml}
+                    <div class="footer-mural">GERADO EM ${obterDataAtualFormatada()} POR SISTEMA IGREJA FIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
         }
 
         async function imprimirAgendaSemanal() {
             try {
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
                 if (error) throw error;
-
                 if (!data || data.length === 0) {
                     alert("Não há programações agendadas para gerar a impressão mural.");
                     return;
                 }
-
                 let linhasTabelaHtml = '';
                 const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-
+                
                 data.forEach(ag => {
                     const dataReal = ag.data || '';
                     let diaSemanaExibicao = '';
@@ -812,7 +760,6 @@
                         const dataObj = new Date(dataReal + 'T00:00:00');
                         diaSemanaExibicao = diasOrdenados[dataObj.getDay()];
                     }
-
                     linhasTabelaHtml += `
                         <tr>
                             <td class="col-data">
@@ -838,21 +785,26 @@
                     <!DOCTYPE html>
                     <html>
                     <head>
-                        <title>Agenda Semanal de Atividades</title>
+                        <title>Mural - Cronograma da Agenda Semanal</title>
                         <style>
-                            @page { size: landscape; margin: 10mm 15mm 10mm 15mm; }
-                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 10px; background-color: #fff; }
-                            .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; }
-                            .header h1 { margin: 0; font-size: 30px; letter-spacing: 1px; color: #0f172a; }
-                            .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; color: #475569; font-weight: 600; }
+                            body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; margin: 30px; padding-bottom: 60px; background: #fff; }
+                            .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #0f172a; padding-bottom: 12px; }
+                            .header h1 { margin: 0; font-size: 22px; color: #0f172a; font-weight: 800; }
+                            .header p { margin: 4px 0 0 0; font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 600; tracking-spacing: 0.5px; }
                             table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                            th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
-                            td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
-                            .col-data { width: 14%; } .col-horario { width: 8%; font-weight: bold; color: #b45309; } .col-evento { width: 26%; font-size: 14px; color: #1e293b; } .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; } .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
-                            .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-                            .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
-                            @media print { body { margin: 0; } .btn-print { display: none; } th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                            th { background-color: #f8fafc; color: #1e293b; font-size: 11px; text-transform: uppercase; font-weight: 700; padding: 12px 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; vertical-align: top; }
+                            tr:nth-child(even) { background-color: #f8fafc; }
+                            .col-data { width: 12%; line-height: 1.3; }
+                            .dia-semana { font-size: 10px; color: #64748b; font-weight: 500; }
+                            .col-horario { width: 8%; font-weight: 600; color: #0f172a; }
+                            .col-evento { width: 28%; font-size: 13px; color: #0f172a; }
+                            .col-escalas { width: 20%; line-height: 1.5; }
+                            .col-escalas div { margin-bottom: 2px; }
+                            .col-obs { width: 12%; font-style: italic; color: #64748b; font-size: 11px; }
+                            .footer { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 11px; font-family: Arial, sans-serif; color: #475569; border-top: 1px solid #cbd5e1; padding: 10px 0; background: #fff; }
                             .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+                            @media print { .btn-print { display: none !important; } }
                         </style>
                     </head>
                     <body>
@@ -874,147 +826,108 @@
                             </thead>
                             <tbody>${linhasTabelaHtml}</tbody>
                         </table>
-                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">GERADO EM ${obterDataAtualFormatada()} POR SISTEMA IGREJA FIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
-                    </html>
-                `);
+                    </html> `);
                 janelaImpressao.document.close();
-            } catch (err) { alert("Erro ao fluxo dados da agenda para impressão: " + err.message); }
+            } catch (err) { alert("Erro ao fluir dados da agenda para impressão: " + err.message); }
         }
 
         async function imprimirRelatorioFinanceiro() {
             try {
                 const tipoFiltro = document.getElementById('filtroTipo').value;
                 let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: true });
-                
-                if (tipoFiltro) {
-                    query = query.eq('tipo', tipoFiltro);
-                }
-
+                if (tipoFiltro) { query = query.eq('tipo', tipoFiltro); }
                 const { data, error } = await query;
                 if (error) throw error;
 
-                if (!data || data.length === 0) {
-                    alert("Não há registros lançados para gerar o relatório.");
-                    return;
-                }
-
                 let d = 0, o = 0, de = 0;
-                let linesTabelaHtml = '';
-
+                let linhasTabela = '';
+                
                 data.forEach(f => {
-                    if (f.tipo === 'Dízimo') d += f.valor; 
-                    else if (f.tipo === 'Oferta') o += f.valor; 
+                    if (f.tipo === 'Dízimo') d += f.valor;
+                    else if (f.tipo === 'Oferta') o += f.valor;
                     else de += f.valor;
 
-                    const corValor = f.tipo === 'Despesa' ? 'text-danger' : 'text-success';
-                    const sinal = f.tipo === 'Despesa' ? '-' : '';
-
-                    linesTabelaHtml += `
+                    linhasTabela += `
                         <tr>
                             <td>${formatarData(f.data_lancamento)}</td>
                             <td><strong>${f.tipo}</strong></td>
                             <td>${f.descricao || '-'}</td>
-                            <td><span class="tag-cargo">${f.cargo || '-'}</span></td>
+                            <td>${f.cargo ? f.cargo : '-'}</td>
                             <td>${f.observacao || '-'}</td>
-                            <td class="text-right ${corValor}">${sinal} R$ ${f.valor.toFixed(2)}</td>
+                            <td class="text-right ${f.tipo === 'Despesa' ? 'text-danger' : 'text-success'}">R$ ${f.valor.toFixed(2)}</td>
                         </tr>`;
                 });
-
-                const saldoTotal = d + o - de;
-                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-                const mesAtual = meses[new Date().getMonth()];
-                const anoAtual = new Date().getFullYear();
 
                 const janelaImpressao = window.open('', '_blank');
                 janelaImpressao.document.write(`
                     <!DOCTYPE html>
                     <html>
                     <head>
-                        <title>Relatório Financeiro - Livro Caixa</title>
+                        <title>Relatório de Fluxo de Caixa</title>
                         <style>
-                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
-                            .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
-                            .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
-                            .header p { margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; font-weight: bold; }
-                            
-                            .cards-resumo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+                            body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; margin: 30px; padding-bottom: 60px; background: #fff; }
+                            .header { text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; }
+                            .header h1 { margin: 0; font-size: 22px; color: #0f172a; }
+                            .header p { margin: 4px 0 0 0; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+                            .grid-cards { display: grid; grid-template-cols: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
                             .card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: #f8fafc; }
                             .card p { margin: 0; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
                             .card h3 { margin: 5px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 700; }
-                            
                             table { width: 100%; border-collapse: collapse; margin-top: 15px; }
                             th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
                             td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
                             tr:nth-child(even) { background-color: #f8fafc; }
-                            
                             .text-right { text-align: right; }
                             .text-success { color: #16a34a; font-weight: 600; }
                             .text-danger { color: #dc2626; font-weight: 600; }
-                            .tag-cargo { font-size: 10px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
-                            
-                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
-                            .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
-                            .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
-                            
-                            @media print { body { margin: 20px; } .btn-print { display: none; } }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                            .footer-fin { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 11px; font-family: Arial, sans-serif; color: #475569; border-top: 1px solid #cbd5e1; padding: 10px 0; background: #fff; }
+                            @media print { .btn-print-top { display: none !important; } }
                         </style>
                     </head>
                     <body>
-                        <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+                        <button class="btn-print-top" onclick="window.print()" style="position: fixed; top: 15px; right: 15px; padding: 10px 20px; background: #10b981; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">Imprimir Relatório</button>
                         <div class="header">
-                            <h1>RELATÓRIO MENSAL - LIVRO CAIXA</h1>
-                            <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${mesAtual} de ${anoAtual}</p>
+                            <h1>LIVRO CAIXA - DEMONSTRATIVO MENSAL</h1>
+                            <p>Relatório Consolidado de Entradas e Saídas</p>
                         </div>
-                        
-                        <div class="cards-resumo">
-                            <div class="card"><p>Dízimos (+)</p><h3 style="color: #16a34a;">R$ ${d.toFixed(2)}</h3></div>
-                            <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toFixed(2)}</h3></div>
-                            <div class="card"><p>Despesas (-)</p><h3 style="color: #dc2626;">R$ ${de.toFixed(2)}</h3></div>
-                            <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toFixed(2)}</h3></div>
+                        <div class="grid-cards">
+                            <div class="card"><p>Dízimos</p><h3>R$ ${d.toFixed(2)}</h3></div>
+                            <div class="card"><p>Ofertas</p><h3>R$ ${o.toFixed(2)}</h3></div>
+                            <div class="card"><p>Despesas</p><h3 style="color:#dc2626">R$ ${de.toFixed(2)}</h3></div>
+                            <div class="card"><p>Saldo Líquido</p><h3>R$ ${(d+o-de).toFixed(2)}</h3></div>
                         </div>
-
                         <table>
                             <thead>
                                 <tr>
                                     <th>Data</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição / Contribuinte</th>
+                                    <th>Fluxo</th>
+                                    <th>Descrição / Nome</th>
                                     <th>Cargo</th>
                                     <th>Observação</th>
                                     <th class="text-right">Valor</th>
                                 </tr>
                             </thead>
-                            <tbody>${linesTabelaHtml}</tbody>
+                            <tbody>${linhasTabela}</tbody>
                         </table>
-
-                        <div class="assinaturas">
-                            <div class="linha-assinatura">Tesouraria Local</div>
-                            <div class="linha-assinatura">Pastor Dirigente</div>
-                        </div>
-
-                        <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
+                        <div class="footer-fin">GERADO EM ${obterDataAtualFormatada()} POR SISTEMA IGREJA FIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
                 janelaImpressao.document.close();
-            } catch (err) { alert("Erro ao gerar o relatório financeiro: " + err.message); }
+            } catch (e) { alert("Erro ao montar impressão financeira: " + e.message); }
         }
 
         function atualizarTiposDocumento() {
-            const category = document.getElementById('doc_categoria').value;
-            const selectTipo = document.getElementById('doc_tipo');
-            selectTipo.innerHTML = '';
-            opcoesDocumentos[category].forEach(tipo => {
-                selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
+            const categoria = document.getElementById('doc_categoria').value;
+            const comboTipo = document.getElementById('doc_tipo');
+            comboTipo.innerHTML = '';
+            
+            opcoesDocumentos[categoria].forEach(t => {
+                comboTipo.innerHTML += `<option value="${t}">${t}</option>`;
             });
-            ajustarFormularioDocumento();
-        }
 
-        function ajustarFormularioDocumento() {
-            const category = document.getElementById('doc_categoria').value;
-            const tipo = document.getElementById('doc_tipo').value;
             const lblAlvo = document.getElementById('label-doc-alvo');
             const inpAlvo = document.getElementById('doc_alvo');
             const boxLocal = document.getElementById('box-doc-local');
@@ -1027,22 +940,17 @@
             boxData.classList.add('hidden');
             boxHora.classList.add('hidden');
 
-            if (category === 'Carta') {
+            if (categoria === 'Carta') {
                 lblAlvo.innerText = "Nome do Membro";
                 inpAlvo.placeholder = "Ex: Nome Completo do Irmão/Irmã";
                 boxLocal.classList.remove('hidden');
                 lblLocal.innerText = "Igreja de Destino";
-            } else if (category === 'Memorando') {
+            } else if (categoria === 'Memorando') {
                 lblAlvo.innerText = "Membro Alvo / Assunto";
                 inpAlvo.placeholder = "Ex: Nome do Membro ou Departamento Coberto";
-                if(tipo === 'Memorando Interno') {
-                    lblAlvo.innerText = "Destinatário Interno";
-                    inpAlvo.placeholder = "Ex: Ao Departamento de Louvor / Secretaria Geral";
-                } else {
-                    boxData.classList.remove('hidden');
-                    lblData.innerText = "Data de Vigência / Ocorrência";
-                }
-            } else if (category === 'Convite') {
+                boxData.classList.remove('hidden');
+                lblData.innerText = "Data de Vigência / Ocorrência";
+            } else if (categoria === 'Convite') {
                 lblAlvo.innerText = "Convidado / Instituição";
                 inpAlvo.placeholder = "Ex: Pr. Cláudio Duarte / Ministério de Louvor X";
                 boxLocal.classList.remove('hidden');
@@ -1053,47 +961,42 @@
             }
         }
 
-        function gerarDocumentoParaImpressao() {
+        document.getElementById('formDocumento').onsubmit = async function(e) {
+            e.preventDefault();
             const categoria = document.getElementById('doc_categoria').value;
             const tipo = document.getElementById('doc_tipo').value;
             const alvo = document.getElementById('doc_alvo').value;
-            const local = document.getElementById('doc_local').value || '';
-            const dataInput = document.getElementById('doc_data').value || '';
-            const hora = document.getElementById('doc_hora').value || '';
-            const textoAdicional = document.getElementById('doc_texto').value || '';
-
-            if(!alvo) {
-                alert('Por favor, defina o campo do destinatário/membro principal.');
-                return;
-            }
-
-            const dataHoje = new Date();
-            const mesesPorExtenso = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
+            const local = document.getElementById('doc_local').value;
+            const dataInput = document.getElementById('doc_data').value;
+            const hora = document.getElementById('doc_hora').value;
+            const textoAdicional = document.getElementById('doc_texto_adicional').value;
 
             const novoDoc = {
-                id: Date.now(),
-                categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
-                data_emissao: dataHoje.toLocaleDateString('pt-BR')
+                categoria, tipo, alvo, local, data: dataInput, hora, texto_adicional: textoAdicional,
+                data_emissao: formatarData(new Date().toISOString().split('T')[0])
             };
 
             filaDocumentosCache.unshift(novoDoc);
             renderizarFilaDocumentos();
 
+            let dataFormatada = formatarData(dataInput);
             let corpoTemplate = '';
-            const dataFormatada = dataInput ? formatarData(dataInput) : '';
 
             if (categoria === 'Carta') {
                 corpoTemplate = `
-                    <p>Prezados Irmãos em Cristo,</p>
-                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que está se deslocando para a localidade de <strong>${local}</strong>.</p>
-                    <p>Solicitamos que o(a) recebam na paz do Senhor e prestem o auxílio e comunhão necessários para o seu bom desenvolvimento espiritual na nova comunidade.</p>
+                    <p class="data-topo">Emitido em: ${novoDoc.data_emissao}</p>
+                    <p>À mui digna diretoria e corpo de membros da instituição <strong>${local || 'Igreja Co-Irmã'}</strong>,</p>
+                    <p>Saudamos a todos com a santa paz de nosso Senhor e Salvador Jesus Cristo.</p>
+                    <p>Servimo-nos deste expediente para apresentar e recomendar nosso(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que esteve arrolado(a) como membro ativo, mantendo conduta ilibada, fiel e cooperadora nesta congregação.</p>
+                    <p>Em virtude de seus novos planos e trâmites de locomoção geográfica, damos ciência de sua conformidade eclesiástica para fins de <strong>${tipo}</strong>. Rogamos ao Senhor que prospere sua jornada espiritual em vossa congregação.</p>
                     <p>${textoAdicional}</p>
                 `;
             } else if (categoria === 'Memorando') {
                 corpoTemplate = `
-                    <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${tipo}</p>
-                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
+                    <p class="data-topo">Referência de Emissão: ${novoDoc.data_emissao}</p>
+                    <p><strong>De:</strong> Secretaria Geral Administrativa</p>
+                    <p><strong>Para:</strong> Departamento Geral Eclesiástico / Setor Interno</p>
+                    <p>Comunicamos formalmente ao corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
                     <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
                     <p>${textoAdicional}</p>
                 `;
@@ -1113,54 +1016,52 @@
                 <head>
                     <title>${categoria} - ${tipo}</title>
                     <style>
-                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; }
+                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; padding-bottom: 60px; }
                         .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 15px; }
                         .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; font-weight: bold; line-height: 1.3; }
                         .header .sub-titulo { font-size: 15px; font-weight: bold; margin-top: 3px; }
                         .header p { margin: 4px 0 0 0; font-size: 12px; font-style: italic; letter-spacing: 0.5px; }
                         .titulo-doc { text-align: center; margin: 30px 0; font-size: 18px; font-weight: bold; text-transform: uppercase; text-decoration: underline; }
-                        .corpo { text-align: justify; margin-bottom: 50px; text-indent: 40px; }
+                        .corpo { text-align: justify; text-indent: 40px; margin-bottom: 60px; }
                         .corpo p { margin-bottom: 15px; }
-                        .data-local { text-align: right; margin-bottom: 60px; font-style: italic; }
-                        .assinaturas { display: flex; justify-content: space-around; margin-top: 80px; }
-                        .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
-                        @media print { .btn-print { display: none; } }
-                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: sans-serif; }
+                        .data-topo { text-indent: 0px !important; font-style: italic; text-align: right; margin-bottom: 25px; font-size: 14px; }
+                        .assinaturas { display: flex; justify-content: space-around; margin-top: 50px; text-align: center; font-size: 14px; }
+                        .campo-assinatura { border-top: 1px solid #000; width: 220px; padding-top: 5px; }
+                        .footer-doc { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 11px; font-family: Arial, sans-serif; color: #000; border-top: 1px solid #000; padding: 8px 0; background: #fff; }
+                        @media print { .btn-print-top { display: none !important; } }
                     </style>
                 </head>
                 <body>
-                    <button class="btn-print" onclick="window.print()">Imprimir Correspondência</button>
+                    <button class="btn-print-top" onclick="window.print()" style="position: fixed; top: 15px; right: 15px; padding: 10px 20px; background: #2563eb; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">Imprimir Expediente</button>
                     <div class="header">
-                        <h1>Igreja Evangélica Assembleia de Deus Ministério Madureira</h1>
-                        <div class="sub-titulo">Sub Congregação Jd. Marilena</div>
-                        <p>Rua Guaraton, 47 Jd. Marilena - Guarulhos - SP</p>
+                        <h1>SISTEMA DE GESTÃO ECLESIASTICA</h1>
+                        <div class="sub-titulo">SECRETARIA GERAL ADMINISTRATIVA</div>
+                        <p>Atas, Cartas de Recomendação e Credenciamento Institucional</p>
                     </div>
-                    <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
+                    <div class="titulo-doc">${categoria.toUpperCase()} DE ${tipo.toUpperCase()}</div>
                     <div class="corpo">${corpoTemplate}</div>
-                    <div class="data-local">${localEDataDinamica}</div>
                     <div class="assinaturas">
-                        <div class="linha">Secretário(a)</div>
-                        <div class="linha">Pastor Dirigente</div>
+                        <div class="campo-assinatura">Secretaria Local / Setor</div>
+                        <div class="campo-assinatura">Pastor Regional / Dirigente</div>
                     </div>
+                    <div class="footer-doc">GERADO EM ${obterDataAtualFormatada()} POR SISTEMA IGREJA FIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
             janelaImpressao.document.close();
             document.getElementById('formDocumento').reset();
             atualizarTiposDocumento();
-        }
+        };
 
         function renderizarFilaDocumentos() {
             const container = document.getElementById('filaDocumentos');
-            if(filaDocumentosCache.length === 0) {
+            if (filaDocumentosCache.length === 0) {
                 container.className = "p-8 text-center text-slate-500 text-sm italic";
                 container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
                 return;
             }
-
             container.className = "divide-y divide-slate-800 border-t border-slate-800";
             container.innerHTML = '';
-            
             filaDocumentosCache.forEach(doc => {
                 container.innerHTML += `
                     <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
@@ -1172,8 +1073,7 @@
                             <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
                             <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
                         </div>
-                    </div>
-                `;
+                    </div> `;
             });
         }
 
@@ -1188,85 +1088,70 @@
                 const termo = document.getElementById('busca').value;
                 let query = _supabase.from('membros').select('*').order('nome', { ascending: true });
                 if (termo) query = query.ilike('nome', `%${termo}%`);
-
                 const { data, error } = await query;
                 if (error) throw error;
+                
+                listaMembrosCache = data;
 
                 const tbody = document.getElementById('tabelaMembros');
                 tbody.innerHTML = '';
                 let ativos = 0, inativos = 0;
-
+                
                 data.forEach(m => {
-                    if (m.status === 'Ativo') ativos++; else inativos++;
+                    if (m.status === 'Ativo') ativos++;
+                    else inativos++;
+                    
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-slate-100">${m.nome}</div>
                                 <div class="text-xs text-slate-500 italic">Nasc: ${formatarData(m.data_nascimento)}</div>
                             </td>
-                            <td class="px-6 py-4 text-slate-300 text-sm">${m.cargo || '-'}</td>
-                            <td class="px-6 py-4 text-slate-400 text-sm">
+                            <td class="px-6 py-4 text-sm text-slate-300">${m.cargo || '-'}</td>
+                            <td class="px-6 py-4 text-xs text-slate-400">
                                 <div>${m.celular || '-'}</div>
-                                <div class="text-xs text-slate-500">${m.email || ''}</div>
+                                <div class="text-[11px] text-slate-500">${m.email || '-'}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold ${m.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}">
-                                    ${m.status.toUpperCase()}
+                                <span class="px-2.5 py-1 text-[11px] font-bold rounded-full border ${m.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}">
+                                    ${m.status}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <button onclick="editarMembro(${m.id})" class="text-indigo-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <td class="px-6 py-4 text-right whitespace-nowrap text-sm">
+                                <button onclick="editarMembro(${m.id})" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                                 <button onclick="deletarMembro(${m.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>`;
                 });
-
+                
                 document.getElementById('dashAtivos').textContent = ativos;
                 document.getElementById('dashInativos').textContent = inativos;
                 document.getElementById('dashTotal').textContent = data.length;
                 document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${data.length}</span> Membros`;
                 lucide.createIcons();
-            } catch (err) { console.error(err); }
+            } catch (err) { alert("Erro ao carregar membros: " + err.message); }
         }
 
-        document.getElementById('formMembro').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const membro = {
-                nome: document.getElementById('nome').value,
-                data_nascimento: document.getElementById('data_nascimento').value || null,
-                celular: document.getElementById('input_celular').value || null,
-                email: document.getElementById('email').value || null,
-                cargo: document.getElementById('cargo').value || null,
-                data_adesao: document.getElementById('data_adesao').value || null,
-                status: document.getElementById('status').value,
-                observacao: document.getElementById('observacao').value || null
-            };
-
-            const { error } = editandoID 
-                ? await _supabase.from('membros').update(membro).eq('id', editandoID)
-                : await _supabase.from('membros').insert([membro]);
-
-            if (error) alert("Erro: " + error.message);
-            else { alert("Sucesso!"); resetarEstado(); carregarMembros(); }
-        });
-
         async function editarMembro(id) {
-            const { data, error } = await _supabase.from('membros').select('*').eq('id', id).single();
-            if (error) return;
-            editandoID = id;
-            document.getElementById('nome').value = data.nome;
-            document.getElementById('data_nascimento').value = data.data_nascimento;
-            document.getElementById('input_celular').value = data.celular;
-            document.getElementById('email').value = data.email;
-            document.getElementById('cargo').value = data.cargo;
-            document.getElementById('data_adesao').value = data.data_adesao;
-            document.getElementById('status').value = data.status;
-            document.getElementById('observacao').value = data.observacao;
-            document.getElementById('tituloForm').innerText = "Editando Membro";
-            document.getElementById('textoBtnSalvar').innerText = "Atualizar Cadastro";
-            document.getElementById('btnSalvar').classList.replace('bg-indigo-600', 'bg-amber-600');
-            document.getElementById('btnCancelar').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            try {
+                const { data, error } = await _supabase.from('membros').select('*').eq('id', id).single();
+                if (error) throw error;
+                editandoID = data.id;
+                document.getElementById('nome').value = data.nome || '';
+                document.getElementById('data_nascimento').value = data.data_nascimento || '';
+                document.getElementById('input_celular').value = data.celular || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('cargo').value = data.cargo || '';
+                document.getElementById('data_adesao').value = data.data_adesao || '';
+                document.getElementById('status').value = data.status || 'Ativo';
+                document.getElementById('observacao').value = data.observacao || '';
+                
+                document.getElementById('tituloForm').innerText = "Editando Membro";
+                document.getElementById('textoBtnSalvar').innerText = "Atualizar Cadastro";
+                document.getElementById('btnSalvar').classList.replace('bg-indigo-600', 'bg-amber-600');
+                document.getElementById('btnCancelar').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (err) { alert("Erro: " + err.message); }
         }
 
         function resetarEstado() {
@@ -1279,8 +1164,37 @@
         }
 
         async function deletarMembro(id) {
-            if (confirm("Excluir membro?")) { await _supabase.from('membros').delete().eq('id', id); carregarMembros(); }
+            if (confirm("Excluir membro?")) {
+                await _supabase.from('membros').delete().eq('id', id);
+                carregarMembros();
+            }
         }
+
+        document.getElementById('formMembro').onsubmit = async function(e) {
+            e.preventDefault();
+            const payload = {
+                nome: document.getElementById('nome').value,
+                data_nascimento: document.getElementById('data_nascimento').value || null,
+                celular: document.getElementById('input_celular').value,
+                email: document.getElementById('email').value,
+                cargo: document.getElementById('cargo').value,
+                data_adesao: document.getElementById('data_adesao').value || null,
+                status: document.getElementById('status').value,
+                observacao: document.getElementById('observacao').value
+            };
+
+            try {
+                if (editandoID) {
+                    const { error } = await _supabase.from('membros').update(payload).eq('id', editandoID);
+                    if (error) throw error;
+                } else {
+                    const { error } = await _supabase.from('membros').insert([payload]);
+                    if (error) throw error;
+                }
+                resetarEstado();
+                carregarMembros();
+            } catch (err) { alert("Erro ao salvar: " + err.message); }
+        };
 
         function ajustarCamposFinancas() {
             const tipo = document.getElementById('fin_tipo').value;
@@ -1306,101 +1220,78 @@
             const culto = document.getElementById('fin_oferta_culto').value;
             document.getElementById('fin_culto_manual').classList.toggle('hidden', culto !== 'Outro Culto');
         }
+
         function verificarDespesaOutros() {
             const desp = document.getElementById('fin_despesa_fixa').value;
             document.getElementById('fin_despesa_manual').classList.toggle('hidden', desp !== 'Outras Despesas');
         }
 
-        function autopreencherCargoMembro() {
-            const nome = document.getElementById('fin_membro_nome').value;
-            const m = listaMembrosCache.find(x => x.nome === nome);
-            document.getElementById('fin_membro_cargo').value = m ? (m.cargo || 'Membro') : 'Membro';
-        }
-
         async function atualizarListaMembrosNoFormFinanceiro() {
-            const { data } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
-            listaMembrosCache = data || [];
-            const sel = document.getElementById('fin_membro_nome');
-            sel.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
-            listaMembrosCache.forEach(m => { sel.innerHTML += `<option value="${m.nome}">${m.nome}</option>`; });
-            autopreencherCargoMembro();
+            try {
+                const { data, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo').order('nome', { ascending: true });
+                if (error) throw error;
+                const combo = document.getElementById('fin_membro_nome');
+                combo.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
+                data.forEach(m => {
+                    combo.innerHTML += `<option value="${m.nome}" data-cargo="${m.cargo || 'Membro'}">${m.nome}</option>`;
+                });
+            } catch(e) { console.error(e); }
         }
 
-        document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const tipo = document.getElementById('fin_tipo').value;
-            let desc = ''; let dia = null; let cargoMembro = null;
-
-            if(tipo === 'Dízimo') {
-                desc = document.getElementById('fin_membro_nome').value;
-                cargoMembro = document.getElementById('fin_membro_cargo').value || 'Membro';
-            } else if(tipo === 'Oferta') {
-                const c = document.getElementById('fin_oferta_culto').value;
-                desc = c === 'Outro Culto' ? document.getElementById('fin_culto_manual').value : c;
-                dia = document.getElementById('fin_oferta_dia').value;
-            } else {
-                const df = document.getElementById('fin_despesa_fixa').value;
-                desc = df === 'Outras Despesas' ? document.getElementById('fin_despesa_manual').value : df;
-            }
-
-            const lanc = {
-                tipo, descricao: desc, cargo: cargoMembro, dia_semana: dia,
-                valor: parseFloat(document.getElementById('fin_valor').value),
-                data_lancamento: document.getElementById('fin_data').value,
-                observacao: document.getElementById('fin_observacao').value || null
-            };
-
-            const { error } = editandoFinanceiroID 
-                ? await _supabase.from('financeiro').update(lanc).eq('id', editandoFinanceiroID) 
-                : await _supabase.from('financeiro').insert([lanc]);
-
-            if (error) alert("Erro ao salvar: " + error.message);
-            else { alert("Lançamento realizado com sucesso!"); resetarEstadoFinanceiro(); carregarFinancas(); }
-        });
+        function autopreencherCargoMembro() {
+            const combo = document.getElementById('fin_membro_nome');
+            const opcaoSelecionada = combo.options[combo.selectedIndex];
+            const cargoAttr = opcaoSelecionada.getAttribute('data-cargo');
+            document.getElementById('fin_membro_cargo').value = cargoAttr ? cargoAttr : 'Membro';
+        }
 
         async function carregarFinancas() {
-            const tipoFiltro = document.getElementById('filtroTipo').value;
-            let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
-            
-            if (tipoFiltro) {
-                query = query.eq('tipo', tipoFiltro);
-            }
+            try {
+                const tipoFiltro = document.getElementById('filtroTipo').value;
+                let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
+                if (tipoFiltro) query = query.eq('tipo', tipoFiltro);
+                const { data, error } = await query;
+                if (error) throw error;
 
-            const { data } = await query;
-            const tbody = document.getElementById('tabelaFinanceiro');
-            tbody.innerHTML = '';
-            let d = 0, o = 0, de = 0;
+                const tbody = document.getElementById('tabelaFinanceiro');
+                tbody.innerHTML = '';
+                let d = 0, o = 0, de = 0;
 
-            (data || []).forEach(f => {
-                if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
-                const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
+                data.forEach(f => {
+                    if (f.tipo === 'Dízimo') d += f.valor;
+                    else if (f.tipo === 'Oferta') o += f.valor;
+                    else de += f.valor;
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/30 transition-colors">
-                        <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
-                        <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
-                        <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
-                        <td class="px-6 py-4">${exibicaoCargo}</td>
-                        <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
-                        <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toFixed(2)}</td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                            <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
-            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
-            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
-            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
-            lucide.createIcons();
+                    const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
+                            <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
+                            <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
+                            <td class="px-6 py-4">${exibicaoCargo}</td>
+                            <td class="px-6 py-4 text-xs text-slate-400">${f.observacao || '-'}</td>
+                            <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toFixed(2)}</td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>`;
+                });
+
+                document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
+                document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
+                document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
+                document.getElementById('dashSaldoTotal').textContent = `R$ ${(d + o - de).toFixed(2)}`;
+                lucide.createIcons();
+            } catch (err) { console.error(err); }
         }
 
         async function editarFinanca(id) {
             try {
                 const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
                 if (error) throw error;
-                editandoFinanceiroID = id;
+                editandoFinanceiroID = data.id;
+
                 document.getElementById('fin_tipo').value = data.tipo;
                 ajustarCamposFinancas();
 
@@ -1408,64 +1299,103 @@
                     document.getElementById('fin_membro_nome').value = data.descricao;
                     document.getElementById('fin_membro_cargo').value = data.cargo || 'Membro';
                 } else if (data.tipo === 'Oferta') {
-                    const selectCulto = document.getElementById('fin_oferta_culto');
-                    const oDisponiveis = Array.from(selectCulto.options).map(o => o.value);
-                    if (oDisponiveis.includes(data.descricao)) selectCulto.value = data.descricao;
-                    else {
-                        selectCulto.value = 'Outro Culto';
-                        const inputManual = document.getElementById('fin_culto_manual');
-                        inputManual.classList.remove('hidden');
-                        inputManual.value = data.descricao;
+                    const depe = data.descricao.split(' — ');
+                    document.getElementById('fin_oferta_culto').value = depe[0] || 'Culto Publico';
+                    verificarCultoOutros();
+                    if(document.getElementById('fin_oferta_culto').value === 'Outro Culto') {
+                        document.getElementById('fin_culto_manual').value = depe[0];
                     }
-                    document.getElementById('fin_oferta_dia').value = data.dia_semana || 'Domingo';
+                    document.getElementById('fin_oferta_dia').value = depe[1] || 'Domingo';
                 } else if (data.tipo === 'Despesa') {
-                    const selectDesp = document.getElementById('fin_despesa_fixa');
-                    const oDisponiveis = Array.from(selectDesp.options).map(o => o.value);
-                    if (oDisponiveis.includes(data.descricao)) selectDesp.value = data.descricao;
-                    else {
-                        selectDesp.value = 'Outras Despesas';
-                        const inputManual = document.getElementById('fin_despesa_manual');
-                        inputManual.classList.remove('hidden');
-                        inputManual.value = data.descricao;
+                    document.getElementById('fin_despesa_fixa').value = data.descricao;
+                    verificarDespesaOutros();
+                    if(document.getElementById('fin_despesa_fixa').value === 'Outras Despesas') {
+                        document.getElementById('fin_despesa_manual').value = data.descricao;
                     }
                 }
+
                 document.getElementById('fin_valor').value = data.valor;
                 document.getElementById('fin_data').value = data.data_lancamento;
                 document.getElementById('fin_observacao').value = data.observacao || '';
+
                 document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
                 document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
                 document.getElementById('btnCancelarFinanceiro').classList.remove('hidden');
                 document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
-            } catch (err) { alert("Erro ao buscar fluxo: " + err.message); }
+            } catch (e) { alert(e.message); }
         }
 
-        function resetarEstadoFinanceiro() { 
-            editandoFinanceiroID = null; 
-            document.getElementById('formFinanceiro').reset(); 
+        function resetarEstadoFinanceiro() {
+            editandoFinanceiroID = null;
+            document.getElementById('formFinanceiro').reset();
             document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
             document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
             document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
-            ajustarCamposFinancas(); 
+            ajustarCamposFinancas();
         }
-        
-        async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
+
+        async function deletarFinanca(id) {
+            if (confirm("Estornar este lançamento de caixa?")) {
+                await _supabase.from('financeiro').delete().eq('id', id);
+                carregarFinancas();
+            }
+        }
+
+        document.getElementById('formFinanceiro').onsubmit = async function(e) {
+            e.preventDefault();
+            const tipo = document.getElementById('fin_tipo').value;
+            let descricao = '';
+            let cargo = null;
+
+            if (tipo === 'Dízimo') {
+                descricao = document.getElementById('fin_membro_nome').value;
+                cargo = document.getElementById('fin_membro_cargo').value;
+            } else if (tipo === 'Oferta') {
+                const cSel = document.getElementById('fin_oferta_culto').value;
+                const cTxt = cSel === 'Outro Culto' ? document.getElementById('fin_culto_manual').value : cSel;
+                const dSel = document.getElementById('fin_oferta_dia').value;
+                descricao = `${cTxt} — ${dSel}`;
+            } else if (tipo === 'Despesa') {
+                const dSel = document.getElementById('fin_despesa_fixa').value;
+                descricao = dSel === 'Outras Despesas' ? document.getElementById('fin_despesa_manual').value : dSel;
+            }
+
+            const payload = {
+                tipo, descricao, cargo,
+                valor: parseFloat(document.getElementById('fin_valor').value),
+                data_lancamento: document.getElementById('fin_data').value,
+                observacao: document.getElementById('fin_observacao').value
+            };
+
+            try {
+                if (editandoFinanceiroID) {
+                    await _supabase.from('financeiro').update(payload).eq('id', editandoFinanceiroID);
+                } else {
+                    await _supabase.from('financeiro').insert([payload]);
+                }
+                resetarEstadoFinanceiro();
+                carregarFinancas();
+            } catch(err) { alert(err.message); }
+        };
 
         function atualizarDiaSemanaAutomatico() {
-            const dataInput = document.getElementById('agenda_data').value;
-            const inputDiaSemana = document.getElementById('agenda_dia_semana');
-            if (!dataInput) { inputDiaSemana.value = ''; return; }
-            const dataObjeto = new Date(dataInput + 'T00:00:00');
+            const campoData = document.getElementById('agenda_data').value;
+            if (!campoData) {
+                document.getElementById('agenda_dia_semana').value = '';
+                return;
+            }
             const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-            inputDiaSemana.value = diasOrdenados[dataObjeto.getDay()];
+            const dataObj = new Date(campoData + 'T00:00:00');
+            document.getElementById('agenda_dia_semana').value = diasOrdenados[dataObj.getDay()];
         }
-        
+
         async function carregarAgenda() {
             try {
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
                 if (error) throw error;
                 const tbody = document.getElementById('tabelaAgenda');
                 tbody.innerHTML = '';
-
+                
                 data.forEach(ag => {
                     const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
                     const dataReal = ag.data || '';
@@ -1480,68 +1410,61 @@
                                 <div><span class="text-slate-500 text-xs">Dir:</span> ${ag.dirigente || '-'}</div>
                                 <div><span class="text-slate-500 text-xs">Preg:</span> ${ag.pregador || '-'}</div>
                             </td>
-                            <td class="px-6 py-4 text-slate-300 text-sm">
-                                <div><span class="text-slate-500 text-xs">Port:</span> ${ag.escala_portaria || '-'}</div>
-                                <div><span class="text-slate-500 text-xs">Ofert:</span> ${ag.escala_ofertas || '-'}</div>
+                            <td class="px-6 py-4 text-slate-300 text-xs">
+                                <div><span class="text-slate-500 text-[10px]">Port:</span> ${ag.escala_portaria || '-'}</div>
+                                <div><span class="text-slate-500 text-[10px]">Ofer:</span> ${ag.escala_ofertas || '-'}</div>
                             </td>
-                            <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
+                            <td class="px-6 py-4 text-xs text-slate-400 italic">${obsTexto}</td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarAgenda('${ag.id}')" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarAgenda('${ag.id}')" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editarAgenda(${ag.id})" class="text-amber-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarAgenda(${ag.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>`;
                 });
                 lucide.createIcons();
-            } catch (err) { console.error(err.message); }
+            } catch (err) { console.error(err); }
         }
 
-        document.getElementById('formAgenda').addEventListener('submit', async (e) => {
+        document.getElementById('formAgenda').onsubmit = async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('btnSalvarAgenda');
-            btn.disabled = true;
-            const dataInput = document.getElementById('agenda_data').value;
-            let mesRef = 'Janeiro';
-
-            if (dataInput) {
-                const dataObj = new Date(dataInput + 'T00:00:00');
-                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-                mesRef = meses[dataObj.getMonth()];
-            }
-
-            const r = {
-                tipo_evento: document.getElementById('agenda_tipo_evento').value,
+            const payload = {
+                data: document.getElementById('agenda_data').value,
                 horario: document.getElementById('agenda_horario').value,
-                escala_portaria: document.getElementById('agenda_escala_portaria').value || null,
-                pregador: document.getElementById('agenda_pregador').value || null,
-                escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
-                dirigente: document.getElementById('agenda_dirigente').value || null,
-                saida_visita: document.getElementById('agenda_saida_visita').value || null,
-                mes_referencia: mesRef, data: dataInput
+                tipo_evento: document.getElementById('agenda_tipo_evento').value,
+                dirigente: document.getElementById('agenda_dirigente').value,
+                pregador: document.getElementById('agenda_pregador').value,
+                escala_portaria: document.getElementById('agenda_escala_portaria').value,
+                escala_ofertas: document.getElementById('agenda_escala_ofertas').value,
+                saida_visita: document.getElementById('agenda_saida_visita').value
             };
 
-            const { error } = editandoAgendaID 
-                ? await _supabase.from('agenda_semanal').update(r).eq('id', editandoAgendaID)
-                : await _supabase.from('agenda_semanal').insert([r]);
-
-            if (error) alert("Erro: " + error.message);
-            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
-            btn.disabled = false;
-        });
+            try {
+                if (editandoAgendaID) {
+                    await _supabase.from('agenda_semanal').update(payload).eq('id', editandoAgendaID);
+                } else {
+                    await _supabase.from('agenda_semanal').insert([payload]);
+                }
+                resetarEstadoAgenda();
+                carregarAgenda();
+            } catch (err) { alert(err.message); }
+        };
 
         async function editarAgenda(id) {
             try {
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
                 if (error) throw error;
-                editandoAgendaID = id;
+                editandoAgendaID = data.id;
+
                 document.getElementById('agenda_data').value = data.data || '';
                 atualizarDiaSemanaAutomatico();
-                document.getElementById('agenda_tipo_evento').value = data.tipo_evento || '';
                 document.getElementById('agenda_horario').value = data.horario || '';
+                document.getElementById('agenda_tipo_evento').value = data.tipo_evento || '';
                 document.getElementById('agenda_dirigente').value = data.dirigente || '';
                 document.getElementById('agenda_pregador').value = data.pregador || '';
                 document.getElementById('agenda_escala_portaria').value = data.escala_portaria || '';
                 document.getElementById('agenda_escala_ofertas').value = data.escala_ofertas || '';
                 document.getElementById('agenda_saida_visita').value = data.saida_visita || '';
+                
                 document.getElementById('tituloFormAgenda').innerText = "Editando Cronograma da Agenda";
                 document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Agenda";
                 document.getElementById('btnCancelarAgenda').classList.remove('hidden');
