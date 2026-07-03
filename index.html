@@ -1,1418 +1,1566 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import {
-  Users,
-  DollarSign,
-  Calendar,
-  LayoutDashboard,
-  FileText,
-  LogOut,
-  UserPlus,
-  Save,
-  AlignLeft,
-  UserCheck,
-  UserX,
-  Pencil,
-  Trash2,
-  PlusCircle,
-  CheckCircle,
-  Heart,
-  Gift,
-  ArrowDownCircle,
-  List,
-  Printer,
-  CalendarPlus,
-  Shield,
-  Award,
-  HelpCircle,
-  FilePlus,
-  History,
-  FileCheck,
-  Cake,
-  Filter,
-} from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão - Igreja Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        [color-scheme:dark] { color-scheme: dark; }
+    </style>
+</head>
+<body class="text-slate-200">
+    <div class="min-h-screen flex">
+        
+        <!-- ========================================== -->
+        <!--        PAINEL LATERAL (SIDEBAR)            -->
+        <!-- ========================================== -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
+            <div>
+                <div class="p-6 border-b border-slate-800">
+                    <h2 class="text-xl font-bold text-indigo-400 tracking-wide text-center">
+                        Igreja Digital
+                    </h2>
+                    <p class="text-xs text-slate-500 text-center mt-1 uppercase tracking-widest font-medium">Painel Admin</p>
+                </div>
 
-export const Route = createFileRoute("/")({
-  component: GestaoIgreja,
-});
-
-type Tela = "membros" | "financeiro" | "agenda" | "mural" | "documentos";
-
-interface Membro {
-  id: number;
-  nome: string;
-  data_nascimento: string | null;
-  celular: string | null;
-  email: string | null;
-  cargo: string | null;
-  data_adesao: string | null;
-  status: string;
-  observacao: string | null;
-}
-
-interface Financa {
-  id: number;
-  tipo: string;
-  descricao: string | null;
-  cargo: string | null;
-  dia_semana: string | null;
-  valor: number;
-  data_lancamento: string;
-  observacao: string | null;
-}
-
-interface Agenda {
-  id: number;
-  tipo_evento: string | null;
-  horario: string | null;
-  dirigente: string | null;
-  pregador: string | null;
-  escala_portaria: string | null;
-  escala_ofertas: string | null;
-  saida_visita: string | null;
-  mes_referencia: string | null;
-  data: string | null;
-}
-
-const diasOrdenados = [
-  "Domingo",
-  "Segunda-feira",
-  "Terça-feira",
-  "Quarta-feira",
-  "Quinta-feira",
-  "Sexta-feira",
-  "Sábado",
-];
-
-const meses = [
-  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro",
-];
-
-const opcoesDocumentos: Record<string, string[]> = {
-  Carta: ["Mudança", "Transferência", "Apresentação"],
-  Memorando: ["Desligamento","Reintegração","Integração","Suspensão","Exclusão","Memorando Interno","Apresentação na Sede"],
-  Convite: ["Preletores","Cantores","Igrejas","Abadguar","Congresso Com Jovens","Congresso Com Adolescentes","Congresso Com as Irmãs","Outros Cultos"],
-};
-
-const estruturaCargos = [
-  { chaves: ["pastor dirigente","pastor local","dirigente"], titulo: "Pastor Dirigente", cor: "border-rose-500/30 text-rose-400 bg-rose-500/5", Icone: UserCheck },
-  { chaves: ["co-pastor","copastor","pastor auxiliar"], titulo: "Co-Pastor", cor: "border-orange-500/30 text-orange-400 bg-orange-500/5", Icone: Shield },
-  { chaves: ["presbitero","presbítero"], titulo: "Corpo de Presbíteros", cor: "border-amber-500/30 text-amber-400 bg-amber-500/5", Icone: Award },
-  { chaves: ["diacono","diácono","diaconisa"], titulo: "Corpo de Diáconos / Diaconisas", cor: "border-emerald-500/30 text-emerald-400 bg-emerald-500/5", Icone: Heart },
-  { chaves: ["auxiliar","auxiliar de trabalho","auxiliar feminino","auxiliar masculino","cooperador","cooperadora"], titulo: "Auxiliares da Obra", cor: "border-blue-500/30 text-blue-400 bg-blue-500/5", Icone: HelpCircle },
-];
-
-function normalizar(s: string) {
-  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-}
-
-function formatarData(s: string | null | undefined) {
-  if (!s) return "-";
-  const [a, m, d] = s.split("-");
-  return `${d}/${m}/${a}`;
-}
-
-function formatarCelular(v: string) {
-  return v.replace(/\D/g, "").replace(/^(\d{2})(\d)/g, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2").substring(0, 15);
-}
-
-function formatarMoeda(valor: number | string | null | undefined) {
-  const n = Number(valor ?? 0);
-  if (Number.isNaN(n)) return "R$ 0,00";
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-
-function GestaoIgreja() {
-  const [tela, setTela] = useState<Tela>("membros");
-  return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-200" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <Sidebar tela={tela} onNavigate={setTela} />
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
-        <Topbar tela={tela} />
-        <main className="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
-          {tela === "membros" && <TelaMembros />}
-          {tela === "financeiro" && <TelaFinanceiro />}
-          {tela === "agenda" && <TelaAgenda />}
-          {tela === "mural" && <TelaMural />}
-          {tela === "documentos" && <TelaDocumentos />}
-        </main>
-      </div>
-    </div>
-  );
-}
-
-/* ============ SIDEBAR ============ */
-function Sidebar({ tela, onNavigate }: { tela: Tela; onNavigate: (t: Tela) => void }) {
-  const items: { id: Tela; label: string; Icone: typeof Users; cor: string }[] = [
-    { id: "membros", label: "Membros", Icone: Users, cor: "indigo" },
-    { id: "financeiro", label: "Tesouraria", Icone: DollarSign, cor: "emerald" },
-    { id: "agenda", label: "Agenda Semanal", Icone: Calendar, cor: "amber" },
-    { id: "mural", label: "Mural", Icone: LayoutDashboard, cor: "indigo" },
-    { id: "documentos", label: "Documentos", Icone: FileText, cor: "blue" },
-  ];
-  const cores: Record<string, string> = {
-    indigo: "bg-indigo-600 text-white shadow-lg shadow-indigo-900/20",
-    emerald: "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20",
-    amber: "bg-amber-600 text-white shadow-lg shadow-amber-900/20",
-    blue: "bg-blue-600 text-white shadow-lg shadow-blue-900/20",
-  };
-  return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
-      <div>
-        <div className="p-6 border-b border-slate-800">
-          <h2 className="text-xl font-bold text-indigo-400 tracking-wide text-center">Igreja Digital</h2>
-          <p className="text-xs text-slate-500 text-center mt-1 uppercase tracking-widest font-medium">Painel Admin</p>
-        </div>
-        <nav className="p-4 space-y-1">
-          {items.map(({ id, label, Icone, cor }) => {
-            const ativo = tela === id;
-            return (
-              <button
-                key={id}
-                onClick={() => onNavigate(id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                  ativo ? cores[cor] : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-                }`}
-              >
-                <Icone className="w-5 h-5" />
-                <span>{label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-      <div className="p-4 border-t border-slate-800">
-        <button
-          onClick={() => alert("Logout efetuado temporariamente rascunhado.")}
-          className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition"
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Sair do Sistema</span>
-        </button>
-      </div>
-    </aside>
-  );
-}
-
-/* ============ TOPBAR ============ */
-function Topbar({ tela }: { tela: Tela }) {
-  const config: Record<Tela, { titulo: string; Icone: typeof Users; bg: string }> = {
-    membros: { titulo: "Gestão de Membros", Icone: Users, bg: "bg-indigo-600 shadow-indigo-500/20" },
-    financeiro: { titulo: "Tesouraria & Fluxo de Caixa", Icone: DollarSign, bg: "bg-emerald-600 shadow-emerald-500/20" },
-    agenda: { titulo: "Agenda Semanal", Icone: Calendar, bg: "bg-amber-600 shadow-amber-500/20" },
-    mural: { titulo: "Mural de Atribuições", Icone: LayoutDashboard, bg: "bg-indigo-600 shadow-indigo-500/20" },
-    documentos: { titulo: "Cartas, Memorandos e Convites", Icone: FileText, bg: "bg-blue-600 shadow-blue-500/20" },
-  };
-  const { titulo, Icone, bg } = config[tela];
-  return (
-    <header className="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg text-white shadow-lg ${bg}`}>
-            <Icone className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-white">{titulo}</h1>
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Módulos Ativos</p>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-/* ============ MEMBROS ============ */
-function TelaMembros() {
-  const [membros, setMembros] = useState<Membro[]>([]);
-  const [busca, setBusca] = useState("");
-  const [editandoId, setEditandoId] = useState<number | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const [form, setForm] = useState({
-    nome: "", data_nascimento: "", celular: "", email: "",
-    cargo: "", data_adesao: "", status: "Ativo", observacao: "",
-  });
-
-  async function carregar() {
-    let q = supabase.from("membros").select("*").order("nome", { ascending: true });
-    if (busca) q = q.ilike("nome", `%${busca}%`);
-    const { data } = await q;
-    setMembros((data as Membro[]) || []);
-  }
-
-  useEffect(() => { carregar(); }, [busca]);
-
-  function resetar() {
-    setEditandoId(null);
-    setForm({ nome:"", data_nascimento:"", celular:"", email:"", cargo:"", data_adesao:"", status:"Ativo", observacao:"" });
-  }
-
-  async function salvar(e: FormEvent) {
-    e.preventDefault();
-    const payload = {
-      nome: form.nome,
-      data_nascimento: form.data_nascimento || null,
-      celular: form.celular || null,
-      email: form.email || null,
-      cargo: form.cargo || null,
-      data_adesao: form.data_adesao || null,
-      status: form.status,
-      observacao: form.observacao || null,
-    };
-    const { error } = editandoId
-      ? await supabase.from("membros").update(payload).eq("id", editandoId)
-      : await supabase.from("membros").insert([payload]);
-    if (error) { alert("Erro: " + error.message); return; }
-    alert("Sucesso!");
-    resetar();
-    carregar();
-  }
-
-  function editar(m: Membro) {
-    setEditandoId(m.id);
-    setForm({
-      nome: m.nome ?? "",
-      data_nascimento: m.data_nascimento ?? "",
-      celular: m.celular ?? "",
-      email: m.email ?? "",
-      cargo: m.cargo ?? "",
-      data_adesao: m.data_adesao ?? "",
-      status: m.status ?? "Ativo",
-      observacao: m.observacao ?? "",
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  async function deletar(id: number) {
-    if (!confirm("Excluir membro?")) return;
-    await supabase.from("membros").delete().eq("id", id);
-    carregar();
-  }
-
-  function imprimirAniversariantes() {
-    const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-    const hoje = new Date();
-    const mesAtual = hoje.getMonth();
-    const nomeMes = meses[mesAtual];
-
-    const lista = membros
-      .filter(m => {
-        if (!m.data_nascimento) return false;
-        const [, mm] = m.data_nascimento.split("-");
-        return parseInt(mm, 10) - 1 === mesAtual;
-      })
-      .map(m => {
-        const [, mm, dd] = m.data_nascimento!.split("-");
-        return { nome: m.nome, dia: dd, mes: mm, mesNome: meses[parseInt(mm, 10) - 1] };
-      })
-      .sort((a, b) => parseInt(a.dia) - parseInt(b.dia));
-
-    const w = window.open("", "_blank"); if (!w) return;
-    const linhas = lista.length
-      ? lista.map((a, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${a.nome}</td><td style="text-align:center">${a.dia}/${a.mes}</td><td style="text-align:center">${a.mesNome}</td></tr>`).join("")
-      : `<tr><td colspan="4" style="text-align:center;padding:20px;color:#64748b;font-style:italic">Nenhum aniversariante cadastrado para ${nomeMes}.</td></tr>`;
-
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Aniversariantes de ${nomeMes}</title><style>
-      @page{size:A4;margin:15mm 18mm}
-      html,body{background:#fff}
-      body{font-family:'Calibri Light','Calibri',Arial,sans-serif;color:#1a1a1a;margin:0;line-height:1.4;font-size:13pt}
-      .cabecalho{text-align:center;border-bottom:2px double #334155;padding-bottom:8px;margin-bottom:14px}
-      .cabecalho h2{margin:0;font-size:12pt;color:#0f172a;letter-spacing:.5px;text-transform:uppercase;font-weight:bold}
-      .cabecalho p{margin:2px 0 0 0;font-size:9pt;color:#475569;letter-spacing:1px;text-transform:uppercase}
-      .titulo{text-align:center;font-size:13pt;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin:14px 0 12px 0;color:#0f172a;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1;padding:6px 0}
-      table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12pt}
-      th{background:#0f172a;color:#fff;text-transform:uppercase;font-size:9pt;letter-spacing:1px;padding:8px;text-align:left}
-      th:first-child,th:nth-child(3),th:nth-child(4){text-align:center}
-      td{padding:7px 8px;border-bottom:1px solid #e2e8f0}
-      tr:nth-child(even) td{background:#f8fafc}
-      .resumo{margin-top:12px;text-align:right;font-size:11pt;color:#334155}
-      .rodape{text-align:center;margin-top:18px;font-size:8pt;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #e2e8f0;padding-top:6px}
-      @media print{.btn-print{display:none}}
-      .btn-print{position:fixed;top:20px;right:20px;padding:10px 20px;background:#db2777;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;font-family:sans-serif}
-    </style></head><body>
-      <button class="btn-print" onclick="window.print()">Imprimir Lista</button>
-      <div class="cabecalho">
-        <h2>${NOME_IGREJA}</h2>
-        <p>${SUB_IGREJA}</p>
-        <p>${ENDERECO_IGREJA}</p>
-      </div>
-      <div class="titulo">Aniversariantes de ${nomeMes}</div>
-      <table>
-        <thead><tr><th>#</th><th>Nome</th><th>Nascimento</th><th>Mês</th></tr></thead>
-        <tbody>${linhas}</tbody>
-      </table>
-      <div class="resumo"><strong>Total de aniversariantes:</strong> ${lista.length}</div>
-      <div class="rodape">Gerado em ${new Date().toLocaleDateString("pt-BR")} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
-    </body></html>`);
-    w.document.close();
-  }
-
-  const ativos = membros.filter(m => m.status === "Ativo").length;
-  const inativos = membros.length - ativos;
-  const editColor = editandoId ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20" : "bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20";
-
-  return (
-    <div className="space-y-8">
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-indigo-400" />
-            <h2 className="font-semibold text-slate-100">{editandoId ? "Editando Membro" : "Novo Cadastro"}</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={imprimirAniversariantes} className="inline-flex items-center gap-2 text-xs bg-pink-600 hover:bg-pink-500 text-white font-semibold px-3 py-2 rounded-lg shadow-md shadow-pink-600/20 transition-all">
-              <Cake className="w-4 h-4" /> Aniversariantes do Mês
-            </button>
-            {editandoId && (
-              <button onClick={resetar} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                Cancelar Edição
-              </button>
-            )}
-          </div>
-        </div>
-        <form ref={formRef} onSubmit={salvar} className="p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-            <Campo label="Nome Completo" span={3} required>
-              <input value={form.nome} onChange={e=>setForm({...form, nome:e.target.value})} required placeholder="Ex: João Silva" className={inputCls} />
-            </Campo>
-            <Campo label="Data de Nascimento" span={3}>
-              <input type="date" value={form.data_nascimento} onChange={e=>setForm({...form, data_nascimento:e.target.value})} className={`${inputCls} [color-scheme:dark]`} />
-            </Campo>
-            <Campo label="Telefone" span={3}>
-              <input value={form.celular} onChange={e=>setForm({...form, celular:formatarCelular(e.target.value)})} placeholder="(00) 00000-0000" maxLength={15} className={inputCls} />
-            </Campo>
-            <Campo label="E-mail" span={3}>
-              <input type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} placeholder="exemplo@email.com" className={inputCls} />
-            </Campo>
-            <Campo label="Cargo / Função" span={3}>
-              <input value={form.cargo} onChange={e=>setForm({...form, cargo:e.target.value})} placeholder="Ex: Pastor Dirigente, Presbítero, Diácono" className={inputCls} />
-            </Campo>
-            <Campo label="Data de Membresia" span={3}>
-              <input type="date" value={form.data_adesao} onChange={e=>setForm({...form, data_adesao:e.target.value})} className={`${inputCls} [color-scheme:dark]`} />
-            </Campo>
-            <Campo label="Status" span={3}>
-              <select value={form.status} onChange={e=>setForm({...form, status:e.target.value})} className={`${inputCls} cursor-pointer`}>
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-            </Campo>
-            <Campo label="Observação" span={6}>
-              <textarea value={form.observacao} onChange={e=>setForm({...form, observacao:e.target.value})} rows={2} placeholder="Informações adicionais..." className={`${inputCls} resize-none`} />
-            </Campo>
-          </div>
-          <div className="mt-8 flex justify-end">
-            <button type="submit" className={`inline-flex items-center gap-2 px-8 py-3 text-white font-bold rounded-xl transition-all shadow-lg ${editColor}`}>
-              <Save className="w-5 h-5" />
-              <span>{editandoId ? "Atualizar Cadastro" : "Salvar Membro"}</span>
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <CardStat label="Ativos" valor={ativos} cor="text-emerald-400" Icone={UserCheck} iconCor="text-emerald-500/50" />
-        <CardStat label="Inativos" valor={inativos} cor="text-rose-400" Icone={UserX} iconCor="text-rose-500/50" />
-        <CardStat label="Total Geral" valor={membros.length} cor="text-emerald-400" Icone={Users} iconCor="text-emerald-500/50" />
-      </div>
-
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h2 className="font-semibold text-slate-100 flex items-center gap-2">
-            <AlignLeft className="w-5 h-5 text-indigo-400" /> Lista de Membros
-          </h2>
-          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por nome..." className="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none" />
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                <th className="px-6 py-4">Membro</th>
-                <th className="px-6 py-4">Cargo</th>
-                <th className="px-6 py-4">Contato</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              {membros.map(m => (
-                <tr key={m.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-100">{m.nome}</div>
-                    <div className="text-xs text-slate-500 italic">Nasc: {formatarData(m.data_nascimento)}</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-300 text-sm">{m.cargo || "-"}</td>
-                  <td className="px-6 py-4 text-slate-400 text-sm">
-                    <div>{m.celular || "-"}</div>
-                    <div className="text-xs text-slate-500">{m.email || ""}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-[10px] font-bold ${m.status === "Ativo" ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-800 text-slate-500"}`}>
-                      {m.status.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => editar(m)} className="text-indigo-400 mr-2 hover:scale-110 transition-transform inline-block">
-                      <Pencil className="w-4 h-4" />
+                <nav class="p-4 space-y-1">
+                    <button id="btn-menu-membros" onclick="navegarPara('membros')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span>Membros</span>
                     </button>
-                    <button onClick={() => deletar(m.id)} className="text-rose-400 hover:scale-110 transition-transform inline-block">
-                      <Trash2 className="w-4 h-4" />
+                    
+                    <button id="btn-menu-financeiro" onclick="navegarPara('financeiro')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                        <span>Tesouraria</span>
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-          <span>Total: <span className="text-emerald-500 font-bold text-sm">{membros.length}</span> Membros</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Sistema Online</span>
-        </div>
-      </section>
-    </div>
-  );
-}
 
-/* ============ FINANCEIRO ============ */
-function TelaFinanceiro() {
-  const [lancamentos, setLancamentos] = useState<Financa[]>([]);
-  const [filtroTipo, setFiltroTipo] = useState("");
-  const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [membrosCache, setMembrosCache] = useState<{ nome: string; cargo: string | null }[]>([]);
+                    <button id="btn-menu-agenda" onclick="navegarPara('agenda')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                        <span>Agenda Semanal</span>
+                    </button>
 
-  const [tipo, setTipo] = useState("Dízimo");
-  const [membroNome, setMembroNome] = useState("Contribuinte Geral");
-  const [membroCargo, setMembroCargo] = useState("Membro");
-  const [ofertaCulto, setOfertaCulto] = useState("Culto Publico");
-  const [cultoManual, setCultoManual] = useState("");
-  const [ofertaDia, setOfertaDia] = useState("Domingo");
-  const [despesaFixa, setDespesaFixa] = useState("Aluguel");
-  const [despesaManual, setDespesaManual] = useState("");
-  const [valor, setValor] = useState("");
-  const [dataLanc, setDataLanc] = useState("");
-  const [obs, setObs] = useState("");
+                    <button id="btn-menu-mural" onclick="navegarPara('mural')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <span>Atribuições Mural</span>
+                    </button>
 
-  async function carregarMembrosCache() {
-    const { data } = await supabase.from("membros").select("nome, cargo").order("nome", { ascending: true });
-    setMembrosCache((data as any) || []);
-  }
-  async function carregar() {
-    let q = supabase.from("financeiro").select("*").order("data_lancamento", { ascending: false });
-    if (filtroTipo) q = q.eq("tipo", filtroTipo);
-    const { data } = await q;
-    setLancamentos((data as Financa[]) || []);
-  }
+                    <button id="btn-menu-documentos" onclick="navegarPara('documentos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span>Cartas e Convites</span>
+                    </button>
+                </nav>
+            </div>
 
-  useEffect(() => { carregarMembrosCache(); }, []);
-  useEffect(() => { carregar(); }, [filtroTipo]);
+            <div class="p-4 border-t border-slate-800">
+                <button onclick="alert('Logout efetuado temporariamente rascunhado.')" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Sair do Sistema</span>
+                </button>
+            </div>
+        </aside>
 
-  useEffect(() => {
-    const m = membrosCache.find(x => x.nome === membroNome);
-    setMembroCargo(m ? (m.cargo || "Membro") : "Membro");
-  }, [membroNome, membrosCache]);
-
-  function resetar() {
-    setEditandoId(null); setTipo("Dízimo"); setMembroNome("Contribuinte Geral"); setMembroCargo("Membro");
-    setOfertaCulto("Culto Publico"); setCultoManual(""); setOfertaDia("Domingo");
-    setDespesaFixa("Aluguel"); setDespesaManual(""); setValor(""); setDataLanc(""); setObs("");
-  }
-
-  async function salvar(e: FormEvent) {
-    e.preventDefault();
-    let desc = ""; let dia: string | null = null; let cargo: string | null = null;
-    if (tipo === "Dízimo") { desc = membroNome; cargo = membroCargo || "Membro"; }
-    else if (tipo === "Oferta") { desc = ofertaCulto === "Outro Culto" ? cultoManual : ofertaCulto; dia = ofertaDia; }
-    else { desc = despesaFixa === "Outras Despesas" ? despesaManual : despesaFixa; }
-    const payload = {
-      tipo, descricao: desc, cargo, dia_semana: dia,
-      valor: parseFloat(valor), data_lancamento: dataLanc,
-      observacao: obs || null,
-    };
-    const { error } = editandoId
-      ? await supabase.from("financeiro").update(payload).eq("id", editandoId)
-      : await supabase.from("financeiro").insert([payload]);
-    if (error) { alert("Erro ao salvar: " + error.message); return; }
-    alert("Lançamento realizado com sucesso!");
-    resetar(); carregar();
-  }
-
-  function editar(f: Financa) {
-    setEditandoId(f.id); setTipo(f.tipo);
-    if (f.tipo === "Dízimo") { setMembroNome(f.descricao || "Contribuinte Geral"); setMembroCargo(f.cargo || "Membro"); }
-    else if (f.tipo === "Oferta") {
-      const opcoes = ["Culto Publico","Culto de Santa Ceia","Culto de Ensinamento","Culto de Missões","Culto das irmãs","Culto com os dolescentes","Congresso","Não houve Culto"];
-      if (f.descricao && opcoes.includes(f.descricao)) setOfertaCulto(f.descricao);
-      else { setOfertaCulto("Outro Culto"); setCultoManual(f.descricao || ""); }
-      setOfertaDia(f.dia_semana || "Domingo");
-    } else {
-      const opcoes = ["Aluguel","Ajuda Eclesiástica","Limpeza da igreja","Conta de Luz","Conta de Água","Internet"];
-      if (f.descricao && opcoes.includes(f.descricao)) setDespesaFixa(f.descricao);
-      else { setDespesaFixa("Outras Despesas"); setDespesaManual(f.descricao || ""); }
-    }
-    setValor(String(f.valor)); setDataLanc(f.data_lancamento); setObs(f.observacao || "");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  async function deletar(id: number) {
-    if (!confirm("Excluir fluxo?")) return;
-    await supabase.from("financeiro").delete().eq("id", id);
-    carregar();
-  }
-
-  function imprimirRelatorio() {
-    if (!lancamentos.length) { alert("Não há registros lançados para gerar o relatório."); return; }
-    let d=0,o=0,de=0; let linhas="";
-    const ordenados = [...lancamentos].sort((a,b)=>a.data_lancamento.localeCompare(b.data_lancamento));
-    ordenados.forEach(f => {
-      if (f.tipo === "Dízimo") d += Number(f.valor); else if (f.tipo === "Oferta") o += Number(f.valor); else de += Number(f.valor);
-      const cor = f.tipo === "Despesa" ? "text-danger" : "text-success";
-      const sinal = f.tipo === "Despesa" ? "-" : "";
-      linhas += `<tr><td>${formatarData(f.data_lancamento)}</td><td><strong>${f.tipo}</strong></td><td>${f.descricao||"-"}</td><td><span class="tag-cargo">${f.cargo||"-"}</span></td><td>${f.observacao||"-"}</td><td class="text-right ${cor}">${sinal} ${formatarMoeda(f.valor)}</td></tr>`;
-    });
-    const saldo = d+o-de;
-    const w = window.open("", "_blank"); if (!w) return;
-    w.document.write(`<!DOCTYPE html><html><head><title>Relatório Financeiro</title><style>
-      body{font-family:'Segoe UI',Arial,sans-serif;color:#1e293b;margin:40px;background:#fff}
-      .header{text-align:center;border-bottom:3px double #334155;padding-bottom:15px;margin-bottom:25px}
-      .header h1{margin:0;font-size:24px;color:#0f172a}.header p{margin:5px 0 0 0;font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#64748b;font-weight:bold}
-      .cards-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:30px}
-      .card{border:1px solid #cbd5e1;border-radius:8px;padding:12px 15px;background:#f8fafc}
-      .card p{margin:0;font-size:11px;text-transform:uppercase;color:#64748b;font-weight:600}.card h3{margin:5px 0 0 0;font-size:18px;color:#0f172a;font-weight:700}
-      table{width:100%;border-collapse:collapse;margin-top:15px}
-      th{background:#f1f5f9;color:#334155;font-size:11px;text-transform:uppercase;font-weight:bold;padding:10px;border:1px solid #cbd5e1;text-align:left}
-      td{padding:10px;border:1px solid #cbd5e1;font-size:12px;color:#334155}tr:nth-child(even){background:#f8fafc}
-      .text-right{text-align:right}.text-success{color:#16a34a;font-weight:600}.text-danger{color:#dc2626;font-weight:600}
-      .tag-cargo{font-size:10px;background:#e2e8f0;color:#475569;padding:2px 6px;border-radius:4px}
-      .footer{text-align:center;margin-top:40px;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #e2e8f0;padding-top:15px}
-      .assinaturas{margin-top:60px;display:flex;justify-content:space-around}
-      .linha-assinatura{text-align:center;width:220px;font-size:12px;color:#475569;border-top:1px solid #94a3b8;padding-top:5px}
-      @media print{body{margin:20px}.btn-print{display:none}}
-      .btn-print{position:fixed;top:20px;right:20px;padding:10px 20px;background:#10b981;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px}
-    </style></head><body>
-      <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
-      <div class="header"><h1>RELATÓRIO MENSAL - LIVRO CAIXA</h1><p>Competência: ${meses[new Date().getMonth()]} de ${new Date().getFullYear()}</p></div>
-      <div class="cards-resumo">
-        <div class="card"><p>Dízimos (+)</p><h3 style="color:#16a34a">${formatarMoeda(d)}</h3></div>
-        <div class="card"><p>Ofertas (+)</p><h3 style="color:#0d9488">${formatarMoeda(o)}</h3></div>
-        <div class="card"><p>Despesas (-)</p><h3 style="color:#dc2626">${formatarMoeda(de)}</h3></div>
-        <div class="card"><p>Saldo Líquido</p><h3 style="color:#0f172a">${formatarMoeda(saldo)}</h3></div>
-      </div>
-      <table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição / Contribuinte</th><th>Cargo</th><th>Observação</th><th class="text-right">Valor</th></tr></thead><tbody>${linhas}</tbody></table>
-      <div class="assinaturas"><div class="linha-assinatura">Tesouraria Local</div><div class="linha-assinatura">Pastor Dirigente</div></div>
-      <div class="footer">Gerado em ${new Date().toLocaleDateString("pt-BR")} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
-    </body></html>`);
-    w.document.close();
-  }
-
-  const totDiz = lancamentos.filter(f=>f.tipo==="Dízimo").reduce((a,f)=>a+Number(f.valor),0);
-  const totOf = lancamentos.filter(f=>f.tipo==="Oferta").reduce((a,f)=>a+Number(f.valor),0);
-  const totDe = lancamentos.filter(f=>f.tipo==="Despesa").reduce((a,f)=>a+Number(f.valor),0);
-
-  return (
-    <div className="space-y-8">
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <PlusCircle className="w-5 h-5 text-emerald-400" />
-            <h2 className="font-semibold text-slate-100">{editandoId ? "Editando Lançamento" : "Lançamento de Caixa"}</h2>
-          </div>
-          {editandoId && (
-            <button onClick={resetar} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">Cancelar Edição</button>
-          )}
-        </div>
-        <form onSubmit={salvar} className="p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-            <Campo label="Tipo de Fluxo" span={2}>
-              <select value={tipo} onChange={e=>setTipo(e.target.value)} className={`${inputCls} cursor-pointer`}>
-                <option>Dízimo</option><option>Oferta</option><option>Despesa</option>
-              </select>
-            </Campo>
-
-            {tipo === "Dízimo" && (
-              <>
-                <Campo label="Nome do Membro (Opcional)" span={2}>
-                  <select value={membroNome} onChange={e=>setMembroNome(e.target.value)} className={`${inputCls} cursor-pointer`}>
-                    <option value="Contribuinte Geral">Geral / Anônimo</option>
-                    {membrosCache.map(m => <option key={m.nome} value={m.nome}>{m.nome}</option>)}
-                  </select>
-                </Campo>
-                <Campo label="Cargo / Função" span={2}>
-                  <input readOnly value={membroCargo} className="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 cursor-not-allowed" />
-                </Campo>
-              </>
-            )}
-
-            {tipo === "Oferta" && (
-              <>
-                <Campo label="Tipo de Culto" span={2}>
-                  <div className="flex flex-col gap-2">
-                    <select value={ofertaCulto} onChange={e=>setOfertaCulto(e.target.value)} className={`${inputCls} cursor-pointer`}>
-                      <option>Culto Publico</option><option>Culto de Santa Ceia</option><option>Culto de Ensinamento</option>
-                      <option>Culto de Missões</option><option>Culto das irmãs</option><option>Culto com os dolescentes</option>
-                      <option>Congresso</option><option>Não houve Culto</option><option value="Outro Culto">Outro (Digitar...)</option>
-                    </select>
-                    {ofertaCulto === "Outro Culto" && (
-                      <input value={cultoManual} onChange={e=>setCultoManual(e.target.value)} placeholder="Qual culto?" className={inputCls} />
-                    )}
-                  </div>
-                </Campo>
-                <Campo label="Dia da Semana" span={2}>
-                  <select value={ofertaDia} onChange={e=>setOfertaDia(e.target.value)} className={`${inputCls} cursor-pointer`}>
-                    {diasOrdenados.map(d => <option key={d}>{d}</option>)}
-                  </select>
-                </Campo>
-              </>
-            )}
-
-            {tipo === "Despesa" && (
-              <Campo label="Categoria da Despesa" span={4}>
-                <div className="flex gap-2">
-                  <select value={despesaFixa} onChange={e=>setDespesaFixa(e.target.value)} className={`flex-1 ${inputCls} cursor-pointer`}>
-                    <option>Aluguel</option><option>Ajuda Eclesiástica</option><option>Limpeza da igreja</option>
-                    <option>Conta de Luz</option><option>Conta de Água</option><option>Internet</option>
-                    <option value="Outras Despesas">Outras (Não fixa...)</option>
-                  </select>
-                  {despesaFixa === "Outras Despesas" && (
-                    <input value={despesaManual} onChange={e=>setDespesaManual(e.target.value)} placeholder="Qual despesa?" className={`flex-1 ${inputCls}`} />
-                  )}
+        <!-- ========================================== -->
+        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
+        <!-- ========================================== -->
+        <div class="flex-1 ml-64 flex flex-col min-h-screen">
+            
+            <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
+                <div class="max-w-6xl mx-auto flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div id="iconeDinamicoTopbar" class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+                            <i id="iconeHeader" data-lucide="users"></i>
+                        </div>
+                        <div>
+                            <h1 id="tituloTopbar" class="text-xl font-bold tracking-tight text-white">Gestão de Membros</h1>
+                            <p id="subtituloTopbar" class="text-xs text-slate-500 font-medium uppercase tracking-wider">Módulos Ativos</p>
+                        </div>
+                    </div>
                 </div>
-              </Campo>
-            )}
+            </header>
 
-            <Campo label="Valor (R$)" span={3} required>
-              <input type="number" step="0.01" required value={valor} onChange={e=>setValor(e.target.value)} placeholder="0,00" className={inputCls} />
-            </Campo>
-            <Campo label="Data" span={3} required>
-              <input type="date" required value={dataLanc} onChange={e=>setDataLanc(e.target.value)} className={`${inputCls} [color-scheme:dark]`} />
-            </Campo>
-            <Campo label="Observações do Lançamento" span={6}>
-              <input value={obs} onChange={e=>setObs(e.target.value)} placeholder="Algum detalhe importante..." className={inputCls} />
-            </Campo>
-          </div>
-          <div className="mt-8 flex justify-end">
-            <button type="submit" className="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20">
-              <CheckCircle className="w-5 h-5" />
-              <span>{editandoId ? "Atualizar Lançamento" : "Confirmar Lançamento"}</span>
-            </button>
-          </div>
-        </form>
-      </section>
+            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
+                
+                <!-- ========================================== -->
+                <!-- 1. TELA DE MEMBROS                         -->
+                <!-- ========================================== -->
+                <div id="tela-membros" class="space-y-8 dynamic-screen">
+                    <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeForm" data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
+                                <h2 id="tituloForm" class="font-semibold text-slate-100">Novo Cadastro</h2>
+                            </div>
+                            <button id="btnCancelar" onclick="resetarEstado()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
+                        </div>
+                        
+                        <form id="formMembro" class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
+                                    <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Nascimento</label>
+                                    <input type="date" id="data_nascimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all [color-scheme:dark]">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Telefone</label>
+                                    <input type="text" id="input_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
+                                    <input type="email" id="email" placeholder="exemplo@email.com" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                                    <input type="text" id="cargo" placeholder="Ex: Pastor Dirigente, Presbítero, Diácono, Auxiliar" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Membresia</label>
+                                    <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</label>
+                                    <select id="status" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                        <option value="Ativo">Ativo</option>
+                                        <option value="Inativo">Inativo</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
+                                    <textarea id="observacao" rows="2" placeholder="Informações adicionais..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-8 flex justify-end">
+                                <button type="submit" id="btnSalvar" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
+                                    <i data-lucide="save" class="w-5 h-5"></i>
+                                    <span id="textoBtnSalvar">Salvar Membro</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <CardStat label="Dízimos" valor={formatarMoeda(totDiz)} cor="text-emerald-400" Icone={Heart} iconCor="text-emerald-500/30" small />
-        <CardStat label="Ofertas" valor={formatarMoeda(totOf)} cor="text-teal-400" Icone={Gift} iconCor="text-teal-500/30" small />
-        <CardStat label="Despesas" valor={formatarMoeda(totDe)} cor="text-rose-400" Icone={ArrowDownCircle} iconCor="text-rose-500/30" small />
-        <CardStat label="Saldo do Mês" valor={formatarMoeda(totDiz+totOf-totDe)} cor="text-white" Icone={DollarSign} iconCor="text-slate-400/30" small />
-      </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ativos</p><h3 id="dashAtivos" class="text-3xl font-bold text-emerald-400 mt-1">0</h3></div>
+                            <i data-lucide="user-check" class="text-emerald-500/50"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inativos</p><h3 id="dashInativos" class="text-3xl font-bold text-rose-400 mt-1">0</h3></div>
+                            <i data-lucide="user-x" class="text-rose-500/50"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl text-emerald-500">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-slate-500">Total Geral</p><h3 id="dashTotal" class="text-3xl font-bold mt-1">0</h3></div>
+                            <i data-lucide="users" class="text-emerald-500/50"></i>
+                        </div>
+                    </div>
 
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h2 className="font-semibold text-slate-100 flex items-center gap-2">
-            <List className="w-5 h-5 text-emerald-400" /> Livro Caixa (Mês Vigente)
-          </h2>
-          <div className="flex gap-2 items-center">
-            <Filter className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-            <select value={filtroTipo} onChange={e=>setFiltroTipo(e.target.value)} className="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
-              <option value="">Todos os Fluxos</option>
-              <option value="Dízimo">Apenas Dízimos</option>
-              <option value="Oferta">Apenas Ofertas</option>
-              <option value="Despesa">Apenas Despesas</option>
-            </select>
-            <button onClick={imprimirRelatorio} className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/10">
-              <Printer className="w-4 h-4" /> <span>Imprimir Relatório Mensal</span>
-            </button>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                <th className="px-6 py-4">Data</th><th className="px-6 py-4">Tipo</th><th className="px-6 py-4">Dizimista</th>
-                <th className="px-6 py-4">Cargo</th><th className="px-6 py-4">Obs</th>
-                <th className="px-6 py-4 text-right">Valor</th><th className="px-6 py-4 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              {lancamentos.map(f => (
-                <tr key={f.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4 text-sm">{formatarData(f.data_lancamento)}</td>
-                  <td className="px-6 py-4 font-medium text-slate-400">{f.tipo}</td>
-                  <td className="px-6 py-4 text-slate-200">{f.descricao}</td>
-                  <td className="px-6 py-4">{f.cargo ? <span className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">{f.cargo}</span> : "-"}</td>
-                  <td className="px-6 py-4 text-xs text-slate-400">{f.observacao || "-"}</td>
-                  <td className={`px-6 py-4 text-right font-semibold ${f.tipo === "Despesa" ? "text-rose-400" : "text-emerald-400"}`}>{formatarMoeda(f.valor)}</td>
-                  <td className="px-6 py-4 text-right whitespace-nowrap">
-                    <button onClick={() => editar(f)} className="text-emerald-400 mr-2 hover:scale-110 transition-transform inline-block"><Pencil className="w-4 h-4" /></button>
-                    <button onClick={() => deletar(f.id)} className="text-rose-400 hover:scale-110 transition-transform inline-block"><Trash2 className="w-4 h-4" /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* ============ AGENDA ============ */
-function TelaAgenda() {
-  const [eventos, setEventos] = useState<Agenda[]>([]);
-  const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [form, setForm] = useState({
-    data: "", horario: "", tipo_evento: "", dirigente: "", pregador: "",
-    escala_portaria: "", escala_ofertas: "", saida_visita: "",
-  });
-
-  async function carregar() {
-    const { data } = await supabase.from("agenda_semanal").select("*").order("data", { ascending: true });
-    setEventos((data as Agenda[]) || []);
-  }
-  useEffect(() => { carregar(); }, []);
-
-  const diaSemana = form.data ? diasOrdenados[new Date(form.data + "T00:00:00").getDay()] : "";
-
-  function resetar() {
-    setEditandoId(null);
-    setForm({ data:"", horario:"", tipo_evento:"", dirigente:"", pregador:"", escala_portaria:"", escala_ofertas:"", saida_visita:"" });
-  }
-
-  async function salvar(e: FormEvent) {
-    e.preventDefault();
-    let mesRef = "Janeiro";
-    if (form.data) mesRef = meses[new Date(form.data + "T00:00:00").getMonth()];
-    const payload = {
-      tipo_evento: form.tipo_evento,
-      horario: form.horario,
-      dirigente: form.dirigente || null,
-      pregador: form.pregador || null,
-      escala_portaria: form.escala_portaria || null,
-      escala_ofertas: form.escala_ofertas || null,
-      saida_visita: form.saida_visita || null,
-      mes_referencia: mesRef,
-      data: form.data,
-    };
-    const { error } = editandoId
-      ? await supabase.from("agenda_semanal").update(payload).eq("id", editandoId)
-      : await supabase.from("agenda_semanal").insert([payload]);
-    if (error) { alert("Erro: " + error.message); return; }
-    alert("Agenda atualizada!"); resetar(); carregar();
-  }
-
-  function editar(a: Agenda) {
-    setEditandoId(a.id);
-    setForm({
-      data: a.data || "", horario: a.horario || "", tipo_evento: a.tipo_evento || "",
-      dirigente: a.dirigente || "", pregador: a.pregador || "",
-      escala_portaria: a.escala_portaria || "", escala_ofertas: a.escala_ofertas || "",
-      saida_visita: a.saida_visita || "",
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  async function deletar(id: number) {
-    if (!confirm("Remover este evento?")) return;
-    await supabase.from("agenda_semanal").delete().eq("id", id);
-    carregar();
-  }
-
-  function imprimir() {
-    if (!eventos.length) { alert("Não há programações agendadas para gerar a impressão mural."); return; }
-    let linhas = "";
-    eventos.forEach(ag => {
-      const dia = ag.data ? diasOrdenados[new Date(ag.data + "T00:00:00").getDay()] : "";
-      linhas += `<tr>
-        <td class="col-data"><strong>${formatarData(ag.data)}</strong><br><span class="dia-semana">${dia}</span></td>
-        <td class="col-horario">${ag.horario || "-"}</td>
-        <td class="col-evento"><strong>${ag.tipo_evento || "-"}</strong></td>
-        <td class="col-escalas"><div><strong>Dirigente:</strong> ${ag.dirigente || "-"}</div><div><strong>Pregador:</strong> ${ag.pregador || "-"}</div></td>
-        <td class="col-escalas"><div><strong>Portaria:</strong> ${ag.escala_portaria || "-"}</div><div><strong>Ofertas:</strong> ${ag.escala_ofertas || "-"}</div></td>
-        <td class="col-obs">${ag.saida_visita || "-"}</td>
-      </tr>`;
-    });
-    const w = window.open("", "_blank"); if (!w) return;
-    w.document.write(`<!DOCTYPE html><html><head><title>Agenda Semanal</title><style>
-      @page{size:landscape;margin:10mm 15mm}
-      body{font-family:'Segoe UI',Arial,sans-serif;color:#0f172a;margin:10px;background:#fff}
-      .header{text-align:center;border-bottom:4px solid #1e293b;padding-bottom:12px;margin-bottom:20px}
-      .header h1{margin:0;font-size:30px;color:#0f172a}.header p{margin:5px 0 0 0;font-size:13px;text-transform:uppercase;letter-spacing:4px;color:#475569;font-weight:600}
-      table{width:100%;border-collapse:collapse;margin-top:10px}
-      th{background:#f8fafc;color:#334155;font-size:11px;text-transform:uppercase;font-weight:bold;letter-spacing:1px;padding:10px;border:1px solid #cbd5e1;text-align:left}
-      td{padding:12px 10px;border:1px solid #cbd5e1;font-size:13px;vertical-align:top;color:#334155}
-      .col-data{width:14%}.col-horario{width:8%;font-weight:bold;color:#b45309}.col-evento{width:26%;font-size:14px}.col-escalas{width:18%;font-size:12px;line-height:1.6}.col-obs{width:16%;font-size:11px;color:#64748b;font-style:italic}
-      .dia-semana{color:#4f46e5;font-size:11px;font-weight:600;text-transform:uppercase}
-      .footer{text-align:center;margin-top:30px;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #e2e8f0;padding-top:12px}
-      @media print{body{margin:0}.btn-print{display:none}}
-      .btn-print{position:fixed;top:20px;right:20px;padding:12px 24px;background:#d97706;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
-    </style></head><body>
-      <button class="btn-print" onclick="window.print()">Imprimir Agenda para o Mural</button>
-      <div class="header"><h1>CRONOGRAMA E AGENDA SEMANAL</h1><p>Escala de Cultos, Eventos e Atividades Oficiais</p></div>
-      <table><thead><tr><th>Data / Dia</th><th>Horário</th><th>Programação / Evento</th><th>Ministério Eclesiástico</th><th>Escala de Apoio</th><th>Observações</th></tr></thead><tbody>${linhas}</tbody></table>
-      <div class="footer">Gerado em ${new Date().toLocaleDateString("pt-BR")} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
-    </body></html>`);
-    w.document.close();
-  }
-
-  return (
-    <div className="space-y-8">
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CalendarPlus className="w-5 h-5 text-amber-400" />
-            <h2 className="font-semibold text-slate-100">{editandoId ? "Editando Cronograma da Agenda" : "Programar Evento / Culto"}</h2>
-          </div>
-          {editandoId && (
-            <button onClick={resetar} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">Cancelar Edição</button>
-          )}
-        </div>
-        <form onSubmit={salvar} className="p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-            <Campo label="Data" span={2} required>
-              <input type="date" required value={form.data} onChange={e=>setForm({...form, data:e.target.value})} className={`${inputCls} [color-scheme:dark]`} />
-            </Campo>
-            <Campo label="Dia da Semana" span={2}>
-              <input readOnly value={diaSemana} placeholder="Calculado automaticamente" className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-amber-400 font-medium cursor-not-allowed" />
-            </Campo>
-            <Campo label="Horário" span={2} required>
-              <input required value={form.horario} onChange={e=>setForm({...form, horario:e.target.value})} placeholder="Ex: 19:30, 09:00" className={inputCls} />
-            </Campo>
-            <Campo label="Tipo de Evento" span={6} required>
-              <input required value={form.tipo_evento} onChange={e=>setForm({...form, tipo_evento:e.target.value})} placeholder="Ex: Culto de Ensino, Ensaio do Louvor, Congresso" className={inputCls} />
-            </Campo>
-            <Campo label="Dirigente" span={3}>
-              <input value={form.dirigente} onChange={e=>setForm({...form, dirigente:e.target.value})} placeholder="Nome do dirigente" className={inputCls} />
-            </Campo>
-            <Campo label="Pregador" span={3}>
-              <input value={form.pregador} onChange={e=>setForm({...form, pregador:e.target.value})} placeholder="Nome do pregador" className={inputCls} />
-            </Campo>
-            <Campo label="Escala Portaria" span={3}>
-              <input value={form.escala_portaria} onChange={e=>setForm({...form, escala_portaria:e.target.value})} placeholder="Responsáveis pela portaria" className={inputCls} />
-            </Campo>
-            <Campo label="Escala Ofertas" span={3}>
-              <input value={form.escala_ofertas} onChange={e=>setForm({...form, escala_ofertas:e.target.value})} placeholder="Responsáveis pelo recolhimento" className={inputCls} />
-            </Campo>
-            <Campo label="Observação" span={6}>
-              <input value={form.saida_visita} onChange={e=>setForm({...form, saida_visita:e.target.value})} placeholder="Notas adicionais sobre o evento..." className={inputCls} />
-            </Campo>
-          </div>
-          <div className="mt-8 flex justify-end">
-            <button type="submit" className="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-600/20">
-              <Save className="w-5 h-5" /> <span>{editandoId ? "Atualizar Agenda" : "Salvar Agenda"}</span>
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="font-semibold text-slate-100 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-amber-400" /> Cronograma da Agenda Semanal
-          </h2>
-          <button onClick={imprimir} className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-sm rounded-xl transition-all shadow-md shadow-amber-600/10">
-            <Printer className="w-4 h-4" /> <span>Imprimir Agenda para Mural</span>
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                <th className="px-6 py-4">Data / Dia</th><th className="px-6 py-4">Eventos</th>
-                <th className="px-6 py-4">Dirigente / Pregador</th><th className="px-6 py-4">Portaria / Ofertas</th>
-                <th className="px-6 py-4">Observação</th><th className="px-6 py-4 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              {eventos.map(ag => (
-                <tr key={ag.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-100">{formatarData(ag.data)}</div>
-                    <div className="text-xs text-amber-400 font-semibold">{ag.horario || ""}</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-200 text-sm font-semibold">{ag.tipo_evento || "-"}</td>
-                  <td className="px-6 py-4 text-slate-300 text-sm">
-                    <div><span className="text-slate-500 text-xs">Dir:</span> {ag.dirigente || "-"}</div>
-                    <div><span className="text-slate-500 text-xs">Preg:</span> {ag.pregador || "-"}</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-300 text-sm">
-                    <div><span className="text-slate-500 text-xs">Port:</span> {ag.escala_portaria || "-"}</div>
-                    <div><span className="text-slate-500 text-xs">Ofert:</span> {ag.escala_ofertas || "-"}</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title={ag.saida_visita || ""}>{ag.saida_visita || "---"}</td>
-                  <td className="px-6 py-4 text-right whitespace-nowrap">
-                    <button onClick={() => editar(ag)} className="text-amber-400 mr-3 hover:scale-110 transition-transform inline-block"><Pencil className="w-4 h-4" /></button>
-                    <button onClick={() => deletar(ag.id)} className="text-rose-400 hover:scale-110 transition-transform inline-block"><Trash2 className="w-4 h-4" /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* ============ MURAL ============ */
-function TelaMural() {
-  const [membros, setMembros] = useState<{ nome: string; cargo: string | null }[]>([]);
-
-  async function carregar() {
-    const { data } = await supabase.from("membros").select("nome, cargo").eq("status", "Ativo");
-    setMembros((data as any) || []);
-  }
-  useEffect(() => { carregar(); }, []);
-
-  function oficiaisDe(chaves: string[]) {
-    return membros.filter(m => {
-      if (!m.cargo) return false;
-      const c = normalizar(m.cargo);
-      return chaves.some(k => {
-        const kn = normalizar(k);
-        return c === kn || c.startsWith(kn + " ") || c.endsWith(" " + kn);
-      });
-    });
-  }
-
-  function imprimir() {
-    let html = "";
-    estruturaCargos.forEach(c => {
-      const of = oficiaisDe(c.chaves);
-      html += `<div class="bloco-cargo"><h2>${c.titulo.toUpperCase()} (${of.length})</h2><div class="grade-oficiais">`;
-      if (!of.length) html += `<p class="vazio">Nenhum oficial escalado neste setor.</p>`;
-      else of.forEach(o => { html += `<div class="item-oficial"><span class="ponto">•</span><strong>${o.nome}</strong> <span class="cargo-sub">(${o.cargo})</span></div>`; });
-      html += `</div></div>`;
-    });
-    const w = window.open("", "_blank"); if (!w) return;
-    w.document.write(`<!DOCTYPE html><html><head><title>Mural</title><style>
-      body{font-family:'Segoe UI',sans-serif;color:#1e293b;margin:40px;background:#fff;line-height:1.5}
-      .header{text-align:center;border-bottom:3px double #475569;padding-bottom:20px;margin-bottom:30px}
-      .header h1{margin:0;font-size:26px;color:#0f172a}.header p{margin:5px 0 0 0;font-size:14px;text-transform:uppercase;letter-spacing:2px;color:#64748b}
-      .bloco-cargo{margin-bottom:25px;page-break-inside:avoid;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
-      .bloco-cargo h2{background:#f1f5f9;margin:0;padding:12px 15px;font-size:14px;letter-spacing:1px;color:#1e293b;border-bottom:1px solid #cbd5e1}
-      .grade-oficiais{padding:15px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-      .item-oficial{font-size:13px;color:#334155;display:flex;align-items:center;gap:6px}
-      .item-oficial .ponto{color:#4f46e5;font-size:16px}.item-oficial .cargo-sub{color:#64748b;font-size:11px;font-style:italic}
-      .vazio{font-style:italic;color:#94a3b8;font-size:12px;margin:0;padding:5px}
-      .footer{text-align:center;margin-top:40px;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px}
-      @media print{body{margin:20px}.btn-print{display:none}}
-      .btn-print{position:fixed;top:20px;right:20px;padding:10px 20px;background:#4f46e5;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer}
-    </style></head><body>
-      <button class="btn-print" onclick="window.print()">Imprimir Quadro</button>
-      <div class="header"><h1>ATRIBUIÇÕES ECLESIÁSTICAS</h1><p>Corpo de Obreiros e Ministério Local</p></div>
-      ${html}
-      <div class="footer">Gerado em ${new Date().toLocaleDateString("pt-BR")} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
-    </body></html>`);
-    w.document.close();
-  }
-
-  return (
-    <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-      <div className="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <LayoutDashboard className="w-6 h-6 text-indigo-400" /> QUADRO DE ATRIBUIÇÕES E OFICIAIS
-          </h2>
-          <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
-        </div>
-        <button onClick={imprimir} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition-all shadow-md shadow-indigo-600/10">
-          <Printer className="w-4 h-4" /> <span>Ver Fluxograma de Atribuições</span>
-        </button>
-      </div>
-      <div className="p-6 md:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {estruturaCargos.map(c => {
-            const of = oficiaisDe(c.chaves);
-            const Icone = c.Icone;
-            return (
-              <div key={c.titulo} className={`bg-slate-950/40 rounded-xl p-5 border ${c.cor} flex flex-col gap-4 shadow-xl hover:scale-[1.01] transition-all duration-200`}>
-                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                  <h3 className="font-bold text-sm uppercase tracking-wider">{c.titulo}</h3>
-                  <Icone className="w-5 h-5 opacity-80" />
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
+                            </h2>
+                            <input type="text" id="busca" oninput="carregarMembros()" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Membro</th>
+                                        <th class="px-6 py-4">Cargo</th>
+                                        <th class="px-6 py-4">Contato</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaMembros" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-slate-950/30 border-t border-slate-800 flex justify-between items-center text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+                            <span id="totalMembros">Total: <span class="text-emerald-500 font-bold text-sm">0</span> Membros</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Online</span>
+                        </div>
+                    </section>
                 </div>
-                <div className="flex-1 overflow-y-auto max-h-[160px] pr-1">
-                  {of.length === 0 ? (
-                    <p className="text-xs text-slate-600 italic">Nenhum oficial ativo escalado</p>
-                  ) : (
-                    <ul className="space-y-1.5">
-                      {of.map(o => (
-                        <li key={o.nome} className="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-800">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                          <span className="font-medium">{o.nome}</span>
-                          <span className="text-[10px] text-slate-500 ml-auto italic">{o.cargo}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+
+                <!-- ========================================== -->
+                <!-- 2. TELA FINANCEIRA                         -->
+                <!-- ========================================== -->
+                <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
+                    <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeFormFinanceiro" data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
+                                <h2 id="tituloFormFinanceiro" class="font-semibold text-slate-100">Lançamento de Caixa</h2>
+                            </div>
+                            <button id="btnCancelarFinanceiro" onclick="resetarEstadoFinanceiro()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
+                        </div>
+                        
+                        <form id="formFinanceiro" class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Fluxo</label>
+                                    <select id="fin_tipo" onchange="ajustarCamposFinancas()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                        <option value="Dízimo">Dízimo</option>
+                                        <option value="Oferta">Oferta</option>
+                                        <option value="Despesa">Despesa</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-2" id="container-descricao-membro">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro (Opcional)</label>
+                                    <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                        <option value="Contribuinte Geral">Geral / Anônimo</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2" id="container-cargo-membro">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
+                                    <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
+                                </div>
+
+                                <div class="md:col-span-2 hidden" id="container-oferta-culto">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Culto</label>
+                                    <div class="flex flex-col gap-2">
+                                        <select id="fin_oferta_culto" onchange="verificarCultoOutros()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                            <option value="Culto Publico">Culto Público</option>
+                                            <option value="Culto de Santa Ceia">Culto de Santa Ceia</option>
+                                            <option value="Culto de Ensinamento">Culto de Ensinamento</option>
+                                            <option value="Culto de Missões">Culto de Missões</option>
+                                            <option value="Culto das irmãs">Culto das irmãs</option>
+                                            <option value="Culto com os dolescentes">Culto com os dolescentes</option>
+                                            <option value="Congresso">Congresso</option>
+                                            <option value="Não houve Culto">Não houve Culto</option>
+                                            <option value="Outro Culto">Outro (Digitar...)</option>
+                                        </select>
+                                        <input type="text" id="fin_culto_manual" placeholder="Qual culto?" class="hidden w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none mt-1">
+                                    </div>
+                                </div>
+                                <div class="md:col-span-2 hidden" id="container-oferta-dia">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia da Semana</label>
+                                    <select id="fin_oferta_dia" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                        <option value="Domingo">Domingo</option>
+                                        <option value="Segunda-feira">Segunda-feira</option>
+                                        <option value="Terça-feira">Terça-feira</option>
+                                        <option value="Quarta-feira">Quarta-feira</option>
+                                        <option value="Quinta-feira">Quinta-feira</option>
+                                        <option value="Sexta-feira">Sexta-feira</option>
+                                        <option value="Sábado">Sábado</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-4 hidden" id="container-descricao-despesa">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria da Despesa</label>
+                                    <div class="flex gap-2">
+                                        <select id="fin_despesa_fixa" onchange="verificarDespesaOutros()" class="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                            <option value="Aluguel">Aluguel</option>
+                                            <option value="Ajuda Eclesiástica">Ajuda Eclesiástica</option>
+                                            <option value="Limpeza da igreja">Limpeza da igreja</option>
+                                            <option value="Conta de Luz">Conta de Luz</option>
+                                            <option value="Conta de Água">Conta de Água</option>
+                                            <option value="Internet">Internet</option>
+                                            <option value="Outras Despesas">Outras (Não fixa...)</option>
+                                        </select>
+                                        <input type="text" id="fin_despesa_manual" placeholder="Qual despesa?" class="hidden flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor (R$)</label>
+                                    <input type="number" id="fin_valor" step="0.01" required placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
+                                    <input type="date" id="fin_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observações do Lançamento</label>
+                                    <input type="text" id="fin_observacao" placeholder="Algum detalhe importante..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button type="submit" id="btnSalvarFinanceiro" class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20">
+                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                    <span id="textoBtnSalvarFinanceiro">Confirmar Lançamento</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dízimos</p><h3 id="dashDizimos" class="text-2xl font-bold text-emerald-400 mt-1">R$ 0,00</h3></div>
+                            <i data-lucide="heart" class="text-emerald-500/30"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ofertas</p><h3 id="dashOfertas" class="text-2xl font-bold text-teal-400 mt-1">R$ 0,00</h3></div>
+                            <i data-lucide="gift" class="text-teal-500/30"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Despesas</p><h3 id="dashDespesas" class="text-2xl font-bold text-rose-400 mt-1">R$ 0,00</h3></div>
+                            <i data-lucide="arrow-down-circle" class="text-rose-500/30"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Saldo do Mês</p><h3 id="dashSaldoTotal" class="text-2xl font-bold text-white mt-1">R$ 0,00</h3></div>
+                            <i data-lucide="dollar-sign" class="text-slate-400/30"></i>
+                        </div>
+                    </div>
+
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i> Livro Caixa (Mês Vigente)
+                            </h2>
+                            <div class="flex gap-2">
+                                <select id="filtroTipo" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Fluxos</option>
+                                    <option value="Dízimo">Apenas Dízimos</option>
+                                    <option value="Oferta">Apenas Ofertas</option>
+                                    <option value="Despesa">Apenas Despesas</option>
+                                </select>
+                                <button onclick="imprimirRelatorioFinanceiro()" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold text-xs rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-600/10">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span>Imprimir Relatório Mensal</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Data</th>
+                                        <th class="px-6 py-4">Tipo</th>
+                                        <th class="px-6 py-4">Dizimista</th>
+                                        <th class="px-6 py-4">Cargo</th>
+                                        <th class="px-6 py-4">Obs</th>
+                                        <th class="px-6 py-4 text-right">Valor</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaFinanceiro" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
-                <div className="text-[10px] text-slate-500 uppercase tracking-widest text-right">
-                  Total: {of.length} ativo(s)
+
+                <!-- ========================================== -->
+                <!-- 3. TELA DE AGENDA SEMANAL                  -->
+                <!-- ========================================== -->
+                <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
+                    <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeFormAgenda" data-lucide="calendar-plus" class="w-5 h-5 text-amber-400"></i>
+                                <h2 id="tituloFormAgenda" class="font-semibold text-slate-100">Programar Evento / Culto</h2>
+                            </div>
+                            <button id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
+                        </div>
+                        
+                        <form id="formAgenda" class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
+                                    <input type="date" id="agenda_data" onchange="atualizarDiaSemanaAutomatico()" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia da Semana</label>
+                                    <input type="text" id="agenda_dia_semana" readonly placeholder="Calculado automaticamente" class="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-amber-400 font-medium focus:outline-none cursor-not-allowed">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
+                                    <input type="text" id="agenda_horario" required placeholder="Ex: 19:30, 09:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Evento</label>
+                                    <input type="text" id="agenda_tipo_evento" required placeholder="Ex: Culto de Ensino, Ensaio do Louvor, Congresso de Missões" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dirigente</label>
+                                    <input type="text" id="agenda_dirigente" placeholder="Nome do dirigente" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pregador</label>
+                                    <input type="text" id="agenda_pregador" placeholder="Nome do pregador" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Portaria</label>
+                                    <input type="text" id="agenda_escala_portaria" placeholder="Responsáveis pela portaria" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Escala Ofertas</label>
+                                    <input type="text" id="agenda_escala_ofertas" placeholder="Responsáveis pelo recolhimento" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observação</label>
+                                    <input type="text" id="agenda_saida_visita" placeholder="Notes adicionais sobre o evento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button type="submit" id="btnSalvarAgenda" class="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-500 transition-all shadow-lg shadow-amber-600/20">
+                                    <i data-lucide="save" class="w-5 h-5"></i>
+                                    <span id="textoBtnSalvarAgenda">Salvar Agenda</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma da Agenda Semanal
+                            </h2>
+                            <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-sm rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                <span>Imprimir Agenda para Mural</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Data / Dia</th>
+                                        <th class="px-6 py-4">Eventos</th>
+                                        <th class="px-6 py-4">Dirigente / Pregador</th>
+                                        <th class="px-6 py-4">Portaria / Ofertas</th>
+                                        <th class="px-6 py-4">Observação</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaAgenda" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-/* ============ DOCUMENTOS ============ */
-type DocEmitido = {
-  id: number;
-  categoria: string;
-  tipo: string;
-  alvo: string;
-  local: string;
-  data: string;
-  hora: string;
-  texto: string;
-  criadoEm: string;
-};
-
-const NOME_IGREJA = "IGREJA EVANGÉLICA ASSEMBLEIA DE DEUS MINISTÉRIO MADUREIRA";
-const SUB_IGREJA = "SUB-CONGREGAÇÃO - JD. MARILENA";
-const ENDERECO_IGREJA = "Rua Guaraton, 47 - Jd. Marilena - Guarulhos - SP";
-const CIDADE_IGREJA = "Guarulhos";
-
-function saudacaoAD() {
-  return "Saudações fraternais em nome do Senhor e Salvador Jesus Cristo, desejando-lhe abundantes bênçãos e a plenitude do Espírito Santo.";
-}
-
-function versiculoAD(categoria: string, tipo: string) {
-  if (categoria === "Convite") return `"Alegrei-me quando me disseram: Vamos à Casa do Senhor." (Salmos 122:1)`;
-  if (categoria === "Memorando" && ["Desligamento","Suspensão","Exclusão"].includes(tipo))
-    return `"Tudo, porém, se faça com decência e ordem." (1 Coríntios 14:40)`;
-  if (categoria === "Memorando" && ["Integração","Reintegração","Apresentação na Sede"].includes(tipo))
-    return `"Havendo alegria no céu por um pecador que se arrepende." (Lucas 15:7)`;
-  if (categoria === "Carta") return `"Recebei-vos uns aos outros, como também Cristo nos recebeu para glória de Deus." (Romanos 15:7)`;
-  return `"A graça de nosso Senhor Jesus Cristo seja com todos vós. Amém." (Apocalipse 22:21)`;
-}
-
-function corpoDocumento(categoria: string, tipo: string, d: {alvo:string; local:string; data:string; hora:string; texto:string}) {
-  const alvo = d.alvo || "___________________________";
-  const local = d.local || "___________________________";
-  const dataFmt = d.data ? formatarData(d.data) : "___/___/______";
-  const hora = d.hora || "__:__";
-  const extra = d.texto ? `<p>${d.texto.replace(/\n/g,"<br>")}</p>` : "";
-
-  if (categoria === "Carta") {
-    if (tipo === "Mudança") {
-      return `<p>${saudacaoAD()}</p>
-        <p>Vimos, por meio desta, comunicar que o(a) irmão(ã) <strong>${alvo}</strong>, membro desta Igreja Assembleia de Deus, comunicou oficialmente sua <strong>mudança de residência</strong> para a localidade sob a jurisdição da <strong>${local}</strong>.</p>
-        <p>Certificamos que o referido(a) irmão(ã) encontra-se em plena comunhão com esta casa, sendo digno(a) de toda confiança e recebimento cristão. Rogamos a Vossa Senhoria que o(a) receba com o mesmo amor fraternal com que aqui foi tratado(a).</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Transferência") {
-      return `<p>${saudacaoAD()}</p>
-        <p>Por meio da presente <strong>Carta de Transferência</strong>, comunicamos que o(a) irmão(ã) <strong>${alvo}</strong>, batizado(a) nas águas conforme a doutrina bíblica e membro em plena comunhão desta Igreja Assembleia de Deus, encontra-se, a partir desta data, oficialmente <strong>transferido(a)</strong> para o rol de membros da <strong>${local}</strong>.</p>
-        <p>Atestamos sua boa conduta cristã, moral e doutrinária durante o período em que esteve conosco. Solicitamos que seja arrolado(a) e amparado(a) espiritualmente por essa amada congregação.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Apresentação") {
-      return `<p>${saudacaoAD()}</p>
-        <p>Apresentamos por meio desta o(a) irmão(ã) <strong>${alvo}</strong>, membro fiel desta Igreja Assembleia de Deus, que deseja congregar temporariamente junto à <strong>${local}</strong>.</p>
-        <p>Rogamos que o(a) receba, oriente e ministre a Palavra de Deus em sua vida, mantendo a comunhão que existe entre nós no Corpo de Cristo.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-  }
-
-  if (categoria === "Memorando") {
-    if (tipo === "Desligamento") {
-      return `<p>Comunicamos, por meio deste memorando, o <strong>desligamento</strong> do(a) irmão(ã) <strong>${alvo}</strong> do rol de membros desta Igreja Assembleia de Deus, com vigência a partir de <strong>${dataFmt}</strong>, conforme deliberação da Direção Eclesiástica.</p>
-        <p>O referido desligamento se dá em conformidade com o Estatuto e a Convenção Geral das Assembleias de Deus no Brasil.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Reintegração") {
-      return `<p>Com grande alegria em nosso Senhor Jesus Cristo, comunicamos a <strong>reintegração</strong> do(a) irmão(ã) <strong>${alvo}</strong> ao rol de membros desta Igreja Assembleia de Deus, a partir de <strong>${dataFmt}</strong>, após período de restauração e acompanhamento pastoral.</p>
-        <p>Que o Senhor confirme os passos deste(a) servo(a) na fé e na santificação.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Integração") {
-      return `<p>Comunicamos a <strong>integração</strong> do(a) irmão(ã) <strong>${alvo}</strong> ao rol oficial de membros desta Igreja Assembleia de Deus, a partir de <strong>${dataFmt}</strong>, após cumpridas todas as exigências doutrinárias e o batismo bíblico nas águas.</p>
-        <p>Recebamo-lo(a) com amor cristão, oração e comunhão, para que edifiquemos juntos o Corpo de Cristo.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Suspensão") {
-      return `<p>Comunicamos, para os devidos fins disciplinares, a <strong>suspensão</strong> do(a) irmão(ã) <strong>${alvo}</strong> das atividades ministeriais e da Ceia do Senhor, a partir de <strong>${dataFmt}</strong>, conforme decisão pastoral fundamentada na Palavra de Deus e no Estatuto desta Igreja.</p>
-        <p>Durante o período de disciplina, permanecerá sob acompanhamento e oração da Direção Eclesiástica, visando sua plena restauração.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Exclusão") {
-      return `<p>Comunicamos, com pesar e conforme determina o Estatuto e a doutrina bíblica, a <strong>exclusão</strong> do(a) irmão(ã) <strong>${alvo}</strong> do rol de membros desta Igreja Assembleia de Deus, com vigência em <strong>${dataFmt}</strong>.</p>
-        <p>Que o Senhor, em Sua infinita misericórdia, conceda arrependimento e restauração.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Memorando Interno") {
-      return `<p><strong>Ao(À):</strong> ${alvo}</p>
-        <p>Servimo-nos do presente <strong>Memorando Interno</strong> para tratar de assunto de ordem administrativa e ministerial desta Igreja Assembleia de Deus.</p>
-        ${extra || "<p>[Descrever aqui o assunto do memorando interno]</p>"}
-        <p>Contamos com a costumeira colaboração e zelo ministerial no cumprimento das orientações aqui expressas.</p>
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-    if (tipo === "Apresentação na Sede") {
-      return `<p>Apresentamos à <strong>Sede</strong> desta Igreja Assembleia de Deus o(a) irmão(ã) <strong>${alvo}</strong>, membro desta congregação, para os devidos registros, orientações e providências ministeriais cabíveis, conforme data de vigência <strong>${dataFmt}</strong>.</p>
-        ${extra}
-        <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-    }
-  }
-
-  if (categoria === "Convite") {
-    const dest = alvo;
-    const eventoLocal = local || "___________________________";
-    const baseAbertura = `<p>${saudacaoAD()}</p>
-      <p>É com imensa alegria no Senhor Jesus que esta Igreja Assembleia de Deus vem, por meio deste, <strong>convidar</strong> <strong>${dest}</strong> para participar do(a) <strong>${eventoLocal}</strong>, a realizar-se no dia <strong>${dataFmt}</strong>, às <strong>${hora}</strong> horas, em nosso templo.</p>`;
-    let especifica = "";
-    if (tipo === "Preletores")
-      especifica = `<p>Rogamos que ministre a Palavra de Deus nesta ocasião especial, na certeza de que o Senhor usará poderosamente seu ministério para edificação do rebanho.</p>`;
-    else if (tipo === "Cantores")
-      especifica = `<p>Convidamos para abrilhantar o louvor congregacional com seus dons musicais, exaltando o nome do nosso Senhor e Salvador Jesus Cristo.</p>`;
-    else if (tipo === "Igrejas")
-      especifica = `<p>Estendemos o convite a toda essa amada congregação, para que juntos possamos adorar ao Senhor e desfrutar da comunhão do Espírito Santo.</p>`;
-    else if (tipo === "Abadguar")
-      especifica = `<p>Convidamos para o encontro do <strong>ABADGUAR</strong> — Auxiliadoras Batistas / Assembleianas dedicadas à Guarda e Adoração — momento especial de comunhão, oração e edificação.</p>`;
-    else if (tipo === "Congresso Com Jovens")
-      especifica = `<p>Convidamos para o nosso <strong>Congresso de Jovens</strong>, tempo de avivamento, comunhão e desafios para a mocidade assembleiana.</p>`;
-    else if (tipo === "Congresso Com Adolescentes")
-      especifica = `<p>Convidamos para o nosso <strong>Congresso de Adolescentes</strong>, momento especial dedicado à edificação da nova geração para o Reino de Deus.</p>`;
-    else if (tipo === "Congresso Com as Irmãs")
-      especifica = `<p>Convidamos para o nosso <strong>Congresso do Círculo de Oração das Irmãs</strong>, tempo santo de intercessão, comunhão e ministração da Palavra.</p>`;
-    else
-      especifica = `<p>Convidamos para participação deste culto especial, na certeza de gloriosas bênçãos do Senhor.</p>`;
-
-    return `${baseAbertura}${especifica}${extra}
-      <p>Contamos com sua presença e ministração. Que o Senhor abençoe ricamente a caminhada de seu ministério.</p>
-      <p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-  }
-
-  return `<p>${saudacaoAD()}</p>${extra}<p><em>${versiculoAD(categoria,tipo)}</em></p>`;
-}
-
-function tituloDocumento(categoria: string, tipo: string) {
-  if (categoria === "Carta") return `CARTA DE ${tipo.toUpperCase()}`;
-  if (categoria === "Memorando") return tipo === "Memorando Interno" ? "MEMORANDO INTERNO" : `MEMORANDO DE ${tipo.toUpperCase()}`;
-  if (categoria === "Convite") return `CONVITE — ${tipo.toUpperCase()}`;
-  return "DOCUMENTO ECLESIÁSTICO";
-}
-
-function imprimirDocumento(doc: DocEmitido) {
-  const titulo = tituloDocumento(doc.categoria, doc.tipo);
-  const corpo = corpoDocumento(doc.categoria, doc.tipo, doc);
-  const dataHojeRaw = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
-  const [dia, mes, ano] = dataHojeRaw.split(" de ");
-  const dataHoje = `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} de ${ano}`;
-  const w = window.open("", "_blank"); if (!w) return;
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titulo}</title><style>
-    @page{size:A4;margin:15mm 18mm}
-    html,body{background:#fff}
-    body{font-family:'Calibri Light','Calibri',Arial,sans-serif;color:#1a1a1a;margin:0;line-height:1.4;font-size:13pt}
-    .cabecalho{text-align:center;border-bottom:2px double #334155;padding-bottom:8px;margin-bottom:14px}
-    .cabecalho h2{margin:0;font-size:12pt;color:#0f172a;letter-spacing:.5px;text-transform:uppercase;font-weight:bold}
-    .cabecalho p{margin:2px 0 0 0;font-size:9pt;color:#475569;letter-spacing:1px;text-transform:uppercase}
-    .titulo{text-align:center;font-size:13pt;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin:14px 0 12px 0;color:#0f172a;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1;padding:6px 0}
-    .destinatario{margin:0 0 12px 0;font-size:13pt;color:#334155}
-    .corpo p{text-align:justify;margin:0 0 8px 0;text-indent:36px}
-    .corpo p em{color:#475569}
-    .local-data{margin-top:16px;text-align:right;font-size:13pt;color:#334155}
-    .assinaturas{margin-top:36px;display:flex;justify-content:space-around;gap:30px}
-    .linha-assinatura{text-align:center;width:240px;font-size:11pt;color:#475569;border-top:1px solid #94a3b8;padding-top:4px}
-    .rodape{text-align:center;margin-top:18px;font-size:8pt;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #e2e8f0;padding-top:6px}
-    @media print{.btn-print{display:none}}
-    .btn-print{position:fixed;top:20px;right:20px;padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;font-family:sans-serif}
-
-  </style></head><body>
-    <button class="btn-print" onclick="window.print()">Imprimir Documento</button>
-    <div class="cabecalho">
-      <h2>${NOME_IGREJA}</h2>
-      <p>${SUB_IGREJA}</p>
-      <p>${ENDERECO_IGREJA}</p>
-    </div>
-    <div class="titulo">${titulo}</div>
-    <div class="destinatario"><strong>${doc.categoria === "Carta" ? `À igreja: ${doc.local || "___________________________"}` : doc.categoria === "Convite" ? "Ao(À) Amado(a) Irmão(ã) em Cristo:" : "Referente a:"}</strong>${doc.categoria !== "Carta" ? `<br>${doc.alvo || "___________________________"}${doc.local && doc.categoria === "Convite" ? `<br><strong>Destino:</strong> ${doc.local}` : ""}` : ""}</div>
-    <div class="corpo">${corpo}</div>
-    <div class="local-data">${CIDADE_IGREJA}, ${dataHoje}.</div>
-    <div class="assinaturas">
-      <div class="linha-assinatura">Pastor Dirigente</div>
-      <div class="linha-assinatura">Secretaria da Igreja</div>
-    </div>
-    <div class="rodape">Gerado em ${new Date().toLocaleDateString("pt-BR")} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
-  </body></html>`);
-  w.document.close();
-}
-
-function TelaDocumentos() {
-  const [categoria, setCategoria] = useState("Carta");
-  const [tipo, setTipo] = useState("Mudança");
-  const [alvo, setAlvo] = useState("");
-  const [local, setLocal] = useState("");
-  const [data, setData] = useState("");
-  const [hora, setHora] = useState("");
-  const [texto, setTexto] = useState("");
-  const [emitidos, setEmitidos] = useState<DocEmitido[]>([]);
-
-  useEffect(() => {
-    setTipo(opcoesDocumentos[categoria][0]);
-  }, [categoria]);
-
-  let lblAlvo = "Membro / Destinatário", placeAlvo = "Nome completo";
-  let mostrarLocal = false, lblLocal = "Igreja de Destino / Local";
-  let mostrarData = false, lblData = "Data do Evento / Vigência";
-  let mostrarHora = false;
-  if (categoria === "Carta") { lblAlvo = "Nome do Membro"; placeAlvo = "Ex: Nome Completo do Irmão/Irmã"; mostrarLocal = true; lblLocal = "Igreja de Destino"; }
-  else if (categoria === "Memorando") {
-    if (tipo === "Memorando Interno") { lblAlvo = "Destinatário Interno"; placeAlvo = "Ex: Ao Departamento de Louvor / Secretaria"; }
-    else { lblAlvo = "Membro Alvo / Assunto"; placeAlvo = "Ex: Nome do Membro ou Departamento Coberto"; mostrarData = true; lblData = "Data de Vigência / Ocorrência"; }
-  }
-  else if (categoria === "Convite") {
-    lblAlvo = "Convidado / Instituição"; placeAlvo = "Ex: Pr. Cláudio Duarte / Ministério de Louvor X";
-    mostrarLocal = true; lblLocal = "Evento / Departamento Coberto";
-    mostrarData = true; lblData = "Data do Evento"; mostrarHora = true;
-  }
-
-  function preparar() {
-    if (!alvo.trim()) { alert("Informe o destinatário / assunto do documento."); return; }
-    const novo: DocEmitido = {
-      id: Date.now(), categoria, tipo, alvo, local, data, hora, texto,
-      criadoEm: new Date().toLocaleString("pt-BR"),
-    };
-    setEmitidos([novo, ...emitidos]);
-    imprimirDocumento(novo);
-    setAlvo(""); setLocal(""); setData(""); setHora(""); setTexto("");
-  }
-
-  return (
-    <div className="space-y-8">
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
-          <FilePlus className="w-5 h-5 text-blue-400" />
-          <h2 className="font-semibold text-slate-100">Redigir Nova Correspondência</h2>
-        </div>
-        <div className="p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-            <Campo label="Categoria do Documento" span={3}>
-              <select value={categoria} onChange={e=>setCategoria(e.target.value)} className={`${inputCls} cursor-pointer`}>
-                <option>Carta</option><option>Memorando</option><option>Convite</option>
-              </select>
-            </Campo>
-            <Campo label="Tipo Específico" span={3}>
-              <select value={tipo} onChange={e=>setTipo(e.target.value)} className={`${inputCls} cursor-pointer`}>
-                {opcoesDocumentos[categoria].map(t => <option key={t}>{t}</option>)}
-              </select>
-            </Campo>
-            <div className="md:col-span-6 border-t border-slate-800/60 my-2" />
-            <Campo label={lblAlvo} span={3} required>
-              <input required value={alvo} onChange={e=>setAlvo(e.target.value)} placeholder={placeAlvo} className={inputCls} />
-            </Campo>
-            {mostrarLocal && (
-              <Campo label={lblLocal} span={3}>
-                <input value={local} onChange={e=>setLocal(e.target.value)} placeholder="Ex: Sede, Congregação X, Igreja Y" className={inputCls} />
-              </Campo>
-            )}
-            {mostrarData && (
-              <Campo label={lblData} span={2}>
-                <input type="date" value={data} onChange={e=>setData(e.target.value)} className={`${inputCls} [color-scheme:dark]`} />
-              </Campo>
-            )}
-            {mostrarHora && (
-              <Campo label="Horário" span={2}>
-                <input value={hora} onChange={e=>setHora(e.target.value)} placeholder="Ex: 19:00" className={inputCls} />
-              </Campo>
-            )}
-            <Campo label="Texto Adicional / Observações Importantes" span={6}>
-              <textarea value={texto} onChange={e=>setTexto(e.target.value)} rows={4} placeholder="Digite detalhes que devam constar no documento..." className={`${inputCls} resize-none`} />
-            </Campo>
-          </div>
-          <div className="mt-8 flex justify-end">
-            <button
-              onClick={preparar}
-              className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
-            >
-              <FileCheck className="w-5 h-5" />
-              <span>Gerar e Imprimir Documento</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-        <div className="p-5 border-b border-slate-800 bg-slate-900/50">
-          <h2 className="font-semibold text-slate-100 flex items-center gap-2">
-            <History className="w-5 h-5 text-blue-400" /> Últimas Emissões (Fila de Impressão)
-          </h2>
-        </div>
-        {emitidos.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 text-sm italic">
-            Nenhum documento na fila de espera. Use o formulário acima para redigir.
-          </div>
-        ) : (
-          <ul className="divide-y divide-slate-800">
-            {emitidos.map(d => (
-              <li key={d.id} className="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/40 transition">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-100 truncate">
-                    {tituloDocumento(d.categoria, d.tipo)} — {d.alvo}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {d.local && <>Destino/Evento: {d.local} · </>}Emitido em {d.criadoEm}
-                  </p>
+                <!-- ========================================== -->
+                <!-- 4. TELA MURAL DE ATRIBUIÇÕES               -->
+                <!-- ========================================== -->
+                <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                    <i data-lucide="layout-dashboard" class="w-6 h-6 text-indigo-400"></i> 
+                                    QUADRO DE ATRIBUIÇÕES E OFICIAIS
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Escala Organizacional de Atividades</p>
+                            </div>
+                            <button onclick="imprimirFluxogramaMural()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                <span>Ver Fluxograma de Atribuições</span>
+                            </button>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="containerFluxogramaMural">
+                            </div>
+                        </div>
+                    </section>
                 </div>
-                <div className="flex gap-2 shrink-0">
-                  <button
-                    onClick={() => imprimirDocumento(d)}
-                    className="px-3 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-lg cursor-pointer"
-                  >
-                    Reimprimir
-                  </button>
-                  <button
-                    onClick={() => setEmitidos(emitidos.filter(x => x.id !== d.id))}
-                    className="px-3 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg cursor-pointer"
-                  >
-                    Remover
-                  </button>
+
+                <!-- ========================================== -->
+                <!-- 5. TELA DE DOCUMENTOS                      -->
+                <!-- ========================================== -->
+                <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
+                            <i data-lucide="file-plus" class="w-5 h-5 text-blue-400"></i>
+                            <h2 class="font-semibold text-slate-100">Redigir Nova Correspondência</h2>
+                        </div>
+                        
+                        <form id="formDocumento" class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
+                                    <select id="doc_categoria" onchange="atualizarTiposDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                                        <option value="Carta">Carta</option>
+                                        <option value="Memorando">Memorando</option>
+                                        <option value="Convite">Convite</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo Específico</label>
+                                    <select id="doc_tipo" onchange="ajustarFormularioDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-6 border-t border-slate-800/60 my-2"></div>
+
+                                <div class="md:col-span-3" id="box-doc-alvo">
+                                    <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Membro / Destinatário</label>
+                                    <input type="text" id="doc_alvo" required placeholder="Nome completo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-3 hidden" id="box-doc-local">
+                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Igreja de Destino / Local</label>
+                                    <input type="text" id="doc_local" placeholder="Ex: Sede, Congregação X, Igreja Y" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-2 hidden" id="box-doc-data">
+                                    <label id="label-doc-data" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data do Evento / Vigência</label>
+                                    <input type="date" id="doc_data" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+
+                                <div class="md:col-span-2 hidden" id="box-doc-hora">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
+                                    <input type="text" id="doc_hora" placeholder="Ex: 19:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Texto Adicional / Observações Importantes</label>
+                                    <textarea id="doc_texto" rows="4" placeholder="Digite detalhes que devam constar no documento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button type="button" onclick="gerarDocumentoParaImpressao()" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
+                                    <i data-lucide="file-check" class="w-5 h-5"></i>
+                                    <span>Emitir e Imprimir</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                <i data-lucide="history" class="w-5 h-5 text-blue-400"></i> Últimas Emissões (Fila de Impressão)
+                            </h2>
+                        </div>
+                        <div id="filaDocumentos" class="p-8 text-center text-slate-500 text-sm italic">
+                            Nenhum documento na fila de espera. Use o formulário acima para redigir.
+                        </div>
+                    </section>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
-  );
-}
 
-/* ============ HELPERS ============ */
-const inputCls = "w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all";
-
-function Campo({ label, span, required, children }: { label: string; span: number; required?: boolean; children: React.ReactNode }) {
-  const cls = `md:col-span-${span}`;
-  return (
-    <div className={cls}>
-      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-        {label}{required && " *"}
-      </label>
-      {children}
+            </main>
+        </div>
     </div>
-  );
-}
 
-function CardStat({ label, valor, cor, Icone, iconCor, small }: {
-  label: string; valor: number | string; cor: string;
-  Icone: typeof Users; iconCor: string; small?: boolean;
-}) {
-  return (
-    <div className={`bg-slate-900 border border-slate-800 ${small ? "p-5" : "p-6"} rounded-2xl flex items-center justify-between shadow-xl`}>
-      <div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</p>
-        <h3 className={`${small ? "text-2xl" : "text-3xl"} font-bold ${cor} mt-1`}>{valor}</h3>
-      </div>
-      <Icone className={iconCor} />
-    </div>
-  );
-}
+    <!-- ========================================== -->
+    <!--                  LÓGICA JAVASCRIPT         -->
+    <!-- ========================================== -->
+    <script>
+        const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
+
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let editandoID = null;
+        let editandoFinanceiroID = null; 
+        let editandoAgendaID = null; 
+        let listaMembrosCache = []; 
+        let filaDocumentosCache = [];
+
+        const opcoesDocumentos = {
+            Carta: ['Mudança', 'Transferência', 'Apresentação'],
+            Memorando: ['Desligamento', 'Reintegração', 'Integração', 'Suspensão', 'Exclusão', 'Memorando Interno', 'Apresentação na Sede'],
+            Convite: ['Preletores', 'Cantores', 'Igrejas', 'Abadguar', 'Congresso Com Jovens', 'Congresso Com Adolescentes', 'Congresso Com as Irmãs', 'Outros Cultos']
+        };
+
+        const estruturaCargosEclesiasticos = [
+            { chaves: ['pastor dirigente', 'pastor local', 'dirigente'], titulo: 'Pastor Dirigente', cor: 'border-rose-500/30 text-rose-400 bg-rose-500/5', icone: 'user-check' },
+            { chaves: ['co-pastor', 'copastor', 'pastor auxiliar'], titulo: 'Co-Pastor', cor: 'border-orange-500/30 text-orange-400 bg-orange-500/5', icone: 'shield' },
+            { chaves: ['presbitero', 'presbítero'], titulo: 'Corpo de Presbíteros', cor: 'border-amber-500/30 text-amber-400 bg-amber-500/5', icone: 'award' },
+            { chaves: ['diacono', 'diácono', 'diaconisa'], titulo: 'Corpo de Diáconos / Diaconisas', cor: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5', icone: 'heart' },
+            { chaves: ['auxiliar', 'auxiliar de trabalho', 'auxiliar feminino', 'auxiliar masculino', 'cooperador', 'cooperadora'], titulo: 'Auxiliares da Obra', cor: 'border-blue-500/30 text-blue-400 bg-blue-500/5', icone: 'help-circle' }
+        ];
+
+        function navegarPara(idTela) {
+            document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
+            document.getElementById(`tela-${idTela}`).classList.remove('hidden');
+
+            const botoesMenu = {
+                membros: document.getElementById('btn-menu-membros'),
+                financeiro: document.getElementById('btn-menu-financeiro'),
+                agenda: document.getElementById('btn-menu-agenda'),
+                mural: document.getElementById('btn-menu-mural'),
+                documentos: document.getElementById('btn-menu-documentos')
+            };
+
+            Object.keys(botoesMenu).forEach(chave => {
+                if(botoesMenu[chave]) {
+                    botoesMenu[chave].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+                }
+            });
+
+            const topbarIconContainer = document.getElementById('iconeDinamicoTopbar');
+            const topbarTitulo = document.getElementById('tituloTopbar');
+            const iconeHeader = document.getElementById('iconeHeader');
+
+            if (idTela === 'membros') {
+                botoesMenu.membros.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
+                topbarTitulo.innerText = "Gestão de Membros";
+                topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
+                iconeHeader.setAttribute('data-lucide', 'users');
+                carregarMembros();
+            } else if (idTela === 'financeiro') {
+                botoesMenu.financeiro.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-emerald-600 text-white shadow-lg shadow-emerald-900/20";
+                topbarTitulo.innerText = "Tesouraria & Fluxo de Caixa";
+                topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
+                iconeHeader.setAttribute('data-lucide', 'dollar-sign');
+                resetarEstadoFinanceiro();
+                atualizarListaMembrosNoFormFinanceiro();
+                carregarFinancas();
+            } else if (idTela === 'agenda') {
+                botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
+                topbarTitulo.innerText = "Agenda Semanal";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
+                iconeHeader.setAttribute('data-lucide', 'calendar');
+                resetarEstadoAgenda();
+                carregarAgenda();
+            } else if (idTela === 'mural') {
+                botoesMenu.mural.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
+                topbarTitulo.innerText = "Mural de Atribuições";
+                topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
+                iconeHeader.setAttribute('data-lucide', 'layout-dashboard');
+                atualizarFluxogramaMural();
+            } else if (idTela === 'documentos') {
+                botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
+                topbarTitulo.innerText = "Cartas, Memorandos e Convites";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
+                iconeHeader.setAttribute('data-lucide', 'file-text');
+                atualizarTiposDocumento();
+                renderizarFilaDocumentos();
+            }
+            lucide.createIcons();
+        }
+
+        async function atualizarFluxogramaMural() {
+            try {
+                const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
+                if (error) throw error;
+
+                const container = document.getElementById('containerFluxogramaMural');
+                container.innerHTML = '';
+
+                estruturaCargosEclesiasticos.forEach(c => {
+                    const oficiais = membros.filter(m => {
+                        if (!m.cargo) return false;
+                        const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                        return c.chaves.some(chave => {
+                            const chaveLimpa = chave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                            return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
+                        });
+                    });
+                    
+                    let listaNomes = '';
+                    if (oficiais.length === 0) {
+                        listaNomes = `<p class="text-xs text-slate-600 italic">Nenhum oficial ativo escalado</p>`;
+                    } else {
+                        listaNomes = `<ul class="space-y-1.5">`;
+                        oficiais.forEach(o => {
+                            listaNomes += `
+                                <li class="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-850">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                    <span class="font-medium">${o.nome}</span>
+                                    <span class="text-[10px] text-slate-500 ml-auto italic">${o.cargo}</span>
+                                </li>`;
+                        });
+                        listaNomes += `</ul>`;
+                    }
+
+                    container.innerHTML += `
+                        <div class="bg-slate-950/40 rounded-xl p-5 border ${c.cor} flex flex-col gap-4 shadow-xl hover:scale-[1.01] transition-all duration-200">
+                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                                <h3 class="font-bold text-sm uppercase tracking-wider">${c.titulo}</h3>
+                                <i data-lucide="${c.icone}" class="w-5 h-5 opacity-80"></i>
+                            </div>
+                            <div class="flex-1 overflow-y-auto max-h-[160px] pr-1">
+                                ${listaNomes}
+                            </div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest text-right">
+                                Total: ${oficiais.length} ativo(s)
+                            </div>
+                        </div>`;
+                });
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Erro ao carregar mural:", err.message);
+            }
+        }
+
+        async function imprimirFluxogramaMural() {
+            try {
+                const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
+                if (error) throw error;
+
+                let conteudoHtml = '';
+
+                estruturaCargosEclesiasticos.forEach(c => {
+                    const oficiais = membros.filter(m => {
+                        if (!m.cargo) return false;
+                        const cargoLimpo = m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                        return c.chaves.some(chave => {
+                            const chaveLimpa = chave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                            return cargoLimpo === chaveLimpa || cargoLimpo.startsWith(chaveLimpa + " ") || cargoLimpo.endsWith(" " + chaveLimpa);
+                        });
+                    });
+
+                    conteudoHtml += `
+                        <div class="bloco-cargo">
+                            <h2>${c.titulo.toUpperCase()} (${oficiais.length})</h2>
+                            <div class="grade-oficiais">
+                    `;
+
+                    if (oficiais.length === 0) {
+                        conteudoHtml += `<p class="vazio">Nenhum oficial escalado neste setor.</p>`;
+                    } else {
+                        oficiais.forEach(o => {
+                            conteudoHtml += `
+                                <div class="item-oficial">
+                                    <span class="ponto">•</span>
+                                    <strong>${o.nome}</strong> 
+                                    <span class="cargo-sub">(${o.cargo})</span>
+                                </div>`;
+                        });
+                    }
+
+                    conteudoHtml += `</div></div>`;
+                });
+
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Mural - Corpo de Obreiros e Oficiais</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; line-height: 1.5; }
+                            .header { text-align: center; border-bottom: 3px double #475569; padding-bottom: 20px; margin-bottom: 30px; }
+                            .header h1 { margin: 0; font-size: 26px; color: #0f172a; }
+                            .header p { margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; }
+                            .bloco-cargo { margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+                            .bloco-cargo h2 { background-color: #f1f5f9; margin: 0; padding: 12px 15px; font-size: 14px; letter-spacing: 1px; color: #1e293b; border-bottom: 1px solid #cbd5e1; }
+                            .grade-oficiais { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+                            .item-oficial { font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px; }
+                            .item-oficial .ponto { color: #4f46e5; font-size: 16px; }
+                            .item-oficial .cargo-sub { color: #64748b; font-size: 11px; font-style: italic; }
+                            .vazio { font-style: italic; color: #94a3b8; font-size: 12px; margin: 0; padding: 5px; }
+                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+                            @media print { body { margin: 20px; } .btn-print { display: none; } }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Quadro</button>
+                        <div class="header">
+                            <h1>FLUXOGRAMA DE ATRIBUIÇÕES E OFICIAIS</h1>
+                            <p>Corpo de Obreiros e Ministério Local</p>
+                        </div>
+                        ${conteudoHtml}
+                        <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+            } catch (err) { alert("Erro ao preparar documento de impressão: " + err.message); }
+        }
+
+        async function imprimirAgendaSemanal() {
+            try {
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    alert("Não há programações agendadas para gerar a impressão mural.");
+                    return;
+                }
+
+                let linhasTabelaHtml = '';
+                const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+                data.forEach(ag => {
+                    const dataReal = ag.data || '';
+                    let diaSemanaExibicao = '';
+                    if (dataReal) {
+                        const dataObj = new Date(dataReal + 'T00:00:00');
+                        diaSemanaExibicao = diasOrdenados[dataObj.getDay()];
+                    }
+
+                    linhasTabelaHtml += `
+                        <tr>
+                            <td class="col-data">
+                                <strong>${formatarData(dataReal)}</strong><br>
+                                <span class="dia-semana">${diaSemanaExibicao}</span>
+                            </td>
+                            <td class="col-horario">${ag.horario || '-'}</td>
+                            <td class="col-evento"><strong>${ag.tipo_evento || '-'}</strong></td>
+                            <td class="col-escalas">
+                                <div><strong>Dirigente:</strong> ${ag.dirigente || '-'}</div>
+                                <div><strong>Pregador:</strong> ${ag.pregador || '-'}</div>
+                            </td>
+                            <td class="col-escalas">
+                                <div><strong>Portaria:</strong> ${ag.escala_portaria || '-'}</div>
+                                <div><strong>Ofertas:</strong> ${ag.escala_ofertas || '-'}</div>
+                            </td>
+                            <td class="col-obs">${ag.saida_visita || '-'}</td>
+                        </tr>`;
+                });
+
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Agenda Semanal de Atividades</title>
+                        <style>
+                            @page { size: landscape; margin: 10mm 15mm 10mm 15mm; }
+                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 10px; background-color: #fff; }
+                            .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; }
+                            .header h1 { margin: 0; font-size: 30px; letter-spacing: 1px; color: #0f172a; }
+                            .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; color: #475569; font-weight: 600; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                            th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
+                            .col-data { width: 14%; } .col-horario { width: 8%; font-weight: bold; color: #b45309; } .col-evento { width: 26%; font-size: 14px; color: #1e293b; } .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; } .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
+                            .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+                            .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+                            @media print { body { margin: 0; } .btn-print { display: none; } th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Agenda para o Mural</button>
+                        <div class="header">
+                            <h1>CRONOGRAMA E AGENDA SEMANAL</h1>
+                            <p>Escala de Cultos, Eventos e Atividades Oficiais</p>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data / Dia</th>
+                                    <th>Horário</th>
+                                    <th>Programação / Evento</th>
+                                    <th>Ministério Eclesiástico</th>
+                                    <th>Escala de Apoio</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody>${linhasTabelaHtml}</tbody>
+                        </table>
+                        <div class="footer">Quadro Oficial de Avisos - Gerado em ${new Date().toLocaleDateString('pt-BR')} por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+            } catch (err) { alert("Erro ao fluxo dados da agenda para impressão: " + err.message); }
+        }
+
+        async function imprimirRelatorioFinanceiro() {
+            try {
+                const tipoFiltro = document.getElementById('filtroTipo').value;
+                let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: true });
+                
+                if (tipoFiltro) {
+                    query = query.eq('tipo', tipoFiltro);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    alert("Não há registros lançados para gerar o relatório.");
+                    return;
+                }
+
+                let d = 0, o = 0, de = 0;
+                let linesTabelaHtml = '';
+
+                data.forEach(f => {
+                    if (f.tipo === 'Dízimo') d += f.valor; 
+                    else if (f.tipo === 'Oferta') o += f.valor; 
+                    else de += f.valor;
+
+                    const corValor = f.tipo === 'Despesa' ? 'text-danger' : 'text-success';
+                    const sinal = f.tipo === 'Despesa' ? '-' : '';
+
+                    linesTabelaHtml += `
+                        <tr>
+                            <td>${formatarData(f.data_lancamento)}</td>
+                            <td><strong>${f.tipo}</strong></td>
+                            <td>${f.descricao || '-'}</td>
+                            <td><span class="tag-cargo">${f.cargo || '-'}</span></td>
+                            <td>${f.observacao || '-'}</td>
+                            <td class="text-right ${corValor}">${sinal} R$ ${f.valor.toFixed(2)}</td>
+                        </tr>`;
+                });
+
+                const saldoTotal = d + o - de;
+                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                const mesAtual = meses[new Date().getMonth()];
+                const anoAtual = new Date().getFullYear();
+
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Relatório Financeiro - Livro Caixa</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                            .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
+                            .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                            .header p { margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; font-weight: bold; }
+                            
+                            .cards-resumo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+                            .card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: #f8fafc; }
+                            .card p { margin: 0; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+                            .card h3 { margin: 5px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 700; }
+                            
+                            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                            th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
+                            tr:nth-child(even) { background-color: #f8fafc; }
+                            
+                            .text-right { text-align: right; }
+                            .text-success { color: #16a34a; font-weight: 600; }
+                            .text-danger { color: #dc2626; font-weight: 600; }
+                            .tag-cargo { font-size: 10px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+                            
+                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+                            .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
+                            .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                            
+                            @media print { body { margin: 20px; } .btn-print { display: none; } }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+                        <div class="header">
+                            <h1>RELATÓRIO MENSAL - LIVRO CAIXA</h1>
+                            <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${mesAtual} de ${anoAtual}</p>
+                        </div>
+                        
+                        <div class="cards-resumo">
+                            <div class="card"><p>Dízimos (+)</p><h3 style="color: #16a34a;">R$ ${d.toFixed(2)}</h3></div>
+                            <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toFixed(2)}</h3></div>
+                            <div class="card"><p>Despesas (-)</p><h3 style="color: #dc2626;">R$ ${de.toFixed(2)}</h3></div>
+                            <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toFixed(2)}</h3></div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição / Contribuinte</th>
+                                    <th>Cargo</th>
+                                    <th>Observação</th>
+                                    <th class="text-right">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>${linesTabelaHtml}</tbody>
+                        </table>
+
+                        <div class="assinaturas">
+                            <div class="linha-assinatura">Tesouraria Local</div>
+                            <div class="linha-assinatura">Pastor Dirigente</div>
+                        </div>
+
+                        <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+            } catch (err) { alert("Erro ao gerar o relatório financeiro: " + err.message); }
+        }
+
+        function atualizarTiposDocumento() {
+            const category = document.getElementById('doc_categoria').value;
+            const selectTipo = document.getElementById('doc_tipo');
+            selectTipo.innerHTML = '';
+            opcoesDocumentos[category].forEach(tipo => {
+                selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
+            });
+            ajustarFormularioDocumento();
+        }
+
+        function ajustarFormularioDocumento() {
+            const category = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            const lblAlvo = document.getElementById('label-doc-alvo');
+            const inpAlvo = document.getElementById('doc_alvo');
+            const boxLocal = document.getElementById('box-doc-local');
+            const lblLocal = document.getElementById('label-doc-local');
+            const boxData = document.getElementById('box-doc-data');
+            const lblData = document.getElementById('label-doc-data');
+            const boxHora = document.getElementById('box-doc-hora');
+
+            boxLocal.classList.add('hidden');
+            boxData.classList.add('hidden');
+            boxHora.classList.add('hidden');
+
+            if (category === 'Carta') {
+                lblAlvo.innerText = "Nome do Membro";
+                inpAlvo.placeholder = "Ex: Nome Completo do Irmão/Irmã";
+                boxLocal.classList.remove('hidden');
+                lblLocal.innerText = "Igreja de Destino";
+            } else if (category === 'Memorando') {
+                lblAlvo.innerText = "Membro Alvo / Assunto";
+                inpAlvo.placeholder = "Ex: Nome do Membro ou Departamento Coberto";
+                if(tipo === 'Memorando Interno') {
+                    lblAlvo.innerText = "Destinatário Interno";
+                    inpAlvo.placeholder = "Ex: Ao Departamento de Louvor / Secretaria Geral";
+                } else {
+                    boxData.classList.remove('hidden');
+                    lblData.innerText = "Data de Vigência / Ocorrência";
+                }
+            } else if (category === 'Convite') {
+                lblAlvo.innerText = "Convidado / Instituição";
+                inpAlvo.placeholder = "Ex: Pr. Cláudio Duarte / Ministério de Louvor X";
+                boxLocal.classList.remove('hidden');
+                lblLocal.innerText = "Evento / Departamento Coberto";
+                boxData.classList.remove('hidden');
+                lblData.innerText = "Data do Evento";
+                boxHora.classList.remove('hidden');
+            }
+        }
+
+        function gerarDocumentoParaImpressao() {
+            const categoria = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            const alvo = document.getElementById('doc_alvo').value;
+            const local = document.getElementById('doc_local').value || '';
+            const dataInput = document.getElementById('doc_data').value || '';
+            const hora = document.getElementById('doc_hora').value || '';
+            const textoAdicional = document.getElementById('doc_texto').value || '';
+
+            if(!alvo) {
+                alert('Por favor, defina o campo do destinatário/membro principal.');
+                return;
+            }
+
+            // Gerando string de data dinâmica: "Guarulhos, DD de Mês de AAAA."
+            const dataHoje = new Date();
+            const mesesPorExtenso = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
+
+            const novoDoc = {
+                id: Date.now(),
+                categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
+                data_emissao: dataHoje.toLocaleDateString('pt-BR')
+            };
+
+            filaDocumentosCache.unshift(novoDoc);
+            renderizarFilaDocumentos();
+
+            let corpoTemplate = '';
+            const dataFormatada = dataInput ? formatarData(dataInput) : '';
+
+            if (categoria === 'Carta') {
+                corpoTemplate = `
+                    <p>Prezados Irmãos em Cristo,</p>
+                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que está se deslocando para a localidade de <strong>${local}</strong>.</p>
+                    <p>Solicitamos que o(a) recebam na paz do Senhor e prestem o auxílio e comunhão necessários para o seu bom desenvolvimento espiritual na nova comunidade.</p>
+                    <p>${textoAdicional}</p>
+                `;
+            } else if (categoria === 'Memorando') {
+                corpoTemplate = `
+                    <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${tipo}</p>
+                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
+                    <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
+                    <p>${textoAdicional}</p>
+                `;
+            } else if (categoria === 'Convite') {
+                corpoTemplate = `
+                    <p>Graça e Paz!</p>
+                    <p>Temos a honra de convidar cordialmente <strong>${alvo}</strong> para cooperar conosco no evento <strong>${local}</strong>.</p>
+                    <p>O cronograma oficial está previsto para o dia <strong>${dataFormatada}</strong> às <strong>${hora}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                    <p>${textoAdicional}</p>
+                `;
+            }
+
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${categoria} - ${tipo}</title>
+                    <style>
+                        body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; }
+                        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+                        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; font-weight: bold; line-height: 1.3; }
+                        .header .sub-titulo { font-size: 15px; font-weight: bold; margin-top: 3px; }
+                        .header p { margin: 4px 0 0 0; font-size: 12px; font-style: italic; letter-spacing: 0.5px; }
+                        .titulo-doc { text-align: center; margin: 30px 0; font-size: 18px; font-weight: bold; text-transform: uppercase; text-decoration: underline; }
+                        .corpo { text-align: justify; margin-bottom: 50px; text-indent: 40px; }
+                        .corpo p { margin-bottom: 15px; }
+                        .data-local { text-align: right; margin-bottom: 60px; font-style: italic; }
+                        .assinaturas { display: flex; justify-content: space-around; margin-top: 80px; }
+                        .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
+                        @media print { .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: sans-serif; }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Correspondência</button>
+                    <div class="header">
+                        <h1>Igreja Evangélica Assembleia de Deus Ministério Madureira</h1>
+                        <div class="sub-titulo">Sub Congregação Jd. Marilena</div>
+                        <p>Rua Guaraton, 47 Jd. Marilena - Guarulhos - SP</p>
+                    </div>
+                    <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
+                    <div class="corpo">${corpoTemplate}</div>
+                    <div class="data-local">${localEDataDinamica}</div>
+                    <div class="assinaturas">
+                        <div class="linha">Secretário(a)</div>
+                        <div class="linha">Pastor Dirigente</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
+            document.getElementById('formDocumento').reset();
+            atualizarTiposDocumento();
+        }
+
+        function renderizarFilaDocumentos() {
+            const container = document.getElementById('filaDocumentos');
+            if(filaDocumentosCache.length === 0) {
+                container.className = "p-8 text-center text-slate-500 text-sm italic";
+                container.innerHTML = "Nenhum documento na fila de espera. Use o formulário acima para redigir.";
+                return;
+            }
+
+            container.className = "divide-y divide-slate-800 border-t border-slate-800";
+            container.innerHTML = '';
+            
+            filaDocumentosCache.forEach(doc => {
+                container.innerHTML += `
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-850/40 transition-colors">
+                        <div>
+                            <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
+                            <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
+                        </div>
+                        <div class="text-right text-xs">
+                            <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
+                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function formatarData(dataString) {
+            if (!dataString) return '-';
+            const [ano, mes, dia] = dataString.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        async function carregarMembros() {
+            try {
+                const termo = document.getElementById('busca').value;
+                let query = _supabase.from('membros').select('*').order('nome', { ascending: true });
+                if (termo) query = query.ilike('nome', `%${termo}%`);
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                const tbody = document.getElementById('tabelaMembros');
+                tbody.innerHTML = '';
+                let ativos = 0, inativos = 0;
+
+                data.forEach(m => {
+                    if (m.status === 'Ativo') ativos++; else inativos++;
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-slate-100">${m.nome}</div>
+                                <div class="text-xs text-slate-500 italic">Nasc: ${formatarData(m.data_nascimento)}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-300 text-sm">${m.cargo || '-'}</td>
+                            <td class="px-6 py-4 text-slate-400 text-sm">
+                                <div>${m.celular || '-'}</div>
+                                <div class="text-xs text-slate-500">${m.email || ''}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded text-[10px] font-bold ${m.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}">
+                                    ${m.status.toUpperCase()}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="editarMembro(${m.id})" class="text-indigo-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarMembro(${m.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>`;
+                });
+
+                document.getElementById('dashAtivos').textContent = ativos;
+                document.getElementById('dashInativos').textContent = inativos;
+                document.getElementById('dashTotal').textContent = data.length;
+                document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${data.length}</span> Membros`;
+                lucide.createIcons();
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('formMembro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const membro = {
+                nome: document.getElementById('nome').value,
+                data_nascimento: document.getElementById('data_nascimento').value || null,
+                celular: document.getElementById('input_celular').value || null,
+                email: document.getElementById('email').value || null,
+                cargo: document.getElementById('cargo').value || null,
+                data_adesao: document.getElementById('data_adesao').value || null,
+                status: document.getElementById('status').value,
+                observacao: document.getElementById('observacao').value || null
+            };
+
+            const { error } = editandoID 
+                ? await _supabase.from('membros').update(membro).eq('id', editandoID)
+                : await _supabase.from('membros').insert([membro]);
+
+            if (error) alert("Erro: " + error.message);
+            else { alert("Sucesso!"); resetarEstado(); carregarMembros(); }
+        });
+
+        async function editarMembro(id) {
+            const { data, error } = await _supabase.from('membros').select('*').eq('id', id).single();
+            if (error) return;
+            editandoID = id;
+            document.getElementById('nome').value = data.nome;
+            document.getElementById('data_nascimento').value = data.data_nascimento;
+            document.getElementById('input_celular').value = data.celular;
+            document.getElementById('email').value = data.email;
+            document.getElementById('cargo').value = data.cargo;
+            document.getElementById('data_adesao').value = data.data_adesao;
+            document.getElementById('status').value = data.status;
+            document.getElementById('observacao').value = data.observacao;
+            document.getElementById('tituloForm').innerText = "Editando Membro";
+            document.getElementById('textoBtnSalvar').innerText = "Atualizar Cadastro";
+            document.getElementById('btnSalvar').classList.replace('bg-indigo-600', 'bg-amber-600');
+            document.getElementById('btnCancelar').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetarEstado() {
+            editandoID = null;
+            document.getElementById('formMembro').reset();
+            document.getElementById('tituloForm').innerText = "Novo Cadastro";
+            document.getElementById('textoBtnSalvar').innerText = "Salvar Membro";
+            document.getElementById('btnSalvar').classList.replace('bg-amber-600', 'bg-indigo-600');
+            document.getElementById('btnCancelar').classList.add('hidden');
+        }
+
+        async function deletarMembro(id) {
+            if (confirm("Excluir membro?")) { await _supabase.from('membros').delete().eq('id', id); carregarMembros(); }
+        }
+
+        function ajustarCamposFinancas() {
+            const tipo = document.getElementById('fin_tipo').value;
+            document.getElementById('container-descricao-membro').classList.add('hidden');
+            document.getElementById('container-cargo-membro').classList.add('hidden');
+            document.getElementById('container-descricao-despesa').classList.add('hidden');
+            document.getElementById('container-oferta-culto').classList.add('hidden');
+            document.getElementById('container-oferta-dia').classList.add('hidden');
+
+            if (tipo === 'Dízimo') {
+                document.getElementById('container-descricao-membro').classList.remove('hidden');
+                document.getElementById('container-cargo-membro').classList.remove('hidden');
+                autopreencherCargoMembro();
+            } else if (tipo === 'Oferta') {
+                document.getElementById('container-oferta-culto').classList.remove('hidden');
+                document.getElementById('container-oferta-dia').classList.remove('hidden');
+            } else if (tipo === 'Despesa') {
+                document.getElementById('container-descricao-despesa').classList.remove('hidden');
+            }
+        }
+
+        function verificarCultoOutros() {
+            const culto = document.getElementById('fin_oferta_culto').value;
+            document.getElementById('fin_culto_manual').classList.toggle('hidden', culto !== 'Outro Culto');
+        }
+        function verificarDespesaOutros() {
+            const desp = document.getElementById('fin_despesa_fixa').value;
+            document.getElementById('fin_despesa_manual').classList.toggle('hidden', desp !== 'Outras Despesas');
+        }
+
+        function autopreencherCargoMembro() {
+            const nome = document.getElementById('fin_membro_nome').value;
+            const m = listaMembrosCache.find(x => x.nome === nome);
+            document.getElementById('fin_membro_cargo').value = m ? (m.cargo || 'Membro') : 'Membro';
+        }
+
+        async function atualizarListaMembrosNoFormFinanceiro() {
+            const { data } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
+            listaMembrosCache = data || [];
+            const sel = document.getElementById('fin_membro_nome');
+            sel.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
+            listaMembrosCache.forEach(m => { sel.innerHTML += `<option value="${m.nome}">${m.nome}</option>`; });
+            autopreencherCargoMembro();
+        }
+
+        document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const tipo = document.getElementById('fin_tipo').value;
+            let desc = ''; let dia = null; let cargoMembro = null;
+
+            if(tipo === 'Dízimo') {
+                desc = document.getElementById('fin_membro_nome').value;
+                cargoMembro = document.getElementById('fin_membro_cargo').value || 'Membro';
+            } else if(tipo === 'Oferta') {
+                const c = document.getElementById('fin_oferta_culto').value;
+                desc = c === 'Outro Culto' ? document.getElementById('fin_culto_manual').value : c;
+                dia = document.getElementById('fin_oferta_dia').value;
+            } else {
+                const df = document.getElementById('fin_despesa_fixa').value;
+                desc = df === 'Outras Despesas' ? document.getElementById('fin_despesa_manual').value : df;
+            }
+
+            const lanc = {
+                tipo, descricao: desc, cargo: cargoMembro, dia_semana: dia,
+                valor: parseFloat(document.getElementById('fin_valor').value),
+                data_lancamento: document.getElementById('fin_data').value,
+                observacao: document.getElementById('fin_observacao').value || null
+            };
+
+            const { error } = editandoFinanceiroID 
+                ? await _supabase.from('financeiro').update(lanc).eq('id', editandoFinanceiroID) 
+                : await _supabase.from('financeiro').insert([lanc]);
+
+            if (error) alert("Erro ao salvar: " + error.message);
+            else { alert("Lançamento realizado com sucesso!"); resetarEstadoFinanceiro(); carregarFinancas(); }
+        });
+
+        async function carregarFinancas() {
+            const tipoFiltro = document.getElementById('filtroTipo').value;
+            let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
+            
+            if (tipoFiltro) {
+                query = query.eq('tipo', tipoFiltro);
+            }
+
+            const { data } = await query;
+            const tbody = document.getElementById('tabelaFinanceiro');
+            tbody.innerHTML = '';
+            let d = 0, o = 0, de = 0;
+
+            (data || []).forEach(f => {
+                if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
+                const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/30 transition-colors">
+                        <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
+                        <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
+                        <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
+                        <td class="px-6 py-4">${exibicaoCargo}</td>
+                        <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
+                        <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>`;
+            });
+            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
+            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
+            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
+            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        async function editarFinanca(id) {
+            try {
+                const { data, error } = await _supabase.from('financeiro').select('*').eq('id', id).single();
+                if (error) throw error;
+                editandoFinanceiroID = id;
+                document.getElementById('fin_tipo').value = data.tipo;
+                ajustarCamposFinancas();
+
+                if (data.tipo === 'Dízimo') {
+                    document.getElementById('fin_membro_nome').value = data.descricao;
+                    document.getElementById('fin_membro_cargo').value = data.cargo || 'Membro';
+                } else if (data.tipo === 'Oferta') {
+                    const selectCulto = document.getElementById('fin_oferta_culto');
+                    const oDisponiveis = Array.from(selectCulto.options).map(o => o.value);
+                    if (oDisponiveis.includes(data.descricao)) selectCulto.value = data.descricao;
+                    else {
+                        selectCulto.value = 'Outro Culto';
+                        const inputManual = document.getElementById('fin_culto_manual');
+                        inputManual.classList.remove('hidden');
+                        inputManual.value = data.descricao;
+                    }
+                    document.getElementById('fin_oferta_dia').value = data.dia_semana || 'Domingo';
+                } else if (data.tipo === 'Despesa') {
+                    const selectDesp = document.getElementById('fin_despesa_fixa');
+                    const oDisponiveis = Array.from(selectDesp.options).map(o => o.value);
+                    if (oDisponiveis.includes(data.descricao)) selectDesp.value = data.descricao;
+                    else {
+                        selectDesp.value = 'Outras Despesas';
+                        const inputManual = document.getElementById('fin_despesa_manual');
+                        inputManual.classList.remove('hidden');
+                        inputManual.value = data.descricao;
+                    }
+                }
+                document.getElementById('fin_valor').value = data.valor;
+                document.getElementById('fin_data').value = data.data_lancamento;
+                document.getElementById('fin_observacao').value = data.observacao || '';
+                document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
+                document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
+                document.getElementById('btnCancelarFinanceiro').classList.remove('hidden');
+                document.getElementById('secaoFormFinanceiro').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) { alert("Erro ao buscar fluxo: " + err.message); }
+        }
+
+        function resetarEstadoFinanceiro() { 
+            editandoFinanceiroID = null; 
+            document.getElementById('formFinanceiro').reset(); 
+            document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
+            document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
+            document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
+            ajustarCamposFinancas(); 
+        }
+        
+        async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
+
+        function atualizarDiaSemanaAutomatico() {
+            const dataInput = document.getElementById('agenda_data').value;
+            const inputDiaSemana = document.getElementById('agenda_dia_semana');
+            if (!dataInput) { inputDiaSemana.value = ''; return; }
+            const dataObjeto = new Date(dataInput + 'T00:00:00');
+            const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            inputDiaSemana.value = diasOrdenados[dataObjeto.getDay()];
+        }
+        
+        async function carregarAgenda() {
+            try {
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
+                if (error) throw error;
+                const tbody = document.getElementById('tabelaAgenda');
+                tbody.innerHTML = '';
+
+                data.forEach(ag => {
+                    const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
+                    const dataReal = ag.data || '';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-slate-100">${formatarData(dataReal)}</div>
+                                <div class="text-xs text-amber-400 font-semibold">${ag.horario || ''}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-200 text-sm font-semibold">${ag.tipo_evento || '-'}</td>
+                            <td class="px-6 py-4 text-slate-300 text-sm">
+                                <div><span class="text-slate-500 text-xs">Dir:</span> ${ag.dirigente || '-'}</div>
+                                <div><span class="text-slate-500 text-xs">Preg:</span> ${ag.pregador || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-300 text-sm">
+                                <div><span class="text-slate-500 text-xs">Port:</span> ${ag.escala_portaria || '-'}</div>
+                                <div><span class="text-slate-500 text-xs">Ofert:</span> ${ag.escala_ofertas || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button onclick="editarAgenda('${ag.id}')" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarAgenda('${ag.id}')" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>`;
+                });
+                lucide.createIcons();
+            } catch (err) { console.error(err.message); }
+        }
+
+        document.getElementById('formAgenda').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSalvarAgenda');
+            btn.disabled = true;
+            const dataInput = document.getElementById('agenda_data').value;
+            let mesRef = 'Janeiro';
+
+            if (dataInput) {
+                const dataObj = new Date(dataInput + 'T00:00:00');
+                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                mesRef = meses[dataObj.getMonth()];
+            }
+
+            const r = {
+                tipo_evento: document.getElementById('agenda_tipo_evento').value,
+                horario: document.getElementById('agenda_horario').value,
+                escala_portaria: document.getElementById('agenda_escala_portaria').value || null,
+                pregador: document.getElementById('agenda_pregador').value || null,
+                escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
+                dirigente: document.getElementById('agenda_dirigente').value || null,
+                saida_visita: document.getElementById('agenda_saida_visita').value || null,
+                mes_referencia: mesRef, data: dataInput
+            };
+
+            const { error } = editandoAgendaID 
+                ? await _supabase.from('agenda_semanal').update(r).eq('id', editandoAgendaID)
+                : await _supabase.from('agenda_semanal').insert([r]);
+
+            if (error) alert("Erro: " + error.message);
+            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
+            btn.disabled = false;
+        });
+
+        async function editarAgenda(id) {
+            try {
+                const { data, error } = await _supabase.from('agenda_semanal').select('*').eq('id', id).single();
+                if (error) throw error;
+                editandoAgendaID = id;
+                document.getElementById('agenda_data').value = data.data || '';
+                atualizarDiaSemanaAutomatico();
+                document.getElementById('agenda_tipo_evento').value = data.tipo_evento || '';
+                document.getElementById('agenda_horario').value = data.horario || '';
+                document.getElementById('agenda_dirigente').value = data.dirigente || '';
+                document.getElementById('agenda_pregador').value = data.pregador || '';
+                document.getElementById('agenda_escala_portaria').value = data.escala_portaria || '';
+                document.getElementById('agenda_escala_ofertas').value = data.escala_ofertas || '';
+                document.getElementById('agenda_saida_visita').value = data.saida_visita || '';
+                document.getElementById('tituloFormAgenda').innerText = "Editando Cronograma da Agenda";
+                document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Agenda";
+                document.getElementById('btnCancelarAgenda').classList.remove('hidden');
+                document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) { alert("Erro: " + err.message); }
+        }
+
+        function resetarEstadoAgenda() {
+            editandoAgendaID = null;
+            document.getElementById('formAgenda').reset();
+            document.getElementById('tituloFormAgenda').innerText = "Programar Evento / Culto";
+            document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Agenda";
+            document.getElementById('btnCancelarAgenda').classList.add('hidden');
+        }
+
+        async function deletarAgenda(id) {
+            if (confirm("Remover este evento?")) {
+                const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
+                if (!error) carregarAgenda();
+            }
+        }
+
+        window.onload = function() {
+            carregarMembros();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
+
