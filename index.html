@@ -86,7 +86,7 @@
                 </div>
             </header>
 
-            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
+            <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8 flex-1">
                 
                 <!-- ========================================== -->
                 <!-- 1. TELA DE MEMBROS                         -->
@@ -560,6 +560,15 @@
                 </div>
 
             </main>
+
+            <!-- ========================================== -->
+            <!--                  RODAPÉ ATUALIZADO         -->
+            <!-- ========================================== -->
+            <footer class="w-full text-center py-4 border-t border-slate-800/40 mt-auto">
+                <p class="text-[10px] text-slate-500 font-medium tracking-wide uppercase">
+                    Gerado em 03/07/2026 por Sistema Igreja Digital - DESENVOLVIDO POR DORIVAL J.
+                </p>
+            </footer>
         </div>
     </div>
 
@@ -949,7 +958,7 @@
                             .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
                             
                             @media print { body { margin: 20px; } .btn-print { display: none; } }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
                         </style>
                     </head>
                     <body>
@@ -1058,7 +1067,6 @@
                 return;
             }
 
-            // Gerando string de data dinâmica: "Guarulhos, DD de Mês de AAAA."
             const dataHoje = new Date();
             const mesesPorExtenso = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
@@ -1563,4 +1571,3 @@
     </script>
 </body>
 </html>
-
