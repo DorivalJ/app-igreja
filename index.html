@@ -19,9 +19,6 @@
 <body class="text-slate-200">
     <div class="min-h-screen flex">
         
-        <!-- ========================================== -->
-        <!--        PAINEL LATERAL (SIDEBAR)            -->
-        <!-- ========================================== -->
         <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed h-full z-20">
             <div>
                 <div class="p-6 border-b border-slate-800">
@@ -67,9 +64,6 @@
             </div>
         </aside>
 
-        <!-- ========================================== -->
-        <!--          ÁREA DE CONTEÚDO PRINCIPAL        -->
-        <!-- ========================================== -->
         <div class="flex-1 ml-64 flex flex-col min-h-screen">
             
             <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
@@ -88,9 +82,6 @@
 
             <main class="p-6 md:p-8 max-w-6xl w-full mx-auto space-y-8">
                 
-                <!-- ========================================== -->
-                <!-- 1. TELA DE MEMBROS                         -->
-                <!-- ========================================== -->
                 <div id="tela-membros" class="space-y-8 dynamic-screen">
                     <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -193,9 +184,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 2. TELA FINANCEIRA                         -->
-                <!-- ========================================== -->
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -321,6 +309,60 @@
                     </div>
 
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-400"></i>
+                                    Resumo Visual Financeiro
+                                </h4>
+                                    <p class="text-xs text-slate-500">Proporção dos fluxos atuais baseados em dízimos e ofertas</p>
+                            </div>
+                            <button onclick="imprimirGraficoFinanceiro()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold text-xs rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                <span>Imprimir Gráfico Financeiro</span>
+                            </button>
+                        </div>
+                        
+                        <div class="p-6 space-y-4">
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-medium">
+                                    <span class="text-emerald-400 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Entradas (Dízimos e Ofertas)
+                                    </span>
+                                    <span id="graficoTxtEntradas" class="text-slate-300">R$ 0,00</span>
+                                </div>
+                                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
+                                    <div id="graficoBarraEntradas" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-medium">
+                                    <span class="text-rose-400 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-rose-500"></span> Despesas
+                                    </span>
+                                    <span id="graficoTxtDespesas" class="text-slate-300">R$ 0,00</span>
+                                </div>
+                                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
+                                    <div id="graficoBarraDespesas" class="bg-rose-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-medium">
+                                    <span class="text-blue-400 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Saldo Atual
+                                    </span>
+                                    <span id="graficoTxtSaldo" class="text-slate-300">R$ 0,00</span>
+                                </div>
+                                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
+                                    <div id="graficoBarraSaldo" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2">
                                 <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i> Livro Caixa (Mês Vigente)
@@ -357,9 +399,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 3. TELA DE AGENDA SEMANAL                  -->
-                <!-- ========================================== -->
                 <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
                     <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
@@ -457,9 +496,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 4. TELA MURAL DE ATRIBUIÇÕES               -->
-                <!-- ========================================== -->
                 <div id="tela-mural" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -483,9 +519,6 @@
                     </section>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- 5. TELA DE DOCUMENTOS                      -->
-                <!-- ========================================== -->
                 <div id="tela-documentos" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
@@ -563,9 +596,6 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!--                  LÓGICA JAVASCRIPT         -->
-    <!-- ========================================== -->
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
@@ -643,7 +673,7 @@
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
                 renderizarFilaDocumentos();
@@ -991,6 +1021,94 @@
                 `);
                 janelaImpressao.document.close();
             } catch (err) { alert("Erro ao gerar o relatório financeiro: " + err.message); }
+        }
+
+        // --- NOVA FUNÇÃO DE IMPRESSÃO INDEPENDENTE DO GRÁFICO DE BARRAS ---
+        function imprimirGraficoFinanceiro() {
+            const totalEntradas = document.getElementById('graficoTxtEntradas').innerText;
+            const totalDespesas = document.getElementById('graficoTxtDespesas').innerText;
+            const totalSaldo = document.getElementById('graficoTxtSaldo').innerText;
+
+            const wEntradas = document.getElementById('graficoBarraEntradas').style.width;
+            const wDespesas = document.getElementById('graficoBarraDespesas').style.width;
+            const wSaldo = document.getElementById('graficoBarraSaldo').style.width;
+
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const mesAtual = meses[new Date().getMonth()];
+            const anoAtual = new Date().getFullYear();
+
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Gráfico Financeiro - Resumo Estatístico</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                        .header { text-align: center; border-bottom: 2px solid #334155; padding-bottom: 15px; margin-bottom: 35px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                        .header p { margin: 5px 0 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; font-weight: bold; }
+                        
+                        .container-grafico { border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; background: #fafafa; max-width: 650px; margin: 0 auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+                        .item-barra { margin-bottom: 25px; }
+                        .flex-info { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+                        
+                        .linha-vazia { width: 100%; bg-color: #e2e8f0; background: #e2e8f0; height: 16px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; }
+                        .preenchimento { height: 100%; border-radius: 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        
+                        .bg-entradas { background-color: #10b981 !important; }
+                        .bg-despesas { background-color: #ef4444 !important; }
+                        .bg-saldo { background-color: #3b82f6 !important; }
+                        
+                        .footer { text-align: center; margin-top: 60px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+                        @media print { .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Gráfico</button>
+                    <div class="header">
+                        <h1>BALANÇO E PROPORÇÃO FINANCEIRA</h1>
+                        <p>Gráfico de Linhas Volumétricas — Competência: ${mesAtual} / ${anoAtual}</p>
+                    </div>
+                    
+                    <div class="container-grafico">
+                        <div class="item-barra">
+                            <div class="flex-info">
+                                <span>🟢 ENTRADAS (DÍZIMOS + OFERTAS)</span>
+                                <span>${totalEntradas}</span>
+                            </div>
+                            <div class="linha-vazia">
+                                <div class="preenchimento bg-entradas" style="width: ${wEntradas}"></div>
+                            </div>
+                        </div>
+
+                        <div class="item-barra">
+                            <div class="flex-info">
+                                <span>🔴 DESPESAS ADMINISTRATIVAS</span>
+                                <span>${totalDespesas}</span>
+                            </div>
+                            <div class="linha-vazia">
+                                <div class="preenchimento bg-despesas" style="width: ${wDespesas}"></div>
+                            </div>
+                        </div>
+
+                        <div class="item-barra">
+                            <div class="flex-info">
+                                <span>🔵 SALDO LÍQUIDO DISPONÍVEL</span>
+                                <span>${totalSaldo}</span>
+                            </div>
+                            <div class="linha-vazia">
+                                <div class="preenchimento bg-saldo" style="width: ${wSaldo}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} — Sistema Igreja Digital — Desenvolvido por Dorival J.</div>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
         }
 
         function atualizarTiposDocumento() {
@@ -1381,10 +1499,28 @@
                         </td>
                     </tr>`;
             });
+            
+            const totalEntradas = d + o;
+            const saldoTotal = totalEntradas - de;
+
             document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
             document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
             document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
-            document.getElementById('dashSaldoTotal').textContent = `R$ ${(d+o-de).toFixed(2)}`;
+            document.getElementById('dashSaldoTotal').textContent = `R$ ${saldoTotal.toFixed(2)}`;
+            
+            // --- ATUALIZAÇÃO DO GRÁFICO DE BARRAS DINÂMICO ---
+            document.getElementById('graficoTxtEntradas').innerText = "R$ " + totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('graficoTxtDespesas').innerText = "R$ " + de.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('graficoTxtSaldo').innerText = "R$ " + saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            let pctEntradas = totalEntradas > 0 ? 100 : 0;
+            let pctDespesas = totalEntradas > 0 ? Math.min((de / totalEntradas) * 100, 100) : (de > 0 ? 100 : 0);
+            let pctSaldo = totalEntradas > 0 ? Math.max(0, Math.min((saldoTotal / totalEntradas) * 100, 100)) : (saldoTotal > 0 ? 100 : 0);
+
+            document.getElementById('graficoBarraEntradas').style.width = pctEntradas + '%';
+            document.getElementById('graficoBarraDespesas').style.width = pctDespesas + '%';
+            document.getElementById('graficoBarraSaldo').style.width = pctSaldo + '%';
+
             lucide.createIcons();
         }
 
