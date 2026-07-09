@@ -766,9 +766,20 @@
                         });
                     });
 
+                    let borderLeftColor = '#64748b'; // default slate
+                    const tituloLower = c.titulo.toLowerCase();
+                    if (tituloLower.includes('dirigente')) borderLeftColor = '#ef4444'; // rose/red
+                    else if (tituloLower.includes('co-pastor') || tituloLower.includes('copastor')) borderLeftColor = '#f97316'; // orange
+                    else if (tituloLower.includes('presb')) borderLeftColor = '#f59e0b'; // amber
+                    else if (tituloLower.includes('diac')) borderLeftColor = '#10b981'; // emerald
+                    else if (tituloLower.includes('auxiliar')) borderLeftColor = '#3b82f6'; // blue
+
                     conteudoHtml += `
-                        <div class="bloco-cargo">
-                            <h2>${c.titulo.toUpperCase()} (${oficiais.length})</h2>
+                        <div class="bloco-cargo" style="border-left: 4px solid ${borderLeftColor};">
+                            <div class="bloco-cargo-header">
+                                <span class="titulo-cargo">${c.titulo.toUpperCase()}</span>
+                                <span class="contador-cargo" style="background-color: ${borderLeftColor}15; color: ${borderLeftColor}">${oficiais.length} ativo(s)</span>
+                            </div>
                             <div class="grade-oficiais">
                     `;
 
@@ -778,7 +789,7 @@
                         oficiais.forEach(o => {
                             conteudoHtml += `
                                 <div class="item-oficial">
-                                    <span class="ponto">•</span>
+                                    <span class="ponto" style="color: ${borderLeftColor}">•</span>
                                     <strong>${o.nome}</strong> 
                                     <span class="cargo-sub">(${o.cargo})</span>
                                 </div>`;
@@ -795,20 +806,136 @@
                     <head>
                         <title>Mural - Corpo de Obreiros e Oficiais</title>
                         <style>
-                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; line-height: 1.5; }
-                            .header { text-align: center; border-bottom: 3px double #475569; padding-bottom: 20px; margin-bottom: 30px; }
-                            .header h1 { margin: 0; font-size: 26px; color: #0f172a; }
-                            .header p { margin: 5px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; }
-                            .bloco-cargo { margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
-                            .bloco-cargo h2 { background-color: #f1f5f9; margin: 0; padding: 12px 15px; font-size: 14px; letter-spacing: 1px; color: #1e293b; border-bottom: 1px solid #cbd5e1; }
-                            .grade-oficiais { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
-                            .item-oficial { font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px; }
-                            .item-oficial .ponto { color: #4f46e5; font-size: 16px; }
-                            .item-oficial .cargo-sub { color: #64748b; font-size: 11px; font-style: italic; }
-                            .vazio { font-style: italic; color: #94a3b8; font-size: 12px; margin: 0; padding: 5px; }
-                            .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-                            @media print { body { margin: 20px; } .btn-print { display: none; } }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+                            @page {
+                                size: portrait;
+                                margin: 8mm;
+                            }
+                            body {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                color: #1e293b;
+                                margin: 10px 15px;
+                                background-color: #fff;
+                                line-height: 1.4;
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                            .header {
+                                text-align: center;
+                                border-bottom: 2px solid #e2e8f0;
+                                padding-bottom: 8px;
+                                margin-bottom: 14px;
+                            }
+                            .header h1 {
+                                margin: 0;
+                                font-size: 20px;
+                                font-weight: 800;
+                                color: #0f172a;
+                                letter-spacing: 0.5px;
+                            }
+                            .header p {
+                                margin: 3px 0 0 0;
+                                font-size: 11px;
+                                text-transform: uppercase;
+                                letter-spacing: 3px;
+                                color: #64748b;
+                                font-weight: 600;
+                            }
+                            .bloco-cargo {
+                                margin-bottom: 10px;
+                                page-break-inside: avoid;
+                                border: 1px solid #cbd5e1;
+                                border-radius: 6px;
+                                overflow: hidden;
+                                background-color: #fff;
+                                box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+                            }
+                            .bloco-cargo-header {
+                                background-color: #f8fafc;
+                                padding: 6px 12px;
+                                border-bottom: 1px solid #cbd5e1;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            }
+                            .titulo-cargo {
+                                font-size: 11.5px;
+                                font-weight: 700;
+                                letter-spacing: 0.8px;
+                                color: #1e293b;
+                            }
+                            .contador-cargo {
+                                font-size: 9.5px;
+                                font-weight: 700;
+                                padding: 1.5px 6px;
+                                border-radius: 10px;
+                                text-transform: uppercase;
+                            }
+                            .grade-oficiais {
+                                padding: 10px 12px;
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                                gap: 6px;
+                            }
+                            .item-oficial {
+                                font-size: 11.5px;
+                                color: #334155;
+                                display: flex;
+                                align-items: center;
+                                gap: 5px;
+                            }
+                            .item-oficial .ponto {
+                                font-size: 14px;
+                                font-weight: bold;
+                            }
+                            .item-oficial .cargo-sub {
+                                color: #64748b;
+                                font-size: 10px;
+                                font-style: italic;
+                            }
+                            .vazio {
+                                font-style: italic;
+                                color: #94a3b8;
+                                font-size: 11px;
+                                margin: 0;
+                                padding: 2px 0;
+                            }
+                            .footer {
+                                text-align: center;
+                                margin-top: 15px;
+                                font-size: 9px;
+                                color: #94a3b8;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                                border-top: 1px dashed #e2e8f0;
+                                padding-top: 8px;
+                            }
+                            @media print {
+                                body {
+                                    margin: 0;
+                                }
+                                .btn-print {
+                                    display: none;
+                                }
+                            }
+                            .btn-print {
+                                position: fixed;
+                                top: 15px;
+                                right: 15px;
+                                padding: 8px 16px;
+                                background: #4f46e5;
+                                color: #fff;
+                                border: none;
+                                border-radius: 6px;
+                                font-weight: bold;
+                                cursor: pointer;
+                                font-size: 12px;
+                                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+                                transition: background 0.2s;
+                                z-index: 999;
+                            }
+                            .btn-print:hover {
+                                background: #4338ca;
+                            }
                         </style>
                     </head>
                     <body>
