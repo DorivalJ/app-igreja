@@ -363,11 +363,36 @@
                     </section>
 
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i> Livro Caixa (Mês Vigente)
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
+                                <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i>
+                                <span>Livro Caixa</span>
+                                <span id="labelPeriodoFinanceiro" class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 ml-1">Julho/2026</span>
                             </h2>
-                            <div class="flex gap-2">
+                            <div class="flex flex-wrap gap-2">
+                                <select id="filtroMes" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Meses</option>
+                                    <option value="01">Janeiro</option>
+                                    <option value="02">Fevereiro</option>
+                                    <option value="03">Março</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Maio</option>
+                                    <option value="06">Junho</option>
+                                    <option value="07">Julho</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                                <select id="filtroAno" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Anos</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                </select>
                                 <select id="filtroTipo" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
                                     <option value="">Todos os Fluxos</option>
                                     <option value="Dízimo">Apenas Dízimos</option>
@@ -376,7 +401,7 @@
                                 </select>
                                 <button onclick="imprimirRelatorioFinanceiro()" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold text-xs rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-600/10">
                                     <i data-lucide="printer" class="w-4 h-4"></i>
-                                    <span>Imprimir Relatório Mensal</span>
+                                    <span>Imprimir Relatório</span>
                                 </button>
                             </div>
                         </div>
@@ -1061,6 +1086,9 @@
         async function imprimirRelatorioFinanceiro() {
             try {
                 const tipoFiltro = document.getElementById('filtroTipo').value;
+                const mesFiltro = document.getElementById('filtroMes').value;
+                const anoFiltro = document.getElementById('filtroAno').value;
+
                 let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: true });
                 
                 if (tipoFiltro) {
@@ -1070,15 +1098,33 @@
                 const { data, error } = await query;
                 if (error) throw error;
 
-                if (!data || data.length === 0) {
-                    alert("Não há registros lançados para gerar o relatório.");
+                let filtrados = data || [];
+
+                if (mesFiltro) {
+                    filtrados = filtrados.filter(f => {
+                        if (!f.data_lancamento) return false;
+                        const partes = f.data_lancamento.split('-');
+                        return partes[1] === mesFiltro;
+                    });
+                }
+
+                if (anoFiltro) {
+                    filtrados = filtrados.filter(f => {
+                        if (!f.data_lancamento) return false;
+                        const partes = f.data_lancamento.split('-');
+                        return partes[0] === anoFiltro;
+                    });
+                }
+
+                if (filtrados.length === 0) {
+                    alert("Não há registros lançados para o período selecionado para gerar o relatório.");
                     return;
                 }
 
                 let d = 0, o = 0, de = 0;
                 let linesTabelaHtml = '';
 
-                data.forEach(f => {
+                filtrados.forEach(f => {
                     if (f.tipo === 'Dízimo') d += f.valor; 
                     else if (f.tipo === 'Oferta') o += f.valor; 
                     else de += f.valor;
@@ -1099,8 +1145,17 @@
 
                 const saldoTotal = d + o - de;
                 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-                const mesAtual = meses[new Date().getMonth()];
-                const anoAtual = new Date().getFullYear();
+                
+                let competenciaLabel = '';
+                if (mesFiltro && anoFiltro) {
+                    competenciaLabel = `${meses[parseInt(mesFiltro) - 1]} de ${anoFiltro}`;
+                } else if (anoFiltro) {
+                    competenciaLabel = `Ano de ${anoFiltro}`;
+                } else if (mesFiltro) {
+                    competenciaLabel = `Mês de ${meses[parseInt(mesFiltro) - 1]}`;
+                } else {
+                    competenciaLabel = "Todos os Períodos";
+                }
 
                 const janelaImpressao = window.open('', '_blank');
                 janelaImpressao.document.write(`
@@ -1140,8 +1195,8 @@
                     <body>
                         <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
                         <div class="header">
-                            <h1>RELATÓRIO MENSAL - LIVRO CAIXA</h1>
-                            <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${mesAtual} de ${anoAtual}</p>
+                            <h1>RELATÓRIO DE LIVRO CAIXA</h1>
+                            <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${competenciaLabel}</p>
                         </div>
                         
                         <div class="cards-resumo">
@@ -1662,6 +1717,25 @@
                 return;
             }
             const tipoFiltro = document.getElementById('filtroTipo').value;
+            const mesFiltro = document.getElementById('filtroMes').value;
+            const anoFiltro = document.getElementById('filtroAno').value;
+
+            // Atualiza o label do período na interface
+            const labelPeriodo = document.getElementById('labelPeriodoFinanceiro');
+            if (labelPeriodo) {
+                if (mesFiltro && anoFiltro) {
+                    const mesesNomes = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                    labelPeriodo.innerText = `${mesesNomes[parseInt(mesFiltro)]}/${anoFiltro}`;
+                } else if (anoFiltro) {
+                    labelPeriodo.innerText = anoFiltro;
+                } else if (mesFiltro) {
+                    const mesesNomes = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                    labelPeriodo.innerText = mesesNomes[parseInt(mesFiltro)];
+                } else {
+                    labelPeriodo.innerText = "Todos os Períodos";
+                }
+            }
+
             let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
             
             if (tipoFiltro) {
@@ -1669,11 +1743,30 @@
             }
 
             const { data } = await query;
+
+            let filtrados = data || [];
+
+            if (mesFiltro) {
+                filtrados = filtrados.filter(f => {
+                    if (!f.data_lancamento) return false;
+                    const partes = f.data_lancamento.split('-');
+                    return partes[1] === mesFiltro;
+                });
+            }
+
+            if (anoFiltro) {
+                filtrados = filtrados.filter(f => {
+                    if (!f.data_lancamento) return false;
+                    const partes = f.data_lancamento.split('-');
+                    return partes[0] === anoFiltro;
+                });
+            }
+
             const tbody = document.getElementById('tabelaFinanceiro');
             tbody.innerHTML = '';
             let d = 0, o = 0, de = 0;
 
-            (data || []).forEach(f => {
+            filtrados.forEach(f => {
                 if(f.tipo==='Dízimo') d+=f.valor; else if(f.tipo==='Oferta') o+=f.valor; else de+=f.valor;
                 const exibicaoCargo = f.cargo ? `<span class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium">${f.cargo}</span>` : '-';
 
@@ -1885,6 +1978,17 @@
 
         window.onload = function() {
             carregarMembros();
+
+            // Inicializar filtros do Livro Caixa com mês/ano atuais
+            const dataHoje = new Date();
+            const mesAtualString = String(dataHoje.getMonth() + 1).padStart(2, '0');
+            const anoAtualString = String(dataHoje.getFullYear());
+
+            const fMes = document.getElementById('filtroMes');
+            const fAno = document.getElementById('filtroAno');
+            if (fMes) fMes.value = mesAtualString;
+            if (fAno) fAno.value = anoAtualString;
+
             lucide.createIcons();
         };
     </script>
