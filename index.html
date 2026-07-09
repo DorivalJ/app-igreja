@@ -600,7 +600,16 @@
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
 
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let _supabase = null;
+        try {
+            if (typeof supabase !== 'undefined') {
+                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.warn('Supabase SDK não pôde ser carregado localmente. O aplicativo funcionará em modo de visualização.');
+            }
+        } catch (e) {
+            console.error('Erro ao inicializar o cliente Supabase:', e);
+        }
         let editandoID = null;
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
@@ -673,7 +682,7 @@
             } else if (idTela === 'documentos') {
                 botoesMenu.documentos.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-900/20";
                 topbarTitulo.innerText = "Cartas, Memorandos e Convites";
-                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20";
+                topbarIconContainer.className = "bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-900/20";
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
                 renderizarFilaDocumentos();
@@ -683,6 +692,10 @@
 
         async function atualizarFluxogramaMural() {
             try {
+                if (!_supabase) {
+                    console.warn('Conexão com o banco de dados temporariamente indisponível.');
+                    return;
+                }
                 const { data: membros, error } = await _supabase.from('membros').select('nome, cargo').eq('status', 'Ativo');
                 if (error) throw error;
 
@@ -706,7 +719,7 @@
                         listaNomes = `<ul class="space-y-1.5">`;
                         oficiais.forEach(o => {
                             listaNomes += `
-                                <li class="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-850">
+                                <li class="flex items-center gap-2 text-sm text-slate-300 bg-slate-950/40 px-3 py-1.5 rounded-lg border border-slate-800">
                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
                                     <span class="font-medium">${o.nome}</span>
                                     <span class="text-[10px] text-slate-500 ml-auto italic">${o.cargo}</span>
@@ -1295,6 +1308,10 @@
 
         async function carregarMembros() {
             try {
+                if (!_supabase) {
+                    console.warn('Conexão com o banco de dados temporariamente indisponível.');
+                    return;
+                }
                 const termo = document.getElementById('busca').value;
                 let query = _supabase.from('membros').select('*').order('nome', { ascending: true });
                 if (termo) query = query.ilike('nome', `%${termo}%`);
@@ -1428,6 +1445,10 @@
         }
 
         async function atualizarListaMembrosNoFormFinanceiro() {
+            if (!_supabase) {
+                console.warn('Conexão com o banco de dados temporariamente indisponível.');
+                return;
+            }
             const { data } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
             listaMembrosCache = data || [];
             const sel = document.getElementById('fin_membro_nome');
@@ -1469,6 +1490,10 @@
         });
 
         async function carregarFinancas() {
+            if (!_supabase) {
+                console.warn('Conexão com o banco de dados temporariamente indisponível.');
+                return;
+            }
             const tipoFiltro = document.getElementById('filtroTipo').value;
             let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
             
@@ -1589,6 +1614,10 @@
         
         async function carregarAgenda() {
             try {
+                if (!_supabase) {
+                    console.warn('Conexão com o banco de dados temporariamente indisponível.');
+                    return;
+                }
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
                 if (error) throw error;
                 const tbody = document.getElementById('tabelaAgenda');
