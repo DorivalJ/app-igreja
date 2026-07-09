@@ -1316,11 +1316,7 @@
                 return;
             }
 
-            // Gerando string de data dinâmica: "Guarulhos, DD de Mês de AAAA."
             const dataHoje = new Date();
-            const mesesPorExtenso = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
-
             const novoDoc = {
                 id: Date.now(),
                 categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
@@ -1330,29 +1326,41 @@
             filaDocumentosCache.unshift(novoDoc);
             renderizarFilaDocumentos();
 
-            let corpoTemplate = '';
-            const dataFormatada = dataInput ? formatarData(dataInput) : '';
+            dispararImpressaoDocumento(novoDoc);
 
-            if (categoria === 'Carta') {
+            document.getElementById('formDocumento').reset();
+            atualizarTiposDocumento();
+        }
+
+        function dispararImpressaoDocumento(doc) {
+            // Gerando string de data dinâmica: "Guarulhos, DD de Mês de AAAA."
+            const dataHoje = new Date();
+            const mesesPorExtenso = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
+
+            let corpoTemplate = '';
+            const dataFormatada = doc.data ? formatarData(doc.data) : '';
+
+            if (doc.categoria === 'Carta') {
                 corpoTemplate = `
                     <p>Prezados Irmãos em Cristo,</p>
-                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${alvo}</strong>, que está se deslocando para a localidade de <strong>${local}</strong>.</p>
+                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${doc.alvo}</strong>, que está se deslocando para a localidade de <strong>${doc.local}</strong>.</p>
                     <p>Solicitamos que o(a) recebam na paz do Senhor e prestem o auxílio e comunhão necessários para o seu bom desenvolvimento espiritual na nova comunidade.</p>
-                    <p>${textoAdicional}</p>
+                    <p>${doc.texto || ''}</p>
                 `;
-            } else if (categoria === 'Memorando') {
+            } else if (doc.categoria === 'Memorando') {
                 corpoTemplate = `
-                    <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${tipo}</p>
-                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || novoDoc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${alvo}</strong>.</p>
+                    <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${doc.tipo}</p>
+                    <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || doc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${doc.alvo}</strong>.</p>
                     <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
-                    <p>${textoAdicional}</p>
+                    <p>${doc.texto || ''}</p>
                 `;
-            } else if (categoria === 'Convite') {
+            } else if (doc.categoria === 'Convite') {
                 corpoTemplate = `
                     <p>Graça e Paz!</p>
-                    <p>Temos a honra de convidar cordialmente <strong>${alvo}</strong> para cooperar conosco no evento <strong>${local}</strong>.</p>
-                    <p>O cronograma oficial está previsto para o dia <strong>${dataFormatada}</strong> às <strong>${hora}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
-                    <p>${textoAdicional}</p>
+                    <p>Temos a honra de convidar cordialmente <strong>${doc.alvo}</strong> para cooperar conosco no evento <strong>${doc.local}</strong>.</p>
+                    <p>O cronograma oficial está previsto para o dia <strong>${dataFormatada}</strong> às <strong>${doc.hora}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                    <p>${doc.texto || ''}</p>
                 `;
             }
 
@@ -1361,7 +1369,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>${categoria} - ${tipo}</title>
+                    <title>${doc.categoria} - ${doc.tipo}</title>
                     <style>
                         body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 50px 60px; line-height: 1.6; font-size: 16px; background: #fff; }
                         .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 15px; }
@@ -1385,7 +1393,7 @@
                         <div class="sub-titulo">Sub Congregação Jd. Marilena</div>
                         <p>Rua Guaraton, 47 Jd. Marilena - Guarulhos - SP</p>
                     </div>
-                    <div class="titulo-doc">${categoria} Oficial: ${tipo}</div>
+                    <div class="titulo-doc">${doc.categoria} Oficial: ${doc.tipo}</div>
                     <div class="corpo">${corpoTemplate}</div>
                     <div class="data-local">${localEDataDinamica}</div>
                     <div class="assinaturas">
@@ -1396,8 +1404,13 @@
                 </html>
             `);
             janelaImpressao.document.close();
-            document.getElementById('formDocumento').reset();
-            atualizarTiposDocumento();
+        }
+
+        function reimprimirDocumento(id) {
+            const doc = filaDocumentosCache.find(d => d.id === id);
+            if (doc) {
+                dispararImpressaoDocumento(doc);
+            }
         }
 
         function renderizarFilaDocumentos() {
@@ -1418,13 +1431,20 @@
                             <div class="text-sm font-semibold text-slate-200">${doc.categoria} — <span class="text-indigo-400">${doc.tipo}</span></div>
                             <div class="text-xs text-slate-400 mt-0.5">Alvo/Destinatário: <span class="text-slate-300 font-medium">${doc.alvo}</span></div>
                         </div>
-                        <div class="text-right text-xs">
-                            <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
+                        <div class="flex items-center gap-4 text-right text-xs">
+                            <div>
+                                <div class="text-slate-500">Emitido em ${doc.data_emissao}</div>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">IMPRESSO</span>
+                            </div>
+                            <button onclick="reimprimirDocumento(${doc.id})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-indigo-600/15">
+                                <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                                <span>Reimprimir</span>
+                            </button>
                         </div>
                     </div>
                 `;
             });
+            lucide.createIcons();
         }
 
         function formatarData(dataString) {
@@ -1854,4 +1874,4 @@
         };
     </script>
 </body>
-</html> 
+</html>
