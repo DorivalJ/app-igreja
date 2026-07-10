@@ -58,6 +58,34 @@
                         <i data-lucide="gift" class="w-5 h-5"></i>
                         <span>Ofertas Voluntárias</span>
                     </button>
+
+                    <div class="relative">
+                        <button id="btn-menu-relatorios" onclick="toggleMenuRelatorios()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-400"></i>
+                                <span>Relatórios</span>
+                            </div>
+                            <i id="chevron-relatorios" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                        </button>
+                        <div id="submenu-relatorios" class="hidden pl-6 mt-1 space-y-1">
+                            <button id="btn-relatorio-aniversariantes" onclick="navegarPara('report-aniversariantes')" class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 text-left transition-all duration-200">
+                                <i data-lucide="cake" class="w-4 h-4 text-pink-400"></i>
+                                <span>Aniversariantes</span>
+                            </button>
+                            <button id="btn-relatorio-dizimos" onclick="navegarPara('report-dizimos')" class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 text-left transition-all duration-200">
+                                <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Dízimos Anual</span>
+                            </button>
+                            <button id="btn-relatorio-ofertas" onclick="navegarPara('report-ofertas')" class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 text-left transition-all duration-200">
+                                <i data-lucide="activity" class="w-4 h-4 text-rose-400"></i>
+                                <span>Extrato de Ofertas</span>
+                            </button>
+                            <button id="btn-relatorio-membros" onclick="navegarPara('report-membros')" class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 text-left transition-all duration-200">
+                                <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-400"></i>
+                                <span>Lista de Membros</span>
+                            </button>
+                        </div>
+                    </div>
                 </nav>
             </div>
 
@@ -669,7 +697,7 @@
                                     <input type="number" id="oferta_ano" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
                                 </div>
 
-                                <div class="md:col-span-3">
+                                <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Movimentação</label>
                                     <select id="oferta_tipomovimentacao" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
                                         <option value="Entrada">Entrada (Aporte / Oferta)</option>
@@ -677,7 +705,12 @@
                                     </select>
                                 </div>
 
-                                <div class="md:col-span-3">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Contribuinte / Doador (Opcional)</label>
+                                    <input type="text" id="oferta_contribuinte" placeholder="Ex: José Wilson ou Anônimo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
+                                </div>
+
+                                <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor (R$)</label>
                                     <input type="number" id="oferta_valor" step="0.01" required placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
                                 </div>
@@ -791,6 +824,264 @@
                     </section>
                 </div>
 
+                <!-- RELATÓRIO 1: Aniversariantes do Mês -->
+                <div id="tela-report-aniversariantes" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="cake" class="w-5 h-5 text-pink-400"></i>
+                                <h2 class="font-semibold text-slate-100">Filtros do Relatório</h2>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <label class="text-xs text-slate-400 font-medium">Mês:</label>
+                                <select id="rep-aniv-mes" onchange="carregarRelatorioAniversariantes()" class="px-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                                <button onclick="imprimirRelatorioAniversariantes()" class="inline-flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span>Imprimir</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview de Impressão -->
+                        <div class="p-8 max-w-2xl mx-auto my-6 bg-white text-slate-900 rounded-xl shadow-lg border border-slate-200" id="preview-aniversariantes">
+                            <div class="text-center border-b-2 border-slate-900 pb-4 mb-6">
+                                <h1 class="text-xl font-extrabold tracking-wide text-slate-900 uppercase">Aniversariantes do Mês</h1>
+                                <p id="preview-aniv-mes-vigente" class="text-sm font-semibold text-indigo-600 mt-1 uppercase tracking-wider">Mês Vigente: -</p>
+                            </div>
+                            
+                            <div id="preview-aniv-lista" class="space-y-4">
+                                <div class="text-center py-8 text-slate-400 italic text-sm">Carregando aniversariantes...</div>
+                            </div>
+
+                            <div class="mt-8 border-t border-dashed border-slate-300 pt-4 text-center text-[10px] text-slate-400 uppercase tracking-wider">
+                                Sistema Igreja Digital - Relatório Gerencial
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- RELATÓRIO 2: Dízimos Anual por Dizimista -->
+                <div id="tela-report-dizimos" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="line-chart" class="w-5 h-5 text-emerald-400"></i>
+                                <h2 class="font-semibold text-slate-100">Filtros de Dízimos</h2>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Ano:</label>
+                                    <select id="rep-diz-ano" onchange="carregarRelatorioDizimos()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026" selected>2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                    </select>
+                                </div>
+                                <div class="relative">
+                                    <input type="text" id="rep-diz-busca" oninput="carregarRelatorioDizimos()" placeholder="Buscar por dizimista..." class="pl-8 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none w-48">
+                                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5"></i>
+                                </div>
+                                <button onclick="imprimirRelatorioDizimos()" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 transition-all">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span>Imprimir</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Ano</th>
+                                        <th class="px-6 py-4">Mês</th>
+                                        <th class="px-6 py-4">Nome do Dizimista</th>
+                                        <th class="px-6 py-4">Cargo / Função</th>
+                                        <th class="px-6 py-4 text-right">Valor do Dízimo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaRelatorioDizimos" class="divide-y divide-slate-800">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-8 text-center text-slate-500 text-sm italic">
+                                            Carregando dízimos...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-5 border-t border-slate-800 bg-slate-950/30 flex justify-between items-center">
+                            <span class="text-xs text-slate-400 font-medium">Lançamentos Encontrados: <strong id="rep-diz-count" class="text-slate-200">0</strong></span>
+                            <span class="text-sm text-slate-300 font-semibold">Total Geral: <strong id="rep-diz-total" class="text-emerald-400 font-bold text-base">R$ 0,00</strong></span>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- RELATÓRIO 3: Extrato de Ofertas Voluntárias -->
+                <div id="tela-report-ofertas" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="activity" class="w-5 h-5 text-rose-400"></i>
+                                <h2 class="font-semibold text-slate-100">Filtros de Ofertas Voluntárias</h2>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Período:</label>
+                                    <select id="rep-ofertas-periodo" onchange="alternarFiltroPeriodoOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="mensal">Mensal</option>
+                                        <option value="anual">Anual</option>
+                                    </select>
+                                </div>
+                                <div id="container-rep-ofertas-mes" class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Mês:</label>
+                                    <select id="rep-ofertas-mes" onchange="carregarRelatorioOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="Janeiro">Janeiro</option>
+                                        <option value="Fevereiro">Fevereiro</option>
+                                        <option value="Março">Março</option>
+                                        <option value="Abril">Abril</option>
+                                        <option value="Maio">Maio</option>
+                                        <option value="Junho" selected>Junho</option>
+                                        <option value="Julho">Julho</option>
+                                        <option value="Agosto">Agosto</option>
+                                        <option value="Setembro">Setembro</option>
+                                        <option value="Outubro">Outubro</option>
+                                        <option value="Novembro">Novembro</option>
+                                        <option value="Dezembro">Dezembro</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Ano:</label>
+                                    <select id="rep-ofertas-ano" onchange="carregarRelatorioOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026" selected>2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                    </select>
+                                </div>
+                                <button onclick="imprimirRelatorioOfertasDinamico()" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-500 transition-all">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span id="txt-btn-print-ofertas">Imprimir Mensal</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Resumo cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border-b border-slate-800 bg-slate-950/20">
+                            <div class="p-5 bg-slate-900 border border-slate-800 rounded-xl">
+                                <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Total de Entradas</p>
+                                <h3 id="rep-ofertas-resumo-entradas" class="text-xl font-bold text-emerald-400 mt-1">R$ 0,00</h3>
+                            </div>
+                            <div class="p-5 bg-slate-900 border border-slate-800 rounded-xl">
+                                <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Total de Saídas</p>
+                                <h3 id="rep-ofertas-resumo-saidas" class="text-xl font-bold text-rose-400 mt-1">R$ 0,00</h3>
+                            </div>
+                            <div class="p-5 bg-slate-900 border border-slate-800 rounded-xl">
+                                <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Saldo Consolidado</p>
+                                <h3 id="rep-ofertas-resumo-saldo" class="text-xl font-bold text-indigo-400 mt-1">R$ 0,00</h3>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Data</th>
+                                        <th class="px-6 py-4">Mês/Ano</th>
+                                        <th class="px-6 py-4">Nome do Contribuinte</th>
+                                        <th class="px-6 py-4">Tipo</th>
+                                        <th class="px-6 py-4">Observação / Destinação</th>
+                                        <th class="px-6 py-4 text-right">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaRelatorioOfertas" class="divide-y divide-slate-800">
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">
+                                            Carregando ofertas voluntárias...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- RELATÓRIO 4: Lista de Membros Cadastrados -->
+                <div id="tela-report-membros" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="clipboard-list" class="w-5 h-5 text-amber-400"></i>
+                                <h2 class="font-semibold text-slate-100">Filtros de Membros</h2>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Status:</label>
+                                    <select id="rep-memb-status" onchange="carregarRelatorioMembros()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="">Todos os Status</option>
+                                        <option value="Ativo" selected>Ativos</option>
+                                        <option value="Inativo">Inativos</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Cargo:</label>
+                                    <select id="rep-memb-cargo" onchange="carregarRelatorioMembros()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="">Todos os Cargos</option>
+                                        <option value="Pastor">Pastor(a)</option>
+                                        <option value="Presbítero">Presbítero</option>
+                                        <option value="Diácono">Diácono / Diaconisa</option>
+                                        <option value="Auxiliar">Auxiliar / Cooperador</option>
+                                        <option value="Membro">Membro Comum</option>
+                                    </select>
+                                </div>
+                                <button onclick="imprimirRelatorioMembros()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-all">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span>Imprimir Lista</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Nome Completo</th>
+                                        <th class="px-6 py-4">Cargo / Função</th>
+                                        <th class="px-6 py-4">Celular</th>
+                                        <th class="px-6 py-4">Data Nasc.</th>
+                                        <th class="px-6 py-4">Adesão</th>
+                                        <th class="px-6 py-4 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaRelatorioMembros" class="divide-y divide-slate-800">
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">
+                                            Carregando lista de membros...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-5 border-t border-slate-800 bg-slate-950/30 flex justify-between items-center">
+                            <span class="text-xs text-slate-400 font-medium">Total de Membros Listados: <strong id="rep-memb-count" class="text-amber-400 font-bold text-sm">0</strong></span>
+                        </div>
+                    </section>
+                </div>
+
             </main>
         </div>
     </div>
@@ -839,14 +1130,32 @@
                 agenda: document.getElementById('btn-menu-agenda'),
                 mural: document.getElementById('btn-menu-mural'),
                 documentos: document.getElementById('btn-menu-documentos'),
-                ofertas: document.getElementById('btn-menu-ofertas')
+                ofertas: document.getElementById('btn-menu-ofertas'),
+                'report-aniversariantes': document.getElementById('btn-relatorio-aniversariantes'),
+                'report-dizimos': document.getElementById('btn-relatorio-dizimos'),
+                'report-ofertas': document.getElementById('btn-relatorio-ofertas'),
+                'report-membros': document.getElementById('btn-relatorio-membros')
             };
 
             Object.keys(botoesMenu).forEach(chave => {
                 if(botoesMenu[chave]) {
-                    botoesMenu[chave].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+                    if (chave.startsWith('report-')) {
+                        botoesMenu[chave].className = "w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 text-left transition-all duration-200";
+                    } else {
+                        botoesMenu[chave].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+                    }
                 }
             });
+
+            // Highlight parent Reports menu if active
+            const btnRelatorios = document.getElementById('btn-menu-relatorios');
+            if (btnRelatorios) {
+                if (idTela.startsWith('report-')) {
+                    btnRelatorios.className = "w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-slate-800 text-indigo-400 shadow-md";
+                } else {
+                    btnRelatorios.className = "w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+                }
+            }
 
             const topbarIconContainer = document.getElementById('iconeDinamicoTopbar');
             const topbarTitulo = document.getElementById('tituloTopbar');
@@ -901,7 +1210,58 @@
                 iconeHeader.setAttribute('data-lucide', 'gift');
                 resetarEstadoOfertas();
                 carregarOfertas();
+            } else if (idTela === 'report-aniversariantes') {
+                botoesMenu['report-aniversariantes'].className = "w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm bg-indigo-600 text-white font-semibold shadow-sm text-left transition-all duration-200";
+                topbarTitulo.innerText = "Aniversariantes do Mês";
+                topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
+                iconeHeader.setAttribute('data-lucide', 'cake');
+                
+                // Pre-select current month if empty
+                const selectAniv = document.getElementById('rep-aniv-mes');
+                if (selectAniv && !selectAniv.value) {
+                    selectAniv.value = String(new Date().getMonth() + 1);
+                }
+                carregarRelatorioAniversariantes();
+            } else if (idTela === 'report-dizimos') {
+                botoesMenu['report-dizimos'].className = "w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white font-semibold shadow-sm text-left transition-all duration-200";
+                topbarTitulo.innerText = "Dízimos Anual";
+                topbarIconContainer.className = "bg-emerald-600 p-2 rounded-lg text-white shadow-lg shadow-emerald-500/20";
+                iconeHeader.setAttribute('data-lucide', 'line-chart');
+                carregarRelatorioDizimos();
+            } else if (idTela === 'report-ofertas') {
+                botoesMenu['report-ofertas'].className = "w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm bg-rose-600 text-white font-semibold shadow-sm text-left transition-all duration-200";
+                topbarTitulo.innerText = "Extrato de Ofertas";
+                topbarIconContainer.className = "bg-rose-600 p-2 rounded-lg text-white shadow-lg shadow-rose-500/20";
+                iconeHeader.setAttribute('data-lucide', 'activity');
+                carregarRelatorioOfertas();
+            } else if (idTela === 'report-membros') {
+                botoesMenu['report-membros'].className = "w-full flex items-center gap-2 px-4 py-2 rounded-lg text-sm bg-amber-600 text-white font-semibold shadow-sm text-left transition-all duration-200";
+                topbarTitulo.innerText = "Lista de Membros";
+                topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
+                iconeHeader.setAttribute('data-lucide', 'clipboard-list');
+                carregarRelatorioMembros();
             }
+            lucide.createIcons();
+        }
+
+        function toggleMenuRelatorios() {
+            const submenu = document.getElementById('submenu-relatorios');
+            const chevron = document.getElementById('chevron-relatorios');
+            if (submenu) {
+                const isHidden = submenu.classList.contains('hidden');
+                if (isHidden) {
+                    submenu.classList.remove('hidden');
+                    if (chevron) {
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
+                } else {
+                    submenu.classList.add('hidden');
+                    if (chevron) {
+                        chevron.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        }
             lucide.createIcons();
         }
 
@@ -2180,21 +2540,16 @@
             const partes = dataVal.split('-');
             const ano = parseInt(partes[0]);
             const mesNum = parseInt(partes[1]);
-            const mesesNomes = [
-                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-            ];
-            document.getElementById('oferta_mes').value = mesesNomes[mesNum - 1];
-            document.getElementById('oferta_ano').value = ano;
-        }
-
-        function resetarEstadoOfertas() {
+              function resetarEstadoOfertas() {
             editandoOfertaID = null;
             const idInput = document.getElementById('oferta_id');
             if (idInput) idInput.value = '';
             
             const form = document.getElementById('formOfertas');
             if (form) form.reset();
+
+            const contribInput = document.getElementById('oferta_contribuinte');
+            if (contribInput) contribInput.value = '';
             
             const hoje = new Date();
             const yyyy = hoje.getFullYear();
@@ -2305,6 +2660,17 @@
                 
                 const corTipo = item.tipo_movimentacao === 'Saída' ? 'text-rose-400 font-semibold bg-rose-500/10 border-rose-500/20' : 'text-emerald-400 font-semibold bg-emerald-500/10 border-emerald-500/20';
                 const labelTipo = item.tipo_movimentacao || 'Entrada';
+
+                // Parse contributor and observation
+                let obsExibida = item.observacao || '-';
+                let badgeContribuinte = '';
+                if (item.observacao && item.observacao.startsWith('Contribuinte:')) {
+                    const parts = item.observacao.split(' | ');
+                    const contribPart = parts[0];
+                    const nomeContribuinte = contribPart.replace('Contribuinte:', '').trim();
+                    badgeContribuinte = `<span class="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded-md font-medium inline-block mr-1.5" title="Contribuinte">${nomeContribuinte}</span>`;
+                    obsExibida = parts.slice(1).join(' | ').trim() || '-';
+                }
                 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/30 transition-colors">
@@ -2315,7 +2681,12 @@
                                 ${labelTipo}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-slate-200 text-sm max-w-[280px] truncate" title="${item.observacao || ''}">${item.observacao || '-'}</td>
+                        <td class="px-6 py-4 text-slate-200 text-sm max-w-[280px] truncate" title="${item.observacao || ''}">
+                            <div class="flex items-center gap-1 flex-wrap">
+                                ${badgeContribuinte}
+                                <span class="truncate">${obsExibida}</span>
+                            </div>
+                        </td>
                         <td class="px-6 py-4 text-right font-medium text-emerald-400">${entradaStr}</td>
                         <td class="px-6 py-4 text-right font-medium text-rose-400">${saidaStr}</td>
                         <td class="px-6 py-4 text-right whitespace-nowrap text-sm">
@@ -2352,6 +2723,14 @@
             
             const valor = parseFloat(document.getElementById('oferta_valor').value) || 0;
             const tipo = document.getElementById('oferta_tipomovimentacao').value;
+
+            // Formulate observation with contributor prefix
+            const contribValue = document.getElementById('oferta_contribuinte').value.trim();
+            const obsValue = document.getElementById('oferta_observacao').value.trim();
+            let observacaoCompleta = obsValue;
+            if (contribValue) {
+                observacaoCompleta = `Contribuinte: ${contribValue}` + (obsValue ? ` | ${obsValue}` : '');
+            }
             
             const payload = {
                 data: document.getElementById('oferta_data').value,
@@ -2360,7 +2739,7 @@
                 tipo_movimentacao: tipo,
                 entrada: tipo === 'Entrada' ? valor : 0,
                 saida: tipo === 'Saída' ? valor : 0,
-                observacao: document.getElementById('oferta_observacao').value || null
+                observacao: observacaoCompleta || null
             };
             
             try {
@@ -2401,7 +2780,17 @@
                 
                 const valor = data.tipo_movimentacao === 'Saída' ? (parseFloat(data.saida) || 0) : (parseFloat(data.entrada) || 0);
                 document.getElementById('oferta_valor').value = valor;
-                document.getElementById('oferta_observacao').value = data.observacao || '';
+
+                // Parse observation and contributor
+                let contrib = '';
+                let obs = data.observacao || '';
+                if (obs && obs.startsWith('Contribuinte:')) {
+                    const parts = obs.split(' | ');
+                    contrib = parts[0].replace('Contribuinte:', '').trim();
+                    obs = parts.slice(1).join(' | ').trim();
+                }
+                document.getElementById('oferta_contribuinte').value = contrib;
+                document.getElementById('oferta_observacao').value = obs;
                 
                 document.getElementById('tituloFormOfertas').innerText = "Editando Movimentação";
                 document.getElementById('textoBtnSalvarOferta').innerText = "Atualizar";
@@ -2460,13 +2849,22 @@
                     
                     const entStr = ent > 0 ? `R$ ${ent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
                     const saiStr = sai > 0 ? `R$ ${sai.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+
+                    // Parse contributor and observation
+                    let obsExibida = item.observacao || '-';
+                    if (item.observacao && item.observacao.startsWith('Contribuinte:')) {
+                        const parts = item.observacao.split(' | ');
+                        const contrib = parts[0].replace('Contribuinte:', '').trim();
+                        const desc = parts.slice(1).join(' | ').trim();
+                        obsExibida = `<strong>Contribuinte:</strong> ${contrib}` + (desc ? ` — ${desc}` : '');
+                    }
                     
                     rowsHtml += `
                         <tr>
                             <td>${formatarData(item.data)}</td>
                             <td>${item.mes}/${item.ano}</td>
                             <td><strong>${item.tipo_movimentacao}</strong></td>
-                            <td>${item.observacao || '-'}</td>
+                            <td>${obsExibida}</td>
                             <td class="text-right text-success">${entStr}</td>
                             <td class="text-right text-danger">${saiStr}</td>
                         </tr>
@@ -2531,7 +2929,7 @@
                             <div class="card"><p>Total Saídas (-)</p><h3 style="color: #dc2626;">R$ ${totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
                             <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
                         </div>
- 
+
                         <table>
                             <thead>
                                 <tr>
@@ -2545,10 +2943,711 @@
                             </thead>
                             <tbody>${rowsHtml}</tbody>
                         </table>
- 
+
                         <div class="assinaturas">
                             <div class="linha-assinatura">Responsável Financeiro</div>
                             <div class="linha-assinatura">Pastor Dirigente</div>
+                        </div>
+
+                        <div class="footer">GERADO POR SISTEMA IGREJA DIGITAL</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+            } catch (err) {
+                alert("Erro ao gerar relatório impresso: " + err.message);
+            }
+        }
+
+        // --- MÓDULOS DE RELATÓRIOS INTEGRADOS ---
+
+        // Cache local de aniversariantes para impressão
+        let relatorioAniversariantesCache = [];
+
+        async function carregarRelatorioAniversariantes() {
+            if (!_supabase) return;
+            const mesSelecionado = parseInt(document.getElementById('rep-aniv-mes').value) || 1;
+            const mesesNomes = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            
+            document.getElementById('preview-aniv-mes-vigente').innerText = `Mês Vigente: ${mesesNomes[mesSelecionado - 1]}`;
+            
+            const container = document.getElementById('preview-aniv-lista');
+            container.innerHTML = '<div class="text-center py-8 text-slate-400 italic text-sm">Buscando membros aniversariantes...</div>';
+            
+            try {
+                const { data, error } = await _supabase.from('membros').select('nome, data_nascimento').eq('status', 'Ativo');
+                if (error) throw error;
+                
+                // Filtrar aniversariantes no mês correspondente
+                const aniversariantes = (data || []).filter(m => {
+                    if (!m.data_nascimento) return false;
+                    const partes = m.data_nascimento.split('-');
+                    return parseInt(partes[1]) === mesSelecionado;
+                });
+                
+                // Ordenar por dia
+                aniversariantes.sort((a, b) => {
+                    const diaA = parseInt(a.data_nascimento.split('-')[2]);
+                    const diaB = parseInt(b.data_nascimento.split('-')[2]);
+                    return diaA - diaB;
+                });
+                
+                relatorioAniversariantesCache = aniversariantes;
+                container.innerHTML = '';
+                
+                if (aniversariantes.length === 0) {
+                    container.innerHTML = '<div class="text-center py-8 text-slate-500 italic text-sm">Nenhum aniversariante cadastrado para este mês.</div>';
+                    return;
+                }
+                
+                aniversariantes.forEach(m => {
+                    const partes = m.data_nascimento.split('-');
+                    const dia = partes[2];
+                    const mes = partes[1];
+                    container.innerHTML += `
+                        <div class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-none">
+                            <span class="font-semibold text-slate-800 text-sm">${m.nome}</span>
+                            <span class="text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-3 py-0.5 rounded-full text-xs">${dia}/${mes}</span>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                container.innerHTML = `<div class="text-center py-8 text-rose-500 italic text-sm">Erro ao carregar aniversariantes: ${err.message}</div>`;
+            }
+        }
+
+        function imprimirRelatorioAniversariantes() {
+            if (relatorioAniversariantesCache.length === 0) {
+                alert("Não há aniversariantes na lista deste mês para gerar impressão.");
+                return;
+            }
+            const mesSelecionado = parseInt(document.getElementById('rep-aniv-mes').value) || 1;
+            const mesesNomes = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            
+            let rowsHtml = '';
+            relatorioAniversariantesCache.forEach(m => {
+                const partes = m.data_nascimento.split('-');
+                const dia = partes[2];
+                rowsHtml += `
+                    <tr>
+                        <td>${m.nome}</td>
+                        <td class="text-center"><strong>${dia} de ${mesesNomes[mesSelecionado - 1]}</strong></td>
+                    </tr>
+                `;
+            });
+            
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Relatório de Aniversariantes do Mês</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                        .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 30px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                        .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #4f46e5; font-weight: bold; }
+                        
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th { background-color: #f1f5f9; color: #334155; font-size: 12px; text-transform: uppercase; font-weight: bold; padding: 12px; border: 1px solid #cbd5e1; text-align: left; }
+                        td { padding: 12px; border: 1px solid #cbd5e1; font-size: 13px; color: #334155; }
+                        tr:nth-child(even) { background-color: #f8fafc; }
+                        .text-center { text-align: center; }
+                        
+                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px dashed #cbd5e1; padding-top: 8px; pointer-events: none; }
+                        .assinaturas { margin-top: 80px; display: flex; justify-content: space-around; }
+                        .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                        
+                        @media print { body { margin: 20px; } .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+                    <div class="header">
+                        <h1>ANIVERSARIANTES DO MÊS</h1>
+                        <p>Mês Vigente: ${mesesNomes[mesSelecionado - 1]}</p>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome Completo</th>
+                                <th class="text-center" style="width: 250px;">Dia do Aniversário</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+
+                    <div class="assinaturas">
+                        <div class="linha-assinatura">Secretaria Executiva</div>
+                        <div class="linha-assinatura">Pastor Dirigente</div>
+                    </div>
+
+                    <div class="footer">SISTEMA IGREJA DIGITAL</div>
+                </body>
+                </html>
+            `);
+            janela.document.close();
+        }
+
+        // Cache local de dízimos para impressão
+        let relatorioDizimosCache = [];
+
+        async function carregarRelatorioDizimos() {
+            if (!_supabase) return;
+            const anoSelecionado = parseInt(document.getElementById('rep-diz-ano').value) || 2026;
+            const busca = document.getElementById('rep-diz-busca').value.toLowerCase().trim();
+            const tbody = document.getElementById('tabelaRelatorioDizimos');
+            
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500 text-sm italic">Buscando dízimos do ano...</td></tr>';
+            
+            try {
+                const { data, error } = await _supabase
+                    .from('financeiro')
+                    .select('*')
+                    .eq('tipo', 'Dízimo')
+                    .gte('data_lancamento', `${anoSelecionado}-01-01`)
+                    .lte('data_lancamento', `${anoSelecionado}-12-31`)
+                    .order('data_lancamento', { ascending: false });
+                
+                if (error) throw error;
+                
+                // Filtrar em memória por nome do dizimista
+                const dízimosFiltrados = (data || []).filter(item => {
+                    if (!busca) return true;
+                    return item.descricao && item.descricao.toLowerCase().includes(busca);
+                });
+                
+                relatorioDizimosCache = dízimosFiltrados;
+                tbody.innerHTML = '';
+                
+                let totalSoma = 0;
+                
+                if (dízimosFiltrados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500 text-sm italic">Nenhum lançamento de dízimo encontrado para os filtros selecionados.</td></tr>';
+                    document.getElementById('rep-diz-count').innerText = '0';
+                    document.getElementById('rep-diz-total').innerText = 'R$ 0,00';
+                    return;
+                }
+                
+                const mesesNomesAbrev = {
+                    '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril', '05': 'Maio', '06': 'Junho',
+                    '07': 'Julho', '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+                };
+                
+                dízimosFiltrados.forEach(item => {
+                    const partes = (item.data_lancamento || '').split('-');
+                    const ano = partes[0] || anoSelecionado;
+                    const mesCod = partes[1] || '01';
+                    const mesNome = mesesNomesAbrev[mesCod] || 'Janeiro';
+                    const valor = parseFloat(item.valor) || 0;
+                    totalSoma += valor;
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4 text-sm text-slate-300 font-medium">${ano}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">${mesNome}</td>
+                            <td class="px-6 py-4 text-sm text-slate-200 font-semibold">${item.descricao || 'Contribuinte Geral'}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">${item.cargo || 'Membro'}</td>
+                            <td class="px-6 py-4 text-sm text-right text-emerald-400 font-bold">R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('rep-diz-count').innerText = String(dízimosFiltrados.length);
+                document.getElementById('rep-diz-total').innerText = `R$ ${totalSoma.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-rose-500 text-sm italic">Erro ao carregar dízimos: ${err.message}</td></tr>`;
+            }
+        }
+
+        function imprimirRelatorioDizimos() {
+            if (relatorioDizimosCache.length === 0) {
+                alert("Não há dízimos listados para gerar impressão.");
+                return;
+            }
+            const anoSelecionado = parseInt(document.getElementById('rep-diz-ano').value) || 2026;
+            
+            let totalSoma = 0;
+            let rowsHtml = '';
+            
+            const mesesNomesAbrev = {
+                '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril', '05': 'Maio', '06': 'Junho',
+                '07': 'Julho', '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+            };
+
+            // Order by contributor name and then month
+            const dízimosOrdenados = [...relatorioDizimosCache].sort((a, b) => {
+                if ((a.descricao || '') < (b.descricao || '')) return -1;
+                if ((a.descricao || '') > (b.descricao || '')) return 1;
+                return (a.data_lancamento || '') < (b.data_lancamento || '') ? -1 : 1;
+            });
+            
+            dízimosOrdenados.forEach(item => {
+                const partes = (item.data_lancamento || '').split('-');
+                const mesCod = partes[1] || '01';
+                const mesNome = mesesNomesAbrev[mesCod] || 'Janeiro';
+                const valor = parseFloat(item.valor) || 0;
+                totalSoma += valor;
+                
+                rowsHtml += `
+                    <tr>
+                        <td class="text-center">${anoSelecionado}</td>
+                        <td>${mesNome}</td>
+                        <td><strong>${item.descricao || 'Contribuinte Geral'}</strong></td>
+                        <td>${item.cargo || 'Membro'}</td>
+                        <td class="text-right text-success">R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
+            });
+            
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Dízimos Anual por Dizimista — ${anoSelecionado}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                        .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                        .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #10b981; font-weight: bold; }
+                        
+                        .card-total { border: 2px solid #10b981; border-radius: 8px; padding: 15px; background: #f0fdf4; margin-bottom: 25px; display: inline-block; min-width: 250px; }
+                        .card-total p { margin: 0; font-size: 11px; text-transform: uppercase; color: #047857; font-weight: 600; }
+                        .card-total h3 { margin: 5px 0 0 0; font-size: 22px; color: #065f46; font-weight: 800; }
+                        
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                        td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
+                        tr:nth-child(even) { background-color: #f8fafc; }
+                        
+                        .text-right { text-align: right; }
+                        .text-center { text-align: center; }
+                        .text-success { color: #059669; font-weight: 600; }
+                        
+                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px dashed #cbd5e1; padding-top: 8px; pointer-events: none; }
+                        .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
+                        .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                        
+                        @media print { body { margin: 20px; } .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+                    <div class="header">
+                        <h1>RELATÓRIO DE DÍZIMOS ANUAL</h1>
+                        <p>Dízimos Anual por Dizimista — Ano de Exercício: ${anoSelecionado}</p>
+                    </div>
+                    
+                    <div class="card-total">
+                        <p>Volume Acumulado Geral</p>
+                        <h3>R$ ${totalSoma.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 80px;">Ano</th>
+                                <th style="width: 150px;">Mês</th>
+                                <th>Nome do Dizimista</th>
+                                <th>Cargo / Função</th>
+                                <th class="text-right" style="width: 150px;">Valor do Dízimo</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+
+                    <div class="assinaturas">
+                        <div class="linha-assinatura">Responsável Tesouraria</div>
+                        <div class="linha-assinatura">Pastor Dirigente</div>
+                    </div>
+
+                    <div class="footer">SISTEMA IGREJA DIGITAL</div>
+                </body>
+                </html>
+            `);
+            janela.document.close();
+        }
+
+        // Cache local de ofertas voluntárias para relatórios
+        let relatorioOfertasCache = [];
+
+        function alternarFiltroPeriodoOfertas() {
+            const periodo = document.getElementById('rep-ofertas-periodo').value;
+            const containerMes = document.getElementById('container-rep-ofertas-mes');
+            const txtBtn = document.getElementById('txt-btn-print-ofertas');
+            
+            if (periodo === 'anual') {
+                containerMes.classList.add('hidden');
+                if (txtBtn) txtBtn.innerText = "Imprimir Anual";
+            } else {
+                containerMes.classList.remove('hidden');
+                if (txtBtn) txtBtn.innerText = "Imprimir Mensal";
+            }
+            
+            carregarRelatorioOfertas();
+        }
+
+        async function carregarRelatorioOfertas() {
+            if (!_supabase) return;
+            const periodo = document.getElementById('rep-ofertas-periodo').value;
+            const mesVal = document.getElementById('rep-ofertas-mes').value;
+            const anoVal = parseInt(document.getElementById('rep-ofertas-ano').value) || 2026;
+            const tbody = document.getElementById('tabelaRelatorioOfertas');
+            
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">Buscando lançamentos de ofertas...</td></tr>';
+            
+            try {
+                let query = _supabase.from('ofertas_voluntarias').select('*').eq('ano', anoVal);
+                if (periodo === 'mensal') {
+                    query = query.eq('mes', mesVal);
+                }
+                
+                const { data, error } = await query.order('data', { ascending: false });
+                if (error) throw error;
+                
+                relatorioOfertasCache = data || [];
+                tbody.innerHTML = '';
+                
+                let totalEntradas = 0;
+                let totalSaidas = 0;
+                
+                if (relatorioOfertasCache.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">Nenhum lançamento encontrado para os filtros selecionados.</td></tr>';
+                    document.getElementById('rep-ofertas-resumo-entradas').innerText = 'R$ 0,00';
+                    document.getElementById('rep-ofertas-resumo-saidas').innerText = 'R$ 0,00';
+                    document.getElementById('rep-ofertas-resumo-saldo').innerText = 'R$ 0,00';
+                    return;
+                }
+                
+                relatorioOfertasCache.forEach(item => {
+                    const ent = parseFloat(item.entrada) || 0;
+                    const sai = parseFloat(item.saida) || 0;
+                    totalEntradas += ent;
+                    totalSaidas += sai;
+                    
+                    const valorStr = ent > 0 
+                        ? `R$ ${ent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : `R$ ${sai.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    
+                    const corTipo = item.tipo_movimentacao === 'Saída' 
+                        ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' 
+                        : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+
+                    // Parse contributor and observation
+                    let contrib = 'Contribuinte Geral';
+                    let obsExibida = item.observacao || '-';
+                    if (item.observacao && item.observacao.startsWith('Contribuinte:')) {
+                        const parts = item.observacao.split(' | ');
+                        contrib = parts[0].replace('Contribuinte:', '').trim();
+                        obsExibida = parts.slice(1).join(' | ').trim() || '-';
+                    }
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4 text-sm">${formatarData(item.data)}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">${item.mes || ''}/${item.ano || ''}</td>
+                            <td class="px-6 py-4 text-sm text-slate-200 font-semibold">${contrib}</td>
+                            <td class="px-6 py-4">
+                                <span class="text-[11px] px-2.5 py-0.5 rounded-full border ${corTipo}">
+                                    ${item.tipo_movimentacao}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-400 max-w-[200px] truncate" title="${obsExibida}">${obsExibida}</td>
+                            <td class="px-6 py-4 text-sm text-right font-bold ${ent > 0 ? 'text-emerald-400' : 'text-rose-400'}">${valorStr}</td>
+                        </tr>
+                    `;
+                });
+                
+                const saldo = totalEntradas - totalSaidas;
+                document.getElementById('rep-ofertas-resumo-entradas').innerText = `R$ ${totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                document.getElementById('rep-ofertas-resumo-saidas').innerText = `R$ ${totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                document.getElementById('rep-ofertas-resumo-saldo').innerText = `R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-rose-500 text-sm italic">Erro ao carregar ofertas: ${err.message}</td></tr>`;
+            }
+        }
+
+        function imprimirRelatorioOfertasDinamico() {
+            if (relatorioOfertasCache.length === 0) {
+                alert("Não há dados de Ofertas Voluntárias no período selecionado para gerar impressão.");
+                return;
+            }
+            const periodo = document.getElementById('rep-ofertas-periodo').value;
+            const mesVal = document.getElementById('rep-ofertas-mes').value;
+            const anoVal = parseInt(document.getElementById('rep-ofertas-ano').value) || 2026;
+            
+            let totalEntradas = 0;
+            let totalSaidas = 0;
+            let rowsHtml = '';
+            
+            // Sort ascending by date
+            const ofertasOrdenadas = [...relatorioOfertasCache].sort((a, b) => (a.data || '') < (b.data || '') ? -1 : 1);
+            
+            ofertasOrdenadas.forEach(item => {
+                const ent = parseFloat(item.entrada) || 0;
+                const sai = parseFloat(item.saida) || 0;
+                totalEntradas += ent;
+                totalSaidas += sai;
+                
+                const entStr = ent > 0 ? `R$ ${ent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+                const saiStr = sai > 0 ? `R$ ${sai.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+
+                // Parse contributor and observation
+                let contrib = 'Contribuinte Geral';
+                let obsExibida = item.observacao || '-';
+                if (item.observacao && item.observacao.startsWith('Contribuinte:')) {
+                    const parts = item.observacao.split(' | ');
+                    contrib = parts[0].replace('Contribuinte:', '').trim();
+                    obsExibida = parts.slice(1).join(' | ').trim() || '-';
+                }
+                
+                rowsHtml += `
+                    <tr>
+                        <td class="text-center">${formatarData(item.data)}</td>
+                        <td>${contrib}</td>
+                        <td><strong>${item.tipo_movimentacao}</strong></td>
+                        <td>${obsExibida}</td>
+                        <td class="text-right text-success">${entStr}</td>
+                        <td class="text-right text-danger">${saiStr}</td>
+                    </tr>
+                `;
+            });
+            
+            const saldoTotal = totalEntradas - totalSaidas;
+            const competencia = periodo === 'mensal' ? `${mesVal} / ${anoVal}` : `Ano de ${anoVal}`;
+            
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Demonstrativo de Ofertas — ${competencia}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                        .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                        .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #e11d48; font-weight: bold; }
+                        
+                        .cards-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+                        .card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: #f8fafc; }
+                        .card p { margin: 0; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+                        .card h3 { margin: 5px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 700; }
+                        
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                        td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
+                        tr:nth-child(even) { background-color: #f8fafc; }
+                        
+                        .text-right { text-align: right; }
+                        .text-center { text-align: center; }
+                        .text-success { color: #16a34a; font-weight: 600; }
+                        .text-danger { color: #dc2626; font-weight: 600; }
+                        
+                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px dashed #cbd5e1; padding-top: 8px; pointer-events: none; }
+                        .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
+                        .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                        
+                        @media print { body { margin: 20px; } .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #e11d48; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Demonstrativo</button>
+                    <div class="header">
+                        <h1>RELATÓRIO DE OFERTAS VOLUNTÁRIAS</h1>
+                        <p>Demonstrativo de Entradas e Destinação de Recursos — Período: ${competencia}</p>
+                    </div>
+                    
+                    <div class="cards-resumo">
+                        <div class="card"><p>Total Entradas (+)</p><h3 style="color: #16a34a;">R$ ${totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                        <div class="card"><p>Total Saídas (-)</p><h3 style="color: #dc2626;">R$ ${totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                        <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 100px;">Data</th>
+                                <th>Doador / Contribuinte</th>
+                                <th style="width: 140px;">Tipo</th>
+                                <th>Descrição / Destinação</th>
+                                <th class="text-right" style="width: 140px;">Entrada</th>
+                                <th class="text-right" style="width: 140px;">Saída</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+
+                    <div class="assinaturas">
+                        <div class="linha-assinatura">Responsável Financeiro</div>
+                        <div class="linha-assinatura">Pastor Dirigente</div>
+                    </div>
+
+                    <div class="footer">SISTEMA IGREJA DIGITAL</div>
+                </body>
+                </html>
+            `);
+            janela.document.close();
+        }
+
+        // Cache local de membros cadastrados para impressão
+        let relatorioMembrosCache = [];
+
+        async function carregarRelatorioMembros() {
+            if (!_supabase) return;
+            const statusFiltro = document.getElementById('rep-memb-status').value;
+            const cargoFiltro = document.getElementById('rep-memb-cargo').value;
+            const tbody = document.getElementById('tabelaRelatorioMembros');
+            
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">Buscando lista de membros...</td></tr>';
+            
+            try {
+                let query = _supabase.from('membros').select('*');
+                if (statusFiltro) {
+                    query = query.eq('status', statusFiltro);
+                }
+                
+                const { data, error } = await query.order('nome', { ascending: true });
+                if (error) throw error;
+                
+                // Filtrar por cargo em memória
+                const membrosFiltrados = (data || []).filter(m => {
+                    if (!cargoFiltro) return true;
+                    return m.cargo && m.cargo.toLowerCase().includes(cargoFiltro.toLowerCase());
+                });
+                
+                relatorioMembrosCache = membrosFiltrados;
+                tbody.innerHTML = '';
+                
+                if (membrosFiltrados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">Nenhum membro cadastrado para as restrições informadas.</td></tr>';
+                    document.getElementById('rep-memb-count').innerText = '0';
+                    return;
+                }
+                
+                membrosFiltrados.forEach(m => {
+                    const statusBadge = m.status === 'Ativo' 
+                        ? '<span class="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 text-emerald-400 bg-emerald-500/10 font-bold">Ativo</span>'
+                        : '<span class="text-[10px] px-2 py-0.5 rounded-full border border-rose-500/20 text-rose-400 bg-rose-500/10 font-bold">Inativo</span>';
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4 text-sm text-slate-100 font-semibold">${m.nome}</td>
+                            <td class="px-6 py-4 text-sm text-slate-300 font-medium">${m.cargo || 'Membro'}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">${m.celular || '-'}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(m.data_nascimento)}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(m.data_adesao)}</td>
+                            <td class="px-6 py-4 text-center">${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('rep-memb-count').innerText = String(membrosFiltrados.length);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-rose-500 text-sm italic">Erro ao carregar membros: ${err.message}</td></tr>`;
+            }
+        }
+
+        function imprimirRelatorioMembros() {
+            if (relatorioMembrosCache.length === 0) {
+                alert("Não há membros cadastrados listados sob as restrições selecionadas para impressão.");
+                return;
+            }
+            
+            let rowsHtml = '';
+            relatorioMembrosCache.forEach(m => {
+                rowsHtml += `
+                    <tr>
+                        <td><strong>${m.nome}</strong></td>
+                        <td>${m.cargo || 'Membro'}</td>
+                        <td>${m.celular || '—'}</td>
+                        <td>${m.email || '—'}</td>
+                        <td class="text-center">${formatarData(m.data_nascimento)}</td>
+                        <td class="text-center">${formatarData(m.data_adesao)}</td>
+                        <td class="text-center"><strong>${m.status || 'Ativo'}</strong></td>
+                    </tr>
+                `;
+            });
+            
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Relação de Membros Cadastrados</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                        .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                        .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #d97706; font-weight: bold; }
+                        
+                        .card-count { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 15px; background: #fffbeb; margin-bottom: 25px; display: inline-block; }
+                        .card-count p { margin: 0; font-size: 11px; text-transform: uppercase; color: #b45309; font-weight: 600; }
+                        .card-count h3 { margin: 3px 0 0 0; font-size: 18px; color: #78350f; font-weight: 800; }
+                        
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                        td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
+                        tr:nth-child(even) { background-color: #f8fafc; }
+                        
+                        .text-center { text-align: center; }
+                        
+                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px dashed #cbd5e1; padding-top: 8px; pointer-events: none; }
+                        .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
+                        .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                        
+                        @media print { body { margin: 20px; } .btn-print { display: none; } }
+                        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #d97706; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">Imprimir Relação</button>
+                    <div class="header">
+                        <h1>RELAÇÃO DE MEMBROS CADASTRADOS</h1>
+                        <p>Livro de Membresia — Atualizado</p>
+                    </div>
+                    
+                    <div class="card-count">
+                        <p>Total de Membros Listados</p>
+                        <h3>${relatorioMembrosCache.length} Membros</h3>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome Completo</th>
+                                <th>Cargo / Função</th>
+                                <th>Celular</th>
+                                <th>E-mail</th>
+                                <th class="text-center">Nascimento</th>
+                                <th class="text-center">Adesão / Membresia</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+
+                    <div class="assinaturas">
+                        <div class="linha-signature" style="text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; margin-top: 60px; display: inline-block;">Secretaria Executiva</div>
+                        <div class="linha-signature" style="text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; margin-top: 60px; display: inline-block; float: right;">Pastor Dirigente</div>
+                    </div>
+
+                    <div class="footer">SISTEMA IGREJA DIGITAL</div>
+                </body>
+                </html>
+            `);
+            janela.document.close();
+        }-assinatura">Pastor Dirigente</div>
                         </div>
  
                         <div class="footer">GERADO POR SISTEMA IGREJA DIGITAL</div>
