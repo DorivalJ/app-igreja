@@ -53,6 +53,11 @@
                         <i data-lucide="file-text" class="w-5 h-5"></i>
                         <span>Cartas e Convites</span>
                     </button>
+
+                    <button id="btn-menu-ofertas" onclick="navegarPara('ofertas')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i data-lucide="gift" class="w-5 h-5"></i>
+                        <span>Ofertas Voluntárias</span>
+                    </button>
                 </nav>
             </div>
 
@@ -621,6 +626,171 @@
                     </section>
                 </div>
 
+                <div id="tela-ofertas" class="hidden space-y-8 dynamic-screen">
+                    <section id="secaoFormOfertas" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i id="iconeFormOfertas" data-lucide="gift" class="w-5 h-5 text-rose-400"></i>
+                                <h2 id="tituloFormOfertas" class="font-semibold text-slate-100">Ofertas Voluntárias</h2>
+                            </div>
+                            <button id="btnCancelarOfertas" onclick="resetarEstadoOfertas()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                Cancelar Edição
+                            </button>
+                        </div>
+                        
+                        <form id="formOfertas" class="p-6 md:p-8" onsubmit="salvarOferta(event)">
+                            <input type="hidden" id="oferta_id">
+                            <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data da Movimentação</label>
+                                    <input type="date" id="oferta_data" onchange="atualizarMesAnoOfertaDinamico()" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all [color-scheme:dark]">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Mês de Competência</label>
+                                    <select id="oferta_mes" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
+                                        <option value="Janeiro">Janeiro</option>
+                                        <option value="Fevereiro">Fevereiro</option>
+                                        <option value="Março">Março</option>
+                                        <option value="Abril">Abril</option>
+                                        <option value="Maio">Maio</option>
+                                        <option value="Junho">Junho</option>
+                                        <option value="Julho">Julho</option>
+                                        <option value="Agosto">Agosto</option>
+                                        <option value="Setembro">Setembro</option>
+                                        <option value="Outubro">Outubro</option>
+                                        <option value="Novembro">Novembro</option>
+                                        <option value="Dezembro">Dezembro</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Ano</label>
+                                    <input type="number" id="oferta_ano" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Movimentação</label>
+                                    <select id="oferta_tipomovimentacao" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
+                                        <option value="Entrada">Entrada (Aporte / Oferta)</option>
+                                        <option value="Saída">Saída (Despesa / Destinação)</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor (R$)</label>
+                                    <input type="number" id="oferta_valor" step="0.01" required placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
+                                </div>
+
+                                <div class="md:col-span-6">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observações / Descrição da Movimentação</label>
+                                    <textarea id="oferta_observacao" rows="3" placeholder="Digite aqui o detalhe da oferta voluntária ou destinação..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all resize-none"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex flex-wrap gap-4 justify-between">
+                                <div>
+                                    <button type="button" onclick="resetarEstadoOfertas()" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl border border-slate-700 transition-all">
+                                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                        <span>Nova Movimentação</span>
+                                    </button>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button type="submit" id="btnSalvarOferta" class="inline-flex items-center gap-2 px-8 py-3 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-500 transition-all shadow-lg shadow-rose-600/20">
+                                        <i data-lucide="save" class="w-5 h-5"></i>
+                                        <span id="textoBtnSalvarOferta">Salvar</span>
+                                    </button>
+                                    <button type="button" onclick="imprimirRelatorioOfertas()" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20">
+                                        <i data-lucide="printer" class="w-5 h-5"></i>
+                                        <span>Imprimir Relatório</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Entradas</p>
+                                <h3 id="dashOfertasEntradas" class="text-3xl font-bold text-emerald-400 mt-1">R$ 0,00</h3>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="text-emerald-500/50 w-8 h-8"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Saídas</p>
+                                <h3 id="dashOfertasSaidas" class="text-3xl font-bold text-rose-400 mt-1">R$ 0,00</h3>
+                            </div>
+                            <i data-lucide="arrow-down-left" class="text-rose-500/50 w-8 h-8"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Saldo das Ofertas</p>
+                                <h3 id="dashOfertasSaldo" class="text-3xl font-bold text-white mt-1">R$ 0,00</h3>
+                            </div>
+                            <i data-lucide="wallet" class="text-indigo-500/50 w-8 h-8"></i>
+                        </div>
+                    </div>
+
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
+                                <i data-lucide="list" class="w-5 h-5 text-rose-400"></i>
+                                <span>Visão Geral dos Lançamentos</span>
+                                <span id="labelPeriodoOfertas" class="text-xs text-rose-400 font-bold bg-rose-500/10 px-2.5 py-1 rounded-xl border border-rose-500/20 ml-1">Todos</span>
+                            </h2>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <i data-lucide="filter" class="w-4 h-4 text-emerald-500"></i>
+                                <select id="filtroMesOfertas" onchange="carregarOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Meses</option>
+                                    <option value="Janeiro">Janeiro</option>
+                                    <option value="Fevereiro">Fevereiro</option>
+                                    <option value="Março">Março</option>
+                                    <option value="Abril">Abril</option>
+                                    <option value="Maio">Maio</option>
+                                    <option value="Junho">Junho</option>
+                                    <option value="Julho">Julho</option>
+                                    <option value="Agosto">Agosto</option>
+                                    <option value="Setembro">Setembro</option>
+                                    <option value="Outubro">Outubro</option>
+                                    <option value="Novembro">Novembro</option>
+                                    <option value="Dezembro">Dezembro</option>
+                                </select>
+                                <select id="filtroAnoOfertas" onchange="carregarOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Anos</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                </select>
+                                <select id="filtroTipoOfertas" onchange="carregarOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                    <option value="">Todos os Fluxos</option>
+                                    <option value="Entrada">Apenas Entradas</option>
+                                    <option value="Saída">Apenas Saídas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
+                                        <th class="px-6 py-4">Data</th>
+                                        <th class="px-6 py-4">Mês/Ano</th>
+                                        <th class="px-6 py-4">Tipo</th>
+                                        <th class="px-6 py-4">Observação / Descrição</th>
+                                        <th class="px-6 py-4 text-right">Entrada</th>
+                                        <th class="px-6 py-4 text-right">Saída</th>
+                                        <th class="px-6 py-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaOfertas" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
             </main>
         </div>
     </div>
@@ -668,7 +838,8 @@
                 financeiro: document.getElementById('btn-menu-financeiro'),
                 agenda: document.getElementById('btn-menu-agenda'),
                 mural: document.getElementById('btn-menu-mural'),
-                documentos: document.getElementById('btn-menu-documentos')
+                documentos: document.getElementById('btn-menu-documentos'),
+                ofertas: document.getElementById('btn-menu-ofertas')
             };
 
             Object.keys(botoesMenu).forEach(chave => {
@@ -723,6 +894,13 @@
                 iconeHeader.setAttribute('data-lucide', 'file-text');
                 atualizarTiposDocumento();
                 renderizarFilaDocumentos();
+            } else if (idTela === 'ofertas') {
+                botoesMenu.ofertas.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-rose-600 text-white shadow-lg shadow-rose-900/20";
+                topbarTitulo.innerText = "Ofertas Voluntárias";
+                topbarIconContainer.className = "bg-rose-600 p-2 rounded-lg text-white shadow-lg shadow-rose-500/20";
+                iconeHeader.setAttribute('data-lucide', 'gift');
+                resetarEstadoOfertas();
+                carregarOfertas();
             }
             lucide.createIcons();
         }
@@ -1977,6 +2155,360 @@
             }
         }
 
+        // --- GESTÃO DE OFERTAS VOLUNTÁRIAS ---
+        let editandoOfertaID = null;
+
+        function atualizarMesAnoOfertaDinamico() {
+            const dataVal = document.getElementById('oferta_data').value;
+            if (!dataVal) return;
+            const partes = dataVal.split('-');
+            const ano = parseInt(partes[0]);
+            const mesNum = parseInt(partes[1]);
+            const mesesNomes = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            document.getElementById('oferta_mes').value = mesesNomes[mesNum - 1];
+            document.getElementById('oferta_ano').value = ano;
+        }
+
+        function resetarEstadoOfertas() {
+            editandoOfertaID = null;
+            document.getElementById('oferta_id').value = '';
+            document.getElementById('formOfertas').reset();
+            
+            const hoje = new Date();
+            const yyyy = hoje.getFullYear();
+            const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoje.getDate()).padStart(2, '0');
+            
+            document.getElementById('oferta_data').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('oferta_ano').value = yyyy;
+            
+            const mesesNomes = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            document.getElementById('oferta_mes').value = mesesNomes[hoje.getMonth()];
+            document.getElementById('oferta_tipomovimentacao').value = 'Entrada';
+            
+            document.getElementById('tituloFormOfertas').innerText = "Ofertas Voluntárias";
+            document.getElementById('textoBtnSalvarOferta').innerText = "Salvar";
+            
+            const btnCancelar = document.getElementById('btnCancelarOfertas');
+            if (btnCancelar) btnCancelar.classList.add('hidden');
+        }
+
+        async function carregarOfertas() {
+            if (!_supabase) {
+                console.warn('Conexão com o banco de dados temporariamente indisponível.');
+                return;
+            }
+            
+            const mesFiltro = document.getElementById('filtroMesOfertas').value;
+            const anoFiltro = document.getElementById('filtroAnoOfertas').value;
+            const tipoFiltro = document.getElementById('filtroTipoOfertas').value;
+            
+            const labelPeriodo = document.getElementById('labelPeriodoOfertas');
+            if (labelPeriodo) {
+                if (mesFiltro && anoFiltro) {
+                    labelPeriodo.innerText = `${mesFiltro}/${anoFiltro}`;
+                } else if (anoFiltro) {
+                    labelPeriodo.innerText = anoFiltro;
+                } else if (mesFiltro) {
+                    labelPeriodo.innerText = mesFiltro;
+                } else {
+                    labelPeriodo.innerText = "Todos os Lançamentos";
+                }
+            }
+            
+            let query = _supabase.from('TabOfertasVoluntarias').select('*').order('data', { ascending: false });
+            
+            if (mesFiltro) {
+                query = query.eq('mes', mesFiltro);
+            }
+            if (anoFiltro) {
+                query = query.eq('ano', parseInt(anoFiltro));
+            }
+            if (tipoFiltro) {
+                query = query.eq('tipomovimentacao', tipoFiltro);
+            }
+            
+            const { data, error } = await query;
+            if (error) {
+                console.error("Erro ao carregar ofertas:", error.message);
+                return;
+            }
+            
+            const tbody = document.getElementById('tabelaOfertas');
+            tbody.innerHTML = '';
+            
+            let totalEntradas = 0;
+            let totalSaidas = 0;
+            
+            const registros = data || [];
+            
+            registros.forEach(item => {
+                const entradaVal = parseFloat(item.entrada) || 0;
+                const saidaVal = parseFloat(item.saida) || 0;
+                
+                totalEntradas += entradaVal;
+                totalSaidas += saidaVal;
+                
+                const entradaStr = entradaVal > 0 ? `R$ ${entradaVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+                const saidaStr = saidaVal > 0 ? `R$ ${saidaVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+                
+                const corTipo = item.tipomovimentacao === 'Saída' ? 'text-rose-400 font-semibold bg-rose-500/10 border-rose-500/20' : 'text-emerald-400 font-semibold bg-emerald-500/10 border-emerald-500/20';
+                const labelTipo = item.tipomovimentacao || 'Entrada';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/30 transition-colors">
+                        <td class="px-6 py-4 text-sm">${formatarData(item.data)}</td>
+                        <td class="px-6 py-4 text-sm text-slate-300 font-medium">${item.mes || ''}/${item.ano || ''}</td>
+                        <td class="px-6 py-4">
+                            <span class="text-[11px] px-2.5 py-0.5 rounded-full border ${corTipo}">
+                                ${labelTipo}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-200 text-sm max-w-[280px] truncate" title="${item.observacao || ''}">${item.observacao || '-'}</td>
+                        <td class="px-6 py-4 text-right font-medium text-emerald-400">${entradaStr}</td>
+                        <td class="px-6 py-4 text-right font-medium text-rose-400">${saidaStr}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap text-sm">
+                            <button onclick="editarOferta('${item.id}')" class="text-emerald-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deletarOferta('${item.id}')" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            if (registros.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-slate-500 text-sm italic">
+                            Nenhum registro encontrado para os filtros selecionados.
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            const saldoTotal = totalEntradas - totalSaidas;
+            
+            document.getElementById('dashOfertasEntradas').textContent = `R$ ${totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('dashOfertasSaidas').textContent = `R$ ${totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('dashOfertasSaldo').textContent = `R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            
+            lucide.createIcons();
+        }
+
+        async function salvarOferta(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSalvarOferta');
+            btn.disabled = true;
+            
+            const valor = parseFloat(document.getElementById('oferta_valor').value) || 0;
+            const tipo = document.getElementById('oferta_tipomovimentacao').value;
+            
+            const payload = {
+                data: document.getElementById('oferta_data').value,
+                mes: document.getElementById('oferta_mes').value,
+                ano: parseInt(document.getElementById('oferta_ano').value) || 2026,
+                tipomovimentacao: tipo,
+                entrada: tipo === 'Entrada' ? valor : 0,
+                saida: tipo === 'Saída' ? valor : 0,
+                observacao: document.getElementById('oferta_observacao').value || null
+            };
+            
+            try {
+                const { error } = editandoOfertaID
+                    ? await _supabase.from('TabOfertasVoluntarias').update(payload).eq('id', editandoOfertaID)
+                    : await _supabase.from('TabOfertasVoluntarias').insert([payload]);
+                    
+                if (error) throw error;
+                
+                alert("Movimentação de Oferta salva com sucesso!");
+                resetarEstadoOfertas();
+                carregarOfertas();
+            } catch (err) {
+                alert("Erro ao salvar movimentação: " + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function editarOferta(id) {
+            try {
+                const { data, error } = await _supabase.from('TabOfertasVoluntarias').select('*').eq('id', id).single();
+                if (error) throw error;
+                
+                editandoOfertaID = id;
+                document.getElementById('oferta_id').value = data.id;
+                document.getElementById('oferta_data').value = data.data || '';
+                document.getElementById('oferta_mes').value = data.mes || 'Janeiro';
+                document.getElementById('oferta_ano').value = data.ano || 2026;
+                document.getElementById('oferta_tipomovimentacao').value = data.tipomovimentacao || 'Entrada';
+                
+                const valor = data.tipomovimentacao === 'Saída' ? (parseFloat(data.saida) || 0) : (parseFloat(data.entrada) || 0);
+                document.getElementById('oferta_valor').value = valor;
+                document.getElementById('oferta_observacao').value = data.observacao || '';
+                
+                document.getElementById('tituloFormOfertas').innerText = "Editando Movimentação";
+                document.getElementById('textoBtnSalvarOferta').innerText = "Atualizar";
+                
+                const btnCancelar = document.getElementById('btnCancelarOfertas');
+                if (btnCancelar) btnCancelar.classList.remove('hidden');
+                
+                document.getElementById('secaoFormOfertas').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert("Erro ao carregar dados para edição: " + err.message);
+            }
+        }
+
+        async function deletarOferta(id) {
+            if (confirm("Deseja realmente excluir este lançamento de oferta voluntária?")) {
+                try {
+                    const { error } = await _supabase.from('TabOfertasVoluntarias').delete().eq('id', id);
+                    if (error) throw error;
+                    carregarOfertas();
+                } catch (err) {
+                    alert("Erro ao excluir registro: " + err.message);
+                }
+            }
+        }
+
+        async function imprimirRelatorioOfertas() {
+            try {
+                const mesFiltro = document.getElementById('filtroMesOfertas').value;
+                const anoFiltro = document.getElementById('filtroAnoOfertas').value;
+                const tipoFiltro = document.getElementById('filtroTipoOfertas').value;
+                
+                let query = _supabase.from('TabOfertasVoluntarias').select('*').order('data', { ascending: true });
+                
+                if (mesFiltro) query = query.eq('mes', mesFiltro);
+                if (anoFiltro) query = query.eq('ano', parseInt(anoFiltro));
+                if (tipoFiltro) query = query.eq('tipomovimentacao', tipoFiltro);
+                
+                const { data, error } = await query;
+                if (error) throw error;
+                
+                const registros = data || [];
+                if (registros.length === 0) {
+                    alert("Não há dados de Ofertas Voluntárias para o período selecionado para gerar o relatório.");
+                    return;
+                }
+                
+                let totalEntradas = 0;
+                let totalSaidas = 0;
+                let rowsHtml = '';
+                
+                registros.forEach(item => {
+                    const ent = parseFloat(item.entrada) || 0;
+                    const sai = parseFloat(item.saida) || 0;
+                    totalEntradas += ent;
+                    totalSaidas += sai;
+                    
+                    const entStr = ent > 0 ? `R$ ${ent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+                    const saiStr = sai > 0 ? `R$ ${sai.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
+                    
+                    rowsHtml += `
+                        <tr>
+                            <td>${formatarData(item.data)}</td>
+                            <td>${item.mes}/${item.ano}</td>
+                            <td><strong>${item.tipomovimentacao}</strong></td>
+                            <td>${item.observacao || '-'}</td>
+                            <td class="text-right text-success">${entStr}</td>
+                            <td class="text-right text-danger">${saiStr}</td>
+                        </tr>
+                    `;
+                });
+                
+                const saldoTotal = totalEntradas - totalSaidas;
+                let competenciaLabel = '';
+                if (mesFiltro && anoFiltro) {
+                    competenciaLabel = `${mesFiltro} de ${anoFiltro}`;
+                } else if (anoFiltro) {
+                    competenciaLabel = `Ano de ${anoFiltro}`;
+                } else if (mesFiltro) {
+                    competenciaLabel = `Mês de ${mesFiltro}`;
+                } else {
+                    competenciaLabel = "Todos os Lançamentos";
+                }
+                
+                const janelaImpressao = window.open('', '_blank');
+                janelaImpressao.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Relatório - Ofertas Voluntárias</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 40px; background-color: #fff; }
+                            .header { text-align: center; border-bottom: 3px double #334155; padding-bottom: 15px; margin-bottom: 25px; }
+                            .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+                            .header p { margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #e11d48; font-weight: bold; }
+                            
+                            .cards-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+                            .card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: #f8fafc; }
+                            .card p { margin: 0; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+                            .card h3 { margin: 5px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 700; }
+                            
+                            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                            th { background-color: #f1f5f9; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+                            td { padding: 10px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
+                            tr:nth-child(even) { background-color: #f8fafc; }
+                            
+                            .text-right { text-align: right; }
+                            .text-success { color: #16a34a; font-weight: 600; }
+                            .text-danger { color: #dc2626; font-weight: 600; }
+                            
+                            .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; border-top: 1px dashed #cbd5e1; padding-top: 8px; pointer-events: none; }
+                            .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
+                            .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
+                            
+                            @media print { body { margin: 20px; } .btn-print { display: none; } }
+                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #e11d48; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
+                        <div class="header">
+                            <h1>RELATÓRIO DE OFERTAS VOLUNTÁRIAS</h1>
+                            <p>Demonstrativo de Entrada e Destinação de Ofertas — Competência: ${competenciaLabel}</p>
+                        </div>
+                        
+                        <div class="cards-resumo">
+                            <div class="card"><p>Total Entradas (+)</p><h3 style="color: #16a34a;">R$ ${totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                            <div class="card"><p>Total Saídas (-)</p><h3 style="color: #dc2626;">R$ ${totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                            <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                        </div>
+ 
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Mês/Ano</th>
+                                    <th>Tipo de Movimentação</th>
+                                    <th>Descrição / Observação</th>
+                                    <th class="text-right">Entrada</th>
+                                    <th class="text-right">Saída</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rowsHtml}</tbody>
+                        </table>
+ 
+                        <div class="assinaturas">
+                            <div class="linha-assinatura">Responsável Financeiro</div>
+                            <div class="linha-assinatura">Pastor Dirigente</div>
+                        </div>
+ 
+                        <div class="footer">GERADO POR SISTEMA IGREJA DIGITAL</div>
+                    </body>
+                    </html>
+                `);
+                janelaImpressao.document.close();
+            } catch (err) {
+                alert("Erro ao gerar relatório impresso: " + err.message);
+            }
+        }
+
         window.onload = function() {
             carregarMembros();
 
@@ -1989,6 +2521,18 @@
             const fAno = document.getElementById('filtroAno');
             if (fMes) fMes.value = mesAtualString;
             if (fAno) fAno.value = anoAtualString;
+
+            // Inicializar filtros e estado das Ofertas Voluntárias com mês/ano atuais
+            const mesesNomes = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            const fMesOferta = document.getElementById('filtroMesOfertas');
+            const fAnoOferta = document.getElementById('filtroAnoOfertas');
+            if (fMesOferta) fMesOferta.value = mesesNomes[dataHoje.getMonth()];
+            if (fAnoOferta) fAnoOferta.value = anoAtualString;
+
+            resetarEstadoOfertas();
 
             lucide.createIcons();
         };
