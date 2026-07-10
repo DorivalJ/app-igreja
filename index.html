@@ -1262,8 +1262,6 @@
                 }
             }
         }
-            lucide.createIcons();
-        }
 
         async function atualizarFluxogramaMural() {
             try {
@@ -2540,7 +2538,15 @@
             const partes = dataVal.split('-');
             const ano = parseInt(partes[0]);
             const mesNum = parseInt(partes[1]);
-              function resetarEstadoOfertas() {
+            const mesesNomes = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            document.getElementById('oferta_mes').value = mesesNomes[mesNum - 1];
+            document.getElementById('oferta_ano').value = ano;
+        }
+
+        function resetarEstadoOfertas() {
             editandoOfertaID = null;
             const idInput = document.getElementById('oferta_id');
             if (idInput) idInput.value = '';
@@ -3647,17 +3653,6 @@
                 </html>
             `);
             janela.document.close();
-        }-assinatura">Pastor Dirigente</div>
-                        </div>
- 
-                        <div class="footer">GERADO POR SISTEMA IGREJA DIGITAL</div>
-                    </body>
-                    </html>
-                `);
-                janelaImpressao.document.close();
-            } catch (err) {
-                alert("Erro ao gerar relatório impresso: " + err.message);
-            }
         }
 
         window.onload = function() {
