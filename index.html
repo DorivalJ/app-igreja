@@ -2231,7 +2231,7 @@
                 query = query.eq('ano', parseInt(anoFiltro));
             }
             if (tipoFiltro) {
-                query = query.eq('tipomovimentacao', tipoFiltro);
+                query = query.eq('tipo_movimentacao', tipoFiltro);
             }
             
             const { data, error } = await query;
@@ -2258,8 +2258,8 @@
                 const entradaStr = entradaVal > 0 ? `R$ ${entradaVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
                 const saidaStr = saidaVal > 0 ? `R$ ${saidaVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '---';
                 
-                const corTipo = item.tipomovimentacao === 'Saída' ? 'text-rose-400 font-semibold bg-rose-500/10 border-rose-500/20' : 'text-emerald-400 font-semibold bg-emerald-500/10 border-emerald-500/20';
-                const labelTipo = item.tipomovimentacao || 'Entrada';
+                const corTipo = item.tipo_movimentacao === 'Saída' ? 'text-rose-400 font-semibold bg-rose-500/10 border-rose-500/20' : 'text-emerald-400 font-semibold bg-emerald-500/10 border-emerald-500/20';
+                const labelTipo = item.tipo_movimentacao || 'Entrada';
                 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/30 transition-colors">
@@ -2312,7 +2312,7 @@
                 data: document.getElementById('oferta_data').value,
                 mes: document.getElementById('oferta_mes').value,
                 ano: parseInt(document.getElementById('oferta_ano').value) || 2026,
-                tipomovimentacao: tipo,
+                tipo_movimentacao: tipo,
                 entrada: tipo === 'Entrada' ? valor : 0,
                 saida: tipo === 'Saída' ? valor : 0,
                 observacao: document.getElementById('oferta_observacao').value || null
@@ -2345,9 +2345,9 @@
                 document.getElementById('oferta_data').value = data.data || '';
                 document.getElementById('oferta_mes').value = data.mes || 'Janeiro';
                 document.getElementById('oferta_ano').value = data.ano || 2026;
-                document.getElementById('oferta_tipomovimentacao').value = data.tipomovimentacao || 'Entrada';
+                document.getElementById('oferta_tipomovimentacao').value = data.tipo_movimentacao || 'Entrada';
                 
-                const valor = data.tipomovimentacao === 'Saída' ? (parseFloat(data.saida) || 0) : (parseFloat(data.entrada) || 0);
+                const valor = data.tipo_movimentacao === 'Saída' ? (parseFloat(data.saida) || 0) : (parseFloat(data.entrada) || 0);
                 document.getElementById('oferta_valor').value = valor;
                 document.getElementById('oferta_observacao').value = data.observacao || '';
                 
@@ -2385,7 +2385,7 @@
                 
                 if (mesFiltro) query = query.eq('mes', mesFiltro);
                 if (anoFiltro) query = query.eq('ano', parseInt(anoFiltro));
-                if (tipoFiltro) query = query.eq('tipomovimentacao', tipoFiltro);
+                if (tipoFiltro) query = query.eq('tipo_movimentacao', tipoFiltro);
                 
                 const { data, error } = await query;
                 if (error) throw error;
@@ -2413,7 +2413,7 @@
                         <tr>
                             <td>${formatarData(item.data)}</td>
                             <td>${item.mes}/${item.ano}</td>
-                            <td><strong>${item.tipomovimentacao}</strong></td>
+                            <td><strong>${item.tipo_movimentacao}</strong></td>
                             <td>${item.observacao || '-'}</td>
                             <td class="text-right text-success">${entStr}</td>
                             <td class="text-right text-danger">${saiStr}</td>
