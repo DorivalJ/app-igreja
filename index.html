@@ -369,7 +369,8 @@
                                 <span>Livro Caixa</span>
                                 <span id="labelPeriodoFinanceiro" class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 ml-1">Julho/2026</span>
                             </h2>
-                            <div class="flex flex-wrap gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <i data-lucide="filter" class="w-4 h-4 text-emerald-500"></i>
                                 <select id="filtroMes" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
                                     <option value="">Todos os Meses</option>
                                     <option value="01">Janeiro</option>
@@ -1139,7 +1140,7 @@
                             <td>${f.descricao || '-'}</td>
                             <td><span class="tag-cargo">${f.cargo || '-'}</span></td>
                             <td>${f.observacao || '-'}</td>
-                            <td class="text-right ${corValor}">${sinal} R$ ${f.valor.toFixed(2)}</td>
+                            <td class="text-right ${corValor}">${sinal} R$ ${f.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         </tr>`;
                 });
 
@@ -1200,10 +1201,10 @@
                         </div>
                         
                         <div class="cards-resumo">
-                            <div class="card"><p>Dízimos (+)</p><h3 style="color: #16a34a;">R$ ${d.toFixed(2)}</h3></div>
-                            <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toFixed(2)}</h3></div>
-                            <div class="card"><p>Despesas (-)</p><h3 style="color: #dc2626;">R$ ${de.toFixed(2)}</h3></div>
-                            <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toFixed(2)}</h3></div>
+                            <div class="card"><p>Dízimos (+)</p><h3 style="color: #16a34a;">R$ ${d.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                            <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                            <div class="card"><p>Despesas (-)</p><h3 style="color: #dc2626;">R$ ${de.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                            <div class="card"><p>Saldo Líquido</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
                         </div>
 
                         <table>
@@ -1777,7 +1778,7 @@
                         <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
                         <td class="px-6 py-4">${exibicaoCargo}</td>
                         <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
-                        <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td class="px-6 py-4 text-right whitespace-nowrap">
                             <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                             <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -1788,10 +1789,10 @@
             const totalEntradas = d + o;
             const saldoTotal = totalEntradas - de;
 
-            document.getElementById('dashDizimos').textContent = `R$ ${d.toFixed(2)}`;
-            document.getElementById('dashOfertas').textContent = `R$ ${o.toFixed(2)}`;
-            document.getElementById('dashDespesas').textContent = `R$ ${de.toFixed(2)}`;
-            document.getElementById('dashSaldoTotal').textContent = `R$ ${saldoTotal.toFixed(2)}`;
+            document.getElementById('dashDizimos').textContent = `R$ ${d.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('dashOfertas').textContent = `R$ ${o.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('dashDespesas').textContent = `R$ ${de.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('dashSaldoTotal').textContent = `R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
             // --- ATUALIZAÇÃO DO GRÁFICO DE BARRAS DINÂMICO ---
             document.getElementById('graficoTxtEntradas').innerText = "R$ " + totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
