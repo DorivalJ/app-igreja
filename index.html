@@ -2222,7 +2222,7 @@
                 }
             }
             
-            let query = _supabase.from('TabOfertasVoluntarias').select('*').order('data', { ascending: false });
+            let query = _supabase.from('ofertas_voluntarias').select('*').order('data', { ascending: false });
             
             if (mesFiltro) {
                 query = query.eq('mes', mesFiltro);
@@ -2320,8 +2320,8 @@
             
             try {
                 const { error } = editandoOfertaID
-                    ? await _supabase.from('TabOfertasVoluntarias').update(payload).eq('id', editandoOfertaID)
-                    : await _supabase.from('TabOfertasVoluntarias').insert([payload]);
+                    ? await _supabase.from('ofertas_voluntarias').update(payload).eq('id', editandoOfertaID)
+                    : await _supabase.from('ofertas_voluntarias').insert([payload]);
                     
                 if (error) throw error;
                 
@@ -2337,7 +2337,7 @@
 
         async function editarOferta(id) {
             try {
-                const { data, error } = await _supabase.from('TabOfertasVoluntarias').select('*').eq('id', id).single();
+                const { data, error } = await _supabase.from('ofertas_voluntarias').select('*').eq('id', id).single();
                 if (error) throw error;
                 
                 editandoOfertaID = id;
@@ -2366,7 +2366,7 @@
         async function deletarOferta(id) {
             if (confirm("Deseja realmente excluir este lançamento de oferta voluntária?")) {
                 try {
-                    const { error } = await _supabase.from('TabOfertasVoluntarias').delete().eq('id', id);
+                    const { error } = await _supabase.from('ofertas_voluntarias').delete().eq('id', id);
                     if (error) throw error;
                     carregarOfertas();
                 } catch (err) {
@@ -2381,7 +2381,7 @@
                 const anoFiltro = document.getElementById('filtroAnoOfertas').value;
                 const tipoFiltro = document.getElementById('filtroTipoOfertas').value;
                 
-                let query = _supabase.from('TabOfertasVoluntarias').select('*').order('data', { ascending: true });
+                let query = _supabase.from('ofertas_voluntarias').select('*').order('data', { ascending: true });
                 
                 if (mesFiltro) query = query.eq('mes', mesFiltro);
                 if (anoFiltro) query = query.eq('ano', parseInt(anoFiltro));
