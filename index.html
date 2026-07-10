@@ -1887,7 +1887,23 @@
                 : await _supabase.from('financeiro').insert([lanc]);
 
             if (error) alert("Erro ao salvar: " + error.message);
-            else { alert("Lançamento realizado com sucesso!"); resetarEstadoFinanceiro(); carregarFinancas(); }
+            else { 
+                alert("Lançamento realizado com sucesso!"); 
+                
+                // Sincronizar filtros com o mês/ano do lançamento salvo
+                if (lanc.data_lancamento) {
+                    const partes = lanc.data_lancamento.split('-');
+                    const ano = partes[0];
+                    const mes = partes[1];
+                    const fMes = document.getElementById('filtroMes');
+                    const fAno = document.getElementById('filtroAno');
+                    if (fMes) fMes.value = mes;
+                    if (fAno) fAno.value = ano;
+                }
+                
+                resetarEstadoFinanceiro(); 
+                carregarFinancas(); 
+            }
         });
 
         async function carregarFinancas() {
@@ -2326,6 +2342,13 @@
                 if (error) throw error;
                 
                 alert("Movimentação de Oferta salva com sucesso!");
+                
+                // Sincronizar filtros com o mês/ano correspondente ao lançamento salvo
+                const fMes = document.getElementById('filtroMesOfertas');
+                const fAno = document.getElementById('filtroAnoOfertas');
+                if (fMes) fMes.value = payload.mes;
+                if (fAno) fAno.value = String(payload.ano);
+                
                 resetarEstadoOfertas();
                 carregarOfertas();
             } catch (err) {
