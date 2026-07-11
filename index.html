@@ -190,7 +190,7 @@
                                     <input type="text" id="cargo" placeholder="Ex: Pastor Dirigente, Presbítero, Diácono, Auxiliar" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                                 <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Batismo</label>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data de Membresia</label>
                                     <input type="date" id="data_adesao" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
                                 </div>
                                 <div class="md:col-span-3">
@@ -1610,7 +1610,7 @@
                             }
                             .footer {
                                 position: fixed;
-                                bottom: 10px;
+                                bottom: 0.5cm;
                                 left: 20px;
                                 right: 20px;
                                 text-align: center;
@@ -1657,7 +1657,7 @@
                             <p>Corpo de Obreiros e Ministério Local</p>
                         </div>
                         ${conteudoHtml}
-                        <div class="footer">GERADO EM 09/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
@@ -1723,7 +1723,7 @@
                             td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
                             .col-data { width: 14%; } .col-horario { width: 8%; font-weight: bold; color: #b45309; } .col-evento { width: 26%; font-size: 14px; color: #1e293b; } .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; } .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
                             .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-                            .footer { position: fixed; bottom: 10px; left: 20px; right: 20px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 6px; pointer-events: none; }
+                            .footer { position: fixed; bottom: 0.5cm; left: 20px; right: 20px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 6px; pointer-events: none; }
                             @media print { body { margin: 0; } .btn-print { display: none; } th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
                             .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
                         </style>
@@ -1747,7 +1747,7 @@
                             </thead>
                             <tbody>${linhasTabelaHtml}</tbody>
                         </table>
-                        <div class="footer">GERADO EM 09/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
@@ -1856,7 +1856,7 @@
                             .text-danger { color: #dc2626; font-weight: 600; }
                             .tag-cargo { font-size: 10px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
                             
-                            .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
+                            .footer { position: fixed; bottom: 0.5cm; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
                             .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
                             .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
                             
@@ -1867,7 +1867,7 @@
                     <body>
                         <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
                         <div class="header">
-                            <h1>RELATÓRIO DE LIVRO CAIXA</h1>
+                            <h1>RELATÓRIO TESOURARIA</h1>
                             <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${competenciaLabel}</p>
                         </div>
                         
@@ -1897,7 +1897,7 @@
                             <div class="linha-assinatura">Pastor Dirigente</div>
                         </div>
 
-                        <div class="footer">GERADO EM 09/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
@@ -1942,7 +1942,7 @@
                         .bg-despesas { background-color: #ef4444 !important; }
                         .bg-saldo { background-color: #3b82f6 !important; }
                         
-                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
+                        .footer { position: fixed; bottom: 0.5cm; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
                         @media print { .btn-print { display: none; } }
                         .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
                     </style>
@@ -1986,7 +1986,7 @@
                         </div>
                     </div>
 
-                    <div class="footer">GERADO EM 09/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                    <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
@@ -2124,7 +2124,7 @@
                         .data-local { text-align: right; margin-bottom: 60px; font-style: italic; }
                         .assinaturas { display: flex; justify-content: space-around; margin-top: 80px; }
                         .linha { text-align: center; width: 250px; border-top: 1px solid #000; padding-top: 5px; font-size: 14px; }
-                        .doc-footer { position: fixed; bottom: 15px; left: 60px; right: 60px; text-align: center; font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-family: Arial, sans-serif; padding-top: 5px; pointer-events: none; }
+                        .doc-footer { position: fixed; bottom: 0.5cm; left: 60px; right: 60px; text-align: center; font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-family: Arial, sans-serif; padding-top: 5px; pointer-events: none; }
                         @media print { .btn-print { display: none; } }
                         .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: sans-serif; }
                     </style>
@@ -2146,7 +2146,7 @@
                         <div class="linha">Secretário(a)</div>
                         <div class="linha">Pastor Dirigente</div>
                     </div>
-                    <div class="doc-footer">GERADO EM 09/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                    <div class="doc-footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
@@ -3052,7 +3052,7 @@
                             .text-success { color: #10b981; font-weight: 600; }
                             .text-danger { color: #f43f5e; font-weight: 600; }
                             
-                            .footer { position: fixed; bottom: 10px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; border-top: 1px dashed #e2e8f0; }
+                            .footer { position: fixed; bottom: 0.5cm; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; border-top: 1px dashed #e2e8f0; }
                             .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; page-break-inside: avoid; }
                             .linha-assinatura { text-align: center; width: 240px; font-size: 11px; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 6px; font-weight: 500; }
                             
@@ -3099,7 +3099,7 @@
                             <div class="linha-assinatura">Pastor Dirigente</div>
                         </div>
 
-                        <div class="footer">SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                        <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
@@ -3210,7 +3210,7 @@
                         tr:nth-child(even) { background-color: #f8fafc; }
                         .text-center { text-align: center; }
                         
-                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
+                        .footer { position: fixed; bottom: 0.5cm; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
                         .assinaturas { margin-top: 80px; display: flex; justify-content: space-around; }
                         .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
                         
@@ -3240,7 +3240,7 @@
                         <div class="linha-signature" style="text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; margin-top: 80px; display: inline-block; float: right;">Pastor Dirigente</div>
                     </div>
 
-                    <div class="footer">SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                    <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
@@ -3384,7 +3384,7 @@
                         .text-center { text-align: center; }
                         .text-success { color: #059669; font-weight: 600; }
                         
-                        .footer { position: fixed; bottom: 15px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
+                        .footer { position: fixed; bottom: 0.5cm; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
                         .assinaturas { margin-top: 60px; display: flex; justify-content: space-around; }
                         .linha-assinatura { text-align: center; width: 220px; font-size: 12px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
                         
@@ -3422,7 +3422,7 @@
                         <div class="linha-assinatura">Pastor Dirigente</div>
                     </div>
 
-                    <div class="footer">SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                    <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
@@ -3606,7 +3606,7 @@
                         .text-success { color: #10b981; font-weight: 600; }
                         .text-danger { color: #f43f5e; font-weight: 600; }
                         
-                        .footer { position: fixed; bottom: 10px; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; border-top: 1px dashed #e2e8f0; }
+                        .footer { position: fixed; bottom: 0.5cm; left: 40px; right: 40px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; border-top: 1px dashed #e2e8f0; }
                         .assinaturas { margin-top: 40px; display: flex; justify-content: space-between; page-break-inside: avoid; }
                         .linha-signature { text-align: center; width: 250px; font-size: 11px; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 6px; font-weight: 500; }
                         
@@ -3653,7 +3653,7 @@
                         <div class="linha-signature">Pastor Dirigente</div>
                     </div>
  
-                    <div class="footer">SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                    <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
@@ -3815,7 +3815,7 @@
                         
                         .text-center { text-align: center; }
                         
-                        .footer { position: fixed; bottom: 10px; left: 20px; right: 20px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
+                        .footer { position: fixed; bottom: 0.5cm; left: 20px; right: 20px; text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 8px; pointer-events: none; }
                         .assinaturas { margin-top: 40px; display: flex; justify-content: space-between; }
                         .linha-signature { text-align: center; width: 250px; font-size: 11px; color: #475569; border-top: 1px solid #94a3b8; padding-top: 5px; }
                         
@@ -3855,7 +3855,7 @@
                         <div class="linha-signature">Pastor Dirigente</div>
                     </div>
 
-                    <div class="footer">SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
+                    <div class="footer">GERADO EM 11/07/2026 POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                 </body>
                 </html>
             `);
