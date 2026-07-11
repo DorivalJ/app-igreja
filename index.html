@@ -3528,28 +3528,78 @@
                 const { data, error } = await query.order('nome', { ascending: true });
                 if (error) throw error;
                 
-                // Filtrar por cargo em memória
+                // Limpar indicador de carregamento
+                tbody.innerHTML = '';
+                
+                // Filtrar por cargo em memória de forma robusta e resiliente
                 const membrosFiltrados = (data || []).filter(m => {
                     if (!cargoFiltro) return true;
-                    return m.cargo && m.cargo.toLowerCase().includes(cargoFiltro.toLowerCase());
+                    
+                    const cargoNormalizado = m.cargo 
+                        ? m.cargo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() 
+                        : '';
+                    const filtroNormalizado = cargoFiltro.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+                    if (filtroNormalizado === 'pastor') {
+                        // Combina Pastor, Pastora, Dirigente, Co-Pastor, Copastor, etc.
+                        return cargoNormalizado.includes('pastor') || cargoNormalizado.includes('dirigente') || cargoNormalizado.includes('copastor') || cargoNormalizado.includes('co-pastor');
+                    }
+                    if (filtroNormalizado === 'presbitero') {
+                        // Combina Presbítero, Presbitero
+                        return cargoNormalizado.includes('presbitero');
+                    }
+                    if (filtroNormalizado === 'diacono') {
+                        // Combina Diácono, Diacono, Diaconisa, Diaconiza
+                        return cargoNormalizado.includes('diacono') || cargoNormalizado.includes('diaconisa') || cargoNormalizado.includes('diaconiza');
+                    }
+                    if (filtroNormalizado === 'auxiliar') {
+                        // Combina Auxiliar, Cooperador, Cooperadora
+                        return cargoNormalizado.includes('auxiliar') || cargoNormalizado.includes('cooperador');
+                    }
+                    if (filtroNormalizado === 'membro') {
+                        // Membro comum: cargo vazio, explicitamente 'membro', ou que não pertence a nenhuma das lideranças acima
+                        if (!cargoNormalizado || cargoNormalizado === '' || cargoNormalizado.includes('membro')) {
+                            return true;
+                        }
+                        const isOutroCargo = cargoNormalizado.includes('pastor') || 
+                                             cargoNormalizado.includes('dirigente') || 
+                                             cargoNormalizado.includes('copastor') || 
+                                             cargoNormalizado.includes('co-pastor') || 
+                                             cargoNormalizado.includes('presbitero') || 
+                                             cargoNormalizado.includes('diacono') || 
+                                             cargoNormalizado.includes('diaconisa') || 
+                                             cargoNormalizado.includes('diaconiza') || 
+                                             cargoNormalizado.includes('auxiliar') || 
+                                             cargoNormalizado.includes('cooperador');
+                        return !isOutroCargo;
+                    }
+
+                    return cargoNormalizado.includes(filtroNormalizado);
                 });
                 
-                 membrosFiltrados.forEach(m => {
-                    const statusBadge = m.status === 'Ativo' 
-                        ? '<span class="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 text-emerald-400 bg-emerald-500/10 font-bold">Ativo</span>'
-                        : '<span class="text-[10px] px-2 py-0.5 rounded-full border border-rose-500/20 text-rose-400 bg-rose-500/10 font-bold">Inativo</span>';
-                    
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-800/30 transition-colors">
-                            <td class="px-6 py-4 text-sm text-slate-100 font-semibold">${m.nome}</td>
-                            <td class="px-6 py-4 text-sm text-slate-300 font-medium">${m.cargo || 'Membro'}</td>
-                            <td class="px-6 py-4 text-sm text-slate-400">${m.celular || '-'}</td>
-                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(m.data_nascimento)}</td>
-                            <td class="px-6 py-4 text-sm text-slate-400">${formatarData(m.data_adesao)}</td>
-                            <td class="px-6 py-4 text-center">${statusBadge}</td>
-                        </tr>
-                    `;
-                });
+                // Salvar o resultado filtrado no cache de impressão
+                relatorioMembrosCache = membrosFiltrados;
+                
+                if (membrosFiltrados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400 text-sm italic">Nenhum membro encontrado com os filtros selecionados.</td></tr>';
+                } else {
+                    membrosFiltrados.forEach(m => {
+                        const statusBadge = m.status === 'Ativo' 
+                            ? '<span class="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 text-emerald-400 bg-emerald-500/10 font-bold">Ativo</span>'
+                            : '<span class="text-[10px] px-2 py-0.5 rounded-full border border-rose-500/20 text-rose-400 bg-rose-500/10 font-bold">Inativo</span>';
+                        
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-800/30 transition-colors">
+                                <td class="px-6 py-4 text-sm text-slate-100 font-semibold">${m.nome}</td>
+                                <td class="px-6 py-4 text-sm text-slate-300 font-medium">${m.cargo || 'Membro'}</td>
+                                <td class="px-6 py-4 text-sm text-slate-400">${m.celular || '-'}</td>
+                                <td class="px-6 py-4 text-sm text-slate-400">${formatarData(m.data_nascimento)}</td>
+                                <td class="px-6 py-4 text-sm text-slate-400">${formatarData(m.data_adesao)}</td>
+                                <td class="px-6 py-4 text-center">${statusBadge}</td>
+                            </tr>
+                        `;
+                    });
+                }
                 
                 document.getElementById('rep-memb-count').innerText = String(membrosFiltrados.length);
             } catch (err) {
