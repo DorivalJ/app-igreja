@@ -739,13 +739,13 @@
 
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Movimentação</label>
-                                    <select id="oferta_tipomovimentacao" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
+                                    <select id="oferta_tipomovimentacao" onchange="alternarTipoMovimentacaoOferta()" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
                                         <option value="Entrada">Entrada (Aporte / Oferta)</option>
                                         <option value="Saída">Saída (Despesa / Destinação)</option>
                                     </select>
                                 </div>
 
-                                <div class="md:col-span-2">
+                                <div class="md:col-span-2" id="container_oferta_contribuinte">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Contribuinte / Doador (Opcional)</label>
                                     <input type="text" id="oferta_contribuinte" placeholder="Ex: José Wilson ou Anônimo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all">
                                 </div>
@@ -2690,6 +2690,18 @@
             document.getElementById('oferta_ano').value = ano;
         }
 
+        function alternarTipoMovimentacaoOferta() {
+            const tipo = document.getElementById('oferta_tipomovimentacao').value;
+            const containerContrib = document.getElementById('container_oferta_contribuinte');
+            const contribInput = document.getElementById('oferta_contribuinte');
+            if (tipo === 'Saída') {
+                if (containerContrib) containerContrib.classList.add('hidden');
+                if (contribInput) contribInput.value = '';
+            } else {
+                if (containerContrib) containerContrib.classList.remove('hidden');
+            }
+        }
+
         function resetarEstadoOfertas() {
             editandoOfertaID = null;
             const idInput = document.getElementById('oferta_id');
@@ -2721,6 +2733,8 @@
             
             const tipoInput = document.getElementById('oferta_tipomovimentacao');
             if (tipoInput) tipoInput.value = 'Entrada';
+            
+            alternarTipoMovimentacaoOferta();
             
             const titulo = document.getElementById('tituloFormOfertas');
             if (titulo) titulo.innerText = "Ofertas Voluntárias";
@@ -2818,7 +2832,9 @@
                     const parts = item.observacao.split(' | ');
                     const contribPart = parts[0];
                     const nomeContribuinte = contribPart.replace('Contribuinte:', '').trim();
-                    badgeContribuinte = `<span class="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded-md font-medium inline-block mr-1.5" title="Contribuinte">${nomeContribuinte}</span>`;
+                    if (item.tipo_movimentacao !== 'Saída') {
+                        badgeContribuinte = `<span class="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded-md font-medium inline-block mr-1.5" title="Contribuinte">${nomeContribuinte}</span>`;
+                    }
                     obsExibida = parts.slice(1).join(' | ').trim() || '-';
                 }
                 
@@ -2874,8 +2890,8 @@
             const valor = parseFloat(document.getElementById('oferta_valor').value) || 0;
             const tipo = document.getElementById('oferta_tipomovimentacao').value;
 
-            // Formulate observation with contributor prefix
-            const contribValue = document.getElementById('oferta_contribuinte').value.trim();
+            // Formulate observation with contributor prefix (only for Entrada)
+            const contribValue = tipo === 'Saída' ? '' : document.getElementById('oferta_contribuinte').value.trim();
             const obsValue = document.getElementById('oferta_observacao').value.trim();
             let observacaoCompleta = obsValue;
             if (contribValue) {
@@ -2942,6 +2958,8 @@
                 document.getElementById('oferta_contribuinte').value = contrib;
                 document.getElementById('oferta_observacao').value = obs;
                 
+                alternarTipoMovimentacaoOferta();
+                
                 document.getElementById('tituloFormOfertas').innerText = "Editando Movimentação";
                 document.getElementById('textoBtnSalvarOferta').innerText = "Atualizar";
                 
@@ -3006,7 +3024,11 @@
                         const parts = item.observacao.split(' | ');
                         const contrib = parts[0].replace('Contribuinte:', '').trim();
                         const desc = parts.slice(1).join(' | ').trim();
-                        obsExibida = `<strong>Contribuinte:</strong> ${contrib}` + (desc ? ` — ${desc}` : '');
+                        if (item.tipo_movimentacao === 'Saída') {
+                            obsExibida = desc || '-';
+                        } else {
+                            obsExibida = `<strong>Contribuinte:</strong> ${contrib}` + (desc ? ` — ${desc}` : '');
+                        }
                     }
                     
                     rowsHtml += `
@@ -3113,6 +3135,7 @@
                     </html>
                 `);
                 janelaImpressao.document.close();
+                janelaImpressao.opener = null;
             } catch (err) {
                 alert("Erro ao gerar relatório impresso: " + err.message);
             }
@@ -3255,6 +3278,7 @@
                 </html>
             `);
             janela.document.close();
+            janela.opener = null;
         }
 
         // Cache local de dízimos para impressão
@@ -3437,6 +3461,7 @@
                 </html>
             `);
             janela.document.close();
+            janela.opener = null;
         }
 
         // Cache local de ofertas voluntárias para relatórios
@@ -3513,6 +3538,10 @@
                         obsExibida = parts.slice(1).join(' | ').trim() || '-';
                     }
                     
+                    if (item.tipo_movimentacao === 'Saída') {
+                        contrib = '-';
+                    }
+                    
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4 text-sm">${formatarData(item.data)}</td>
@@ -3570,6 +3599,10 @@
                     const parts = item.observacao.split(' | ');
                     contrib = parts[0].replace('Contribuinte:', '').trim();
                     obsExibida = parts.slice(1).join(' | ').trim() || '-';
+                }
+                
+                if (item.tipo_movimentacao === 'Saída') {
+                    contrib = '-';
                 }
                 
                 rowsHtml += `
@@ -3668,6 +3701,7 @@
                 </html>
             `);
             janela.document.close();
+            janela.opener = null;
         }
 
         // Cache local de membros cadastrados para impressão
@@ -3870,6 +3904,7 @@
                 </html>
             `);
             janela.document.close();
+            janela.opener = null;
         }
 
         window.onload = async function() {
