@@ -337,14 +337,19 @@
                                     </div>
                                 </div>
 
-                                <div class="md:col-span-3">
+                                <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor (R$)</label>
                                     <input type="number" id="fin_valor" step="0.01" required placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
-                                <div class="md:col-span-3">
+                                <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
-                                    <input type="date" id="fin_data" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                    <input type="date" id="fin_data" required onchange="atualizarDiaSemanaFinancas()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dia</label>
+                                    <input type="text" id="fin_dia" readonly placeholder="Preenchido pela Data" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed font-medium">
                                 </div>
 
                                 <div class="md:col-span-6">
@@ -484,6 +489,7 @@
                                 <thead>
                                     <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
                                         <th class="px-6 py-4">Data</th>
+                                        <th class="px-6 py-4">Dia</th>
                                         <th class="px-6 py-4">Tipo</th>
                                         <th class="px-6 py-4">Dizimista</th>
                                         <th class="px-6 py-4">Cargo</th>
@@ -1805,6 +1811,7 @@
                     linesTabelaHtml += `
                         <tr>
                             <td>${formatarData(f.data_lancamento)}</td>
+                            <td><strong>${obterDiaSemanaAbreviado(f.data_lancamento)}</strong></td>
                             <td><strong>${f.tipo}</strong></td>
                             <td>${f.descricao || '-'}</td>
                             <td><span class="tag-cargo">${f.cargo || '-'}</span></td>
@@ -1889,6 +1896,7 @@
                             <thead>
                                 <tr>
                                     <th>Data</th>
+                                    <th>Dia</th>
                                     <th>Tipo</th>
                                     <th>Descrição / Contribuinte</th>
                                     <th>Cargo</th>
@@ -2378,7 +2386,8 @@
             }
 
             const lanc = {
-                tipo, descricao: desc, cargo: cargoMembro, dia_semana: dia,
+                tipo, descricao: desc, cargo: cargoMembro, 
+                dia_semana: obterDiaSemanaAbreviado(document.getElementById('fin_data').value),
                 valor: parseFloat(document.getElementById('fin_valor').value),
                 data_lancamento: document.getElementById('fin_data').value,
                 observacao: document.getElementById('fin_observacao').value || null
@@ -2470,6 +2479,7 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/30 transition-colors">
                         <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-slate-400">${obterDiaSemanaAbreviado(f.data_lancamento)}</td>
                         <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
                         <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
                         <td class="px-6 py-4">${exibicaoCargo}</td>
@@ -2541,6 +2551,7 @@
                 }
                 document.getElementById('fin_valor').value = data.valor;
                 document.getElementById('fin_data').value = data.data_lancamento;
+                document.getElementById('fin_dia').value = obterDiaSemanaAbreviado(data.data_lancamento);
                 document.getElementById('fin_observacao').value = data.observacao || '';
                 document.getElementById('tituloFormFinanceiro').innerText = "Editando Lançamento";
                 document.getElementById('textoBtnSalvarFinanceiro').innerText = "Atualizar Lançamento";
@@ -2559,6 +2570,25 @@
         }
         
         async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
+
+        function obterDiaSemanaAbreviado(dataStr) {
+            if (!dataStr) return '';
+            const partes = dataStr.split('-');
+            if (partes.length !== 3) return '';
+            const ano = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10) - 1;
+            const dia = parseInt(partes[2], 10);
+            const dataObj = new Date(ano, mes, dia);
+            const dias = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
+            return dias[dataObj.getDay()] || '';
+        }
+
+        function atualizarDiaSemanaFinancas() {
+            const dataInput = document.getElementById('fin_data').value;
+            const inputDia = document.getElementById('fin_dia');
+            if (!dataInput) { inputDia.value = ''; return; }
+            inputDia.value = obterDiaSemanaAbreviado(dataInput);
+        }
 
         function atualizarDiaSemanaAutomatico() {
             const dataInput = document.getElementById('agenda_data').value;
