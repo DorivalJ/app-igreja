@@ -488,7 +488,12 @@
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="bg-slate-950/50 text-slate-500 uppercase text-[10px] font-bold tracking-[0.15em]">
-                                        <th class="px-6 py-4">Data</th>
+                                        <th class="px-6 py-4 cursor-pointer select-none hover:text-slate-200 transition-colors" onclick="alternarOrdemDataFinancas()" title="Clique para inverter a ordem (Crescente / Decrescente)">
+                                            <div class="flex items-center gap-1.5">
+                                                <span>Data</span>
+                                                <i id="iconeOrdemData" data-lucide="arrow-down" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                            </div>
+                                        </th>
                                         <th class="px-6 py-4">Dia</th>
                                         <th class="px-6 py-4">Tipo</th>
                                         <th class="px-6 py-4">Dizimista</th>
@@ -913,7 +918,7 @@
                             </div>
 
                             <div class="mt-8 border-t border-dashed border-slate-300 pt-4 text-center text-[10px] text-slate-400 uppercase tracking-wider">
-                                Gerado por Igreja Digital - Desenvolvido por Dorival J.
+                                Sistema Igreja Digital - Relatório Gerencial
                             </div>
                         </div>
                     </section>
@@ -1908,7 +1913,7 @@
                         </table>
 
                         <div class="assinaturas">
-                            <div class="linha-signature">Tesoureiro Local</div>
+                            <div class="linha-signature">Tesouraria Local</div>
                             <div class="linha-signature">Pastor Dirigente</div>
                         </div>
 
@@ -2417,11 +2422,24 @@
             }
         });
 
+        let ordemDataAsc = false;
+
+        function alternarOrdemDataFinancas() {
+            ordemDataAsc = !ordemDataAsc;
+            carregarFinancas();
+        }
+
         async function carregarFinancas() {
             if (!_supabase) {
                 console.warn('Conexão com o banco de dados temporariamente indisponível.');
                 return;
             }
+
+            const iconeOrdem = document.getElementById('iconeOrdemData');
+            if (iconeOrdem) {
+                iconeOrdem.setAttribute('data-lucide', ordemDataAsc ? 'arrow-up' : 'arrow-down');
+            }
+
             const tipoFiltro = document.getElementById('filtroTipo').value;
             const mesFiltro = document.getElementById('filtroMes').value;
             const anoFiltro = document.getElementById('filtroAno').value;
@@ -2442,7 +2460,7 @@
                 }
             }
 
-            let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: false });
+            let query = _supabase.from('financeiro').select('*').order('data_lancamento', { ascending: ordemDataAsc });
             
             if (tipoFiltro) {
                 query = query.eq('tipo', tipoFiltro);
@@ -3156,7 +3174,7 @@
                         </table>
 
                         <div class="assinaturas">
-                            <div class="linha-assinatura">Tesoureiro</div>
+                            <div class="linha-assinatura">Responsável Financeiro</div>
                             <div class="linha-assinatura">Pastor Dirigente</div>
                         </div>
 
@@ -3722,7 +3740,7 @@
                     </table>
  
                     <div class="assinaturas">
-                        <div class="linha-signature">Tesoureiro</div>
+                        <div class="linha-signature">Responsável Financeiro</div>
                         <div class="linha-signature">Pastor Dirigente</div>
                     </div>
  
