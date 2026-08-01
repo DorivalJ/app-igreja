@@ -367,7 +367,7 @@
                         </form>
                     </section>
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
                             <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dízimos</p><h3 id="dashDizimos" class="text-2xl font-bold text-emerald-400 mt-1">R$ 0,00</h3></div>
                             <i data-lucide="heart" class="text-emerald-500/30"></i>
@@ -375,6 +375,10 @@
                         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
                             <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ofertas</p><h3 id="dashOfertas" class="text-2xl font-bold text-teal-400 mt-1">R$ 0,00</h3></div>
                             <i data-lucide="gift" class="text-teal-500/30"></i>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                            <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dízimos + Ofertas</p><h3 id="dashDizimosOfertas" class="text-2xl font-bold text-cyan-400 mt-1">R$ 0,00</h3></div>
+                            <i data-lucide="trending-up" class="text-cyan-500/30"></i>
                         </div>
                         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
                             <div><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Despesas</p><h3 id="dashDespesas" class="text-2xl font-bold text-rose-400 mt-1">R$ 0,00</h3></div>
@@ -2515,6 +2519,9 @@
 
             document.getElementById('dashDizimos').textContent = `R$ ${d.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('dashOfertas').textContent = `R$ ${o.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            if (document.getElementById('dashDizimosOfertas')) {
+                document.getElementById('dashDizimosOfertas').textContent = `R$ ${totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
             document.getElementById('dashDespesas').textContent = `R$ ${de.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('dashSaldoTotal').textContent = `R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
