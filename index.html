@@ -1693,11 +1693,8 @@
 
                 data.forEach(ag => {
                     const dataReal = ag.data || '';
-                    let diaSemanaExibicao = '';
-                    if (dataReal) {
-                        const dataObj = new Date(dataReal + 'T00:00:00');
-                        diaSemanaExibicao = diasOrdenados[dataObj.getDay()];
-                    }
+                    const diaSemanaExibicao = obterDiaSemanaAbreviado(dataReal);
+                    const horarioStr = ag.horario ? (diaSemanaExibicao ? `${ag.horario} - ${diaSemanaExibicao}` : ag.horario) : (diaSemanaExibicao || '-');
 
                     linhasTabelaHtml += `
                         <tr>
@@ -1705,7 +1702,7 @@
                                 <strong>${formatarData(dataReal)}</strong><br>
                                 <span class="dia-semana">${diaSemanaExibicao}</span>
                             </td>
-                            <td class="col-horario">${ag.horario || '-'}</td>
+                            <td class="col-horario">${horarioStr}</td>
                             <td class="col-evento"><strong>${ag.tipo_evento || '-'}</strong></td>
                             <td class="col-escalas">
                                 <div><strong>Dirigente:</strong> ${ag.dirigente || '-'}</div>
@@ -2620,9 +2617,7 @@
             const dataInput = document.getElementById('agenda_data').value;
             const inputDiaSemana = document.getElementById('agenda_dia_semana');
             if (!dataInput) { inputDiaSemana.value = ''; return; }
-            const dataObjeto = new Date(dataInput + 'T00:00:00');
-            const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-            inputDiaSemana.value = diasOrdenados[dataObjeto.getDay()];
+            inputDiaSemana.value = obterDiaSemanaAbreviado(dataInput);
         }
         
         async function carregarAgenda() {
@@ -2639,11 +2634,13 @@
                 data.forEach(ag => {
                     const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
                     const dataReal = ag.data || '';
+                    const diaAbrev = obterDiaSemanaAbreviado(dataReal);
+                    const horarioExibicao = ag.horario ? (diaAbrev ? `${ag.horario} - ${diaAbrev}` : ag.horario) : (diaAbrev || '');
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-slate-100">${formatarData(dataReal)}</div>
-                                <div class="text-xs text-amber-400 font-semibold">${ag.horario || ''}</div>
+                                <div class="text-xs text-amber-400 font-semibold">${horarioExibicao}</div>
                             </td>
                             <td class="px-6 py-4 text-slate-200 text-sm font-semibold">${ag.tipo_evento || '-'}</td>
                             <td class="px-6 py-4 text-slate-300 text-sm">
