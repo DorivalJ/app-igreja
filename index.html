@@ -219,12 +219,23 @@
             </div>
 
             <div class="p-4 border-t border-slate-800 space-y-1">
+                <div id="usuario-logado-info" class="px-3 py-2 mb-2 rounded-lg bg-slate-900/80 border border-slate-800/80 text-xs text-slate-400 flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                    <div class="overflow-hidden">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Usuário Conectado</p>
+                        <p id="txt-email-usuario-logado" class="truncate font-medium text-slate-200" title="Sessão Ativa">Conectado</p>
+                    </div>
+                </div>
+                <button id="btn-menu-usuarios" onclick="navegarPara('usuarios')" class="hidden w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 rounded-xl transition font-medium">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
+                    <span>Cadastrar Usuário</span>
+                </button>
                 <button id="btn-menu-alterar-senha" onclick="navegarPara('alterar-senha')" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 rounded-xl transition font-medium">
                     <i data-lucide="key-round" class="w-5 h-5 text-indigo-400"></i>
                     <span>Alterar Senha</span>
                 </button>
-                <button onclick="fazerLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                <button onclick="fazerLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition font-medium">
+                    <i data-lucide="log-out" class="w-5 h-5 text-rose-400"></i>
                     <span>Sair do Sistema</span>
                 </button>
             </div>
@@ -1231,6 +1242,72 @@
                     </section>
                 </div>
 
+                <!-- TELA DE CADASTRAR NOVOS USUÁRIOS (DENTRO DO SISTEMA) -->
+                <div id="tela-usuarios" class="hidden space-y-8 dynamic-screen">
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden max-w-2xl mx-auto">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center gap-3">
+                            <div class="p-2.5 bg-indigo-600/10 rounded-xl text-indigo-400">
+                                <i data-lucide="user-plus" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-bold text-lg text-slate-100">Cadastrar Novo Usuário / Operador</h2>
+                                <p class="text-xs text-slate-400">Crie a conta de acesso para os colaboradores da igreja</p>
+                            </div>
+                        </div>
+
+                        <div id="msg-cadastro-usuario" class="hidden mx-6 mt-6 p-4 rounded-xl text-sm font-medium"></div>
+
+                        <form id="formCadastrarUsuario" class="p-6 md:p-8 space-y-6" onsubmit="cadastrarNovoUsuario(event)">
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label for="novo-user-email" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail do Novo Usuário</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+                                            <i data-lucide="mail" class="w-5 h-5"></i>
+                                        </span>
+                                        <input type="email" id="novo-user-email" required placeholder="exemplo@igreja.com" class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-sm">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="novo-user-senha" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Senha de Acesso Inicial</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+                                            <i data-lucide="lock" class="w-5 h-5"></i>
+                                        </span>
+                                        <input type="password" id="novo-user-senha" required minlength="6" placeholder="Mínimo de 6 caracteres" class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-sm">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="novo-user-confirmar-senha" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Confirmar Senha</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+                                            <i data-lucide="lock" class="w-5 h-5"></i>
+                                        </span>
+                                        <input type="password" id="novo-user-confirmar-senha" required minlength="6" placeholder="Digite a mesma senha novamente" class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-sm">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-2">
+                                <p class="font-semibold text-indigo-400 flex items-center gap-1.5">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i> Informação sobre Nível de Acesso
+                                </p>
+                                <p class="leading-relaxed">Todos os usuários cadastrados terão acesso completo a todos os módulos do sistema (Membros, Tesouraria, Agenda, Mural, Cartas e Relatórios).</p>
+                                <p class="leading-relaxed text-slate-500">Após a criação, o novo usuário já poderá entrar no aplicativo usando seu e-mail e senha cadastrados.</p>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                                <button type="submit" id="btn-cadastrar-novo-usuario" class="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20">
+                                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                                    <span id="txt-btn-cadastrar-usuario">Cadastrar Usuário</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+
                 <!-- TELA DE ALTERAR SENHA (DENTRO DO SISTEMA) -->
                 <div id="tela-alterar-senha" class="hidden space-y-8 dynamic-screen">
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden max-w-2xl mx-auto">
@@ -1286,6 +1363,25 @@
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
+        const EMAIL_ADMINISTRADOR = 'dorival14@yahoo.com';
+        let usuarioLogadoAtual = null;
+
+        function isUsuarioAdmin(email) {
+            if (!email) return false;
+            return email.trim().toLowerCase() === EMAIL_ADMINISTRADOR.toLowerCase();
+        }
+
+        async function garantirUsuarioAdminExistente() {
+            if (!_supabase) return;
+            try {
+                await _supabase.auth.signUp({
+                    email: EMAIL_ADMINISTRADOR,
+                    password: 'Igreja2026!'
+                });
+            } catch (e) {
+                // Usuário já cadastrado ou erro ignorável
+            }
+        }
 
         // Capturar URL inicial antes que o SDK do Supabase modifique/limpe a hash ou query string
         const initialUrl = window.location.href;
@@ -1295,6 +1391,7 @@
         try {
             if (typeof supabase !== 'undefined') {
                 _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                garantirUsuarioAdminExistente();
             } else {
                 console.warn('Supabase SDK não pôde ser carregado localmente. O aplicativo funcionará em modo de visualização.');
             }
@@ -1317,6 +1414,25 @@
             mostrarTelaAlterarSenhaExternal();
         }
 
+        function atualizarInfoUsuarioLogado(user) {
+            usuarioLogadoAtual = user || null;
+            const txtEmail = document.getElementById('txt-email-usuario-logado');
+            if (txtEmail) {
+                const emailStr = user && user.email ? user.email : 'Conectado';
+                txtEmail.innerText = emailStr;
+                txtEmail.title = emailStr;
+            }
+
+            const btnMenuUsuarios = document.getElementById('btn-menu-usuarios');
+            if (btnMenuUsuarios) {
+                if (user && isUsuarioAdmin(user.email)) {
+                    btnMenuUsuarios.classList.remove('hidden');
+                } else {
+                    btnMenuUsuarios.classList.add('hidden');
+                }
+            }
+        }
+
         const session = _supabase ? _supabase.auth.getSession() : null;
         if (session) {
             session.then(({ data, error }) => {
@@ -1324,6 +1440,7 @@
                 if (isRecoveryFlow) {
                     mostrarTelaAlterarSenhaExternal();
                 } else if (isLogged) {
+                    if (data.session.user) atualizarInfoUsuarioLogado(data.session.user);
                     document.getElementById('tela-login').classList.add('hidden');
                     document.getElementById('sidebar').classList.remove('hidden');
                     document.getElementById('painel-principal').classList.remove('hidden');
@@ -1516,6 +1633,84 @@
             }
         }
 
+        async function cadastrarNovoUsuario(event) {
+            if (event) event.preventDefault();
+
+            if (!isUsuarioAdmin(usuarioLogadoAtual ? usuarioLogadoAtual.email : '')) {
+                exibirMensagem('msg-cadastro-usuario', 'Apenas o e-mail administrador (dorival14@yahoo.com) tem permissão para cadastrar novos usuários.', 'erro');
+                return;
+            }
+
+            const emailInput = document.getElementById('novo-user-email');
+            const senhaInput = document.getElementById('novo-user-senha');
+            const confirmarSenhaInput = document.getElementById('novo-user-confirmar-senha');
+            const btnSubmit = document.getElementById('btn-cadastrar-novo-usuario');
+            const txtBtn = document.getElementById('txt-btn-cadastrar-usuario');
+
+            const email = emailInput ? emailInput.value.trim() : '';
+            const senha = senhaInput ? senhaInput.value : '';
+            const confirmarSenha = confirmarSenhaInput ? confirmarSenhaInput.value : '';
+
+            if (!email || !senha || !confirmarSenha) {
+                exibirMensagem('msg-cadastro-usuario', 'Por favor, preencha todos os campos.', 'erro');
+                return;
+            }
+
+            if (senha.length < 6) {
+                exibirMensagem('msg-cadastro-usuario', 'A senha de acesso deve ter no mínimo 6 caracteres.', 'erro');
+                return;
+            }
+
+            if (senha !== confirmarSenha) {
+                exibirMensagem('msg-cadastro-usuario', 'As senhas não coincidem. Digite a mesma senha nos dois campos.', 'erro');
+                return;
+            }
+
+            if (!_supabase) {
+                exibirMensagem('msg-cadastro-usuario', 'Erro: Cliente Supabase não está configurado.', 'erro');
+                return;
+            }
+
+            try {
+                if (btnSubmit) btnSubmit.disabled = true;
+                if (txtBtn) txtBtn.innerText = "Cadastrando...";
+                exibirMensagem('msg-cadastro-usuario', '', 'limpar');
+
+                // Cria um cliente Supabase secundário/temporário sem persistência de sessão
+                // para que a sessão atual do usuário logado não seja deslogada/substituída.
+                const tempSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: {
+                        persistSession: false,
+                        autoRefreshToken: false,
+                        detectSessionInUrl: false
+                    }
+                });
+
+                const { data, error } = await tempSupabase.auth.signUp({
+                    email: email,
+                    password: senha
+                });
+
+                if (error) throw error;
+
+                exibirMensagem('msg-cadastro-usuario', '✅ Novo usuário <strong>' + email + '</strong> cadastrado com sucesso! Ele já pode acessar o sistema.', 'sucesso');
+                
+                if (emailInput) emailInput.value = '';
+                if (senhaInput) senhaInput.value = '';
+                if (confirmarSenhaInput) confirmarSenhaInput.value = '';
+            } catch (err) {
+                console.error("Erro ao cadastrar novo usuário:", err);
+                let msg = err.message || 'Falha na comunicação com o Supabase.';
+                if (msg.includes('already registered')) {
+                    msg = 'Este e-mail já está cadastrado no sistema.';
+                }
+                exibirMensagem('msg-cadastro-usuario', 'Erro ao cadastrar usuário: ' + msg, 'erro');
+            } finally {
+                if (btnSubmit) btnSubmit.disabled = false;
+                if (txtBtn) txtBtn.innerText = "Cadastrar Usuário";
+            }
+        }
+
         async function fazerLogin(event) {
             if (event) event.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -1542,6 +1737,9 @@
                 }
                 
                 // Login com sucesso!
+                if (data && data.session && data.session.user) {
+                    atualizarInfoUsuarioLogado(data.session.user);
+                }
                 document.getElementById('tela-login').classList.add('hidden');
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('painel-principal').classList.remove('hidden');
@@ -1610,6 +1808,7 @@
                 mural: document.getElementById('btn-menu-mural'),
                 documentos: document.getElementById('btn-menu-documentos'),
                 ofertas: document.getElementById('btn-menu-ofertas'),
+                usuarios: document.getElementById('btn-menu-usuarios'),
                 'alterar-senha': document.getElementById('btn-menu-alterar-senha'),
                 'report-aniversariantes': document.getElementById('btn-relatorio-aniversariantes'),
                 'report-dizimos': document.getElementById('btn-relatorio-dizimos'),
@@ -1720,6 +1919,20 @@
                 topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
                 iconeHeader.setAttribute('data-lucide', 'clipboard-list');
                 carregarRelatorioMembros();
+            } else if (idTela === 'usuarios') {
+                const userEmail = usuarioLogadoAtual ? usuarioLogadoAtual.email : '';
+                if (!isUsuarioAdmin(userEmail)) {
+                    alert('Acesso negado: Apenas o e-mail administrador (dorival14@yahoo.com) tem permissão para acessar esta tela.');
+                    navegarPara('membros');
+                    return;
+                }
+                if (botoesMenu['usuarios']) {
+                    botoesMenu['usuarios'].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
+                }
+                topbarTitulo.innerText = "Cadastrar Usuários do Sistema";
+                topbarIconContainer.className = "bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20";
+                iconeHeader.setAttribute('data-lucide', 'user-plus');
+                exibirMensagem('msg-cadastro-usuario', '', 'limpar');
             } else if (idTela === 'alterar-senha') {
                 if (botoesMenu['alterar-senha']) {
                     botoesMenu['alterar-senha'].className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-900/20";
