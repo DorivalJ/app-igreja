@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão - Igreja Digital</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <link rel="apple-touch-icon" href="./icon.svg">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1281,6 +1287,10 @@
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
 
+        // Capturar URL inicial antes que o SDK do Supabase modifique/limpe a hash ou query string
+        const initialUrl = window.location.href;
+        let isRecoveryFlow = initialUrl.includes('type=recovery') || initialUrl.includes('error_description');
+
         let _supabase = null;
         try {
             if (typeof supabase !== 'undefined') {
@@ -1292,21 +1302,26 @@
             console.error('Erro ao inicializar o cliente Supabase:', e);
         }
 
-        // Verificação de sessão ativa do Supabase e escuta de alteração de estado no início do script
+        // Escuta de alteração de estado no Supabase
         if (_supabase) {
             _supabase.auth.onAuthStateChange((event, session) => {
                 if (event === 'PASSWORD_RECOVERY') {
+                    isRecoveryFlow = true;
                     mostrarTelaAlterarSenhaExternal();
                 }
             });
+        }
+
+        // Se for fluxo de recuperação na abertura inicial, ativa a tela de nova senha imediatamente
+        if (isRecoveryFlow) {
+            mostrarTelaAlterarSenhaExternal();
         }
 
         const session = _supabase ? _supabase.auth.getSession() : null;
         if (session) {
             session.then(({ data, error }) => {
                 const isLogged = data && data.session;
-                const isRecovery = window.location.hash && window.location.hash.includes('type=recovery');
-                if (isRecovery) {
+                if (isRecoveryFlow) {
                     mostrarTelaAlterarSenhaExternal();
                 } else if (isLogged) {
                     document.getElementById('tela-login').classList.add('hidden');
@@ -1319,9 +1334,13 @@
                 }
             }).catch(err => {
                 console.error("Erro na verificação inicial de sessão:", err);
-                document.getElementById('tela-login').classList.remove('hidden');
-                document.getElementById('sidebar').classList.add('hidden');
-                document.getElementById('painel-principal').classList.add('hidden');
+                if (isRecoveryFlow) {
+                    mostrarTelaAlterarSenhaExternal();
+                } else {
+                    document.getElementById('tela-login').classList.remove('hidden');
+                    document.getElementById('sidebar').classList.add('hidden');
+                    document.getElementById('painel-principal').classList.add('hidden');
+                }
             });
         } else {
             // Se não houver supabase (modo local ou visualização), libera as telas imediatamente
@@ -1412,7 +1431,11 @@
                 if (emailInput) emailInput.value = '';
             } catch (err) {
                 console.error("Erro ao solicitar recuperação de senha:", err);
-                exibirMensagem('msg-recuperacao', 'Erro ao enviar e-mail: ' + (err.message || 'E-mail não encontrado ou falha na requisição.'), 'erro');
+                let mensagemErro = err.message || 'E-mail não encontrado ou falha na requisição.';
+                if (mensagemErro.toLowerCase().includes('rate limit')) {
+                    mensagemErro = 'Limite de envios excedido. Por favor, aguarde alguns minutos antes de solicitar outro e-mail.';
+                }
+                exibirMensagem('msg-recuperacao', 'Erro ao enviar e-mail: ' + mensagemErro, 'erro');
             } finally {
                 if (btnSubmit) btnSubmit.disabled = false;
                 if (btnText) btnText.innerText = "Enviar link de recuperação";
@@ -1471,6 +1494,7 @@
                 exibirMensagem(msgId, '✅ Senha alterada com sucesso!', 'sucesso');
 
                 if (origem === 'external') {
+                    isRecoveryFlow = false;
                     document.getElementById('ext-nova-senha').value = '';
                     document.getElementById('ext-confirmar-nova-senha').value = '';
                     setTimeout(() => {
