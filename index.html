@@ -1374,12 +1374,15 @@
         async function garantirUsuarioAdminExistente() {
             if (!_supabase) return;
             try {
-                await _supabase.auth.signUp({
-                    email: EMAIL_ADMINISTRADOR,
+                const { data, error } = await _supabase.auth.signUp({
+                    email: EMAIL_ADMINISTRADOR.trim().toLowerCase(),
                     password: 'Igreja2026!'
                 });
+                if (error && error.message) {
+                    console.warn("Log de criação de admin no Supabase:", error.message);
+                }
             } catch (e) {
-                // Usuário já cadastrado ou erro ignorável
+                console.warn("Exceção ao verificar admin no Supabase:", e);
             }
         }
 
@@ -1713,8 +1716,10 @@
 
         async function fazerLogin(event) {
             if (event) event.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-senha').value;
+            const rawEmail = document.getElementById('login-email').value;
+            const rawPassword = document.getElementById('login-senha').value;
+            const email = rawEmail ? rawEmail.trim().toLowerCase() : '';
+            const password = rawPassword ? rawPassword.trim() : '';
             const btnSubmit = document.getElementById('btn-login-submit');
             const btnText = document.getElementById('login-btn-texto');
             
@@ -1752,7 +1757,13 @@
                 document.getElementById('login-senha').value = '';
             } catch (err) {
                 console.error("Erro no login:", err);
-                alert("Erro ao realizar login: " + (err.message || "E-mail ou senha incorretos."));
+                let msg = err.message || "E-mail ou senha incorretos.";
+                if (msg.toLowerCase().includes("invalid login credentials")) {
+                    msg = "E-mail ou senha incorretos.\n\n• Verifique se não há caracteres ou espaços indesejados.\n• Se for o primeiro acesso ou se alterou a senha, clique no link 'Esqueceu a senha?' para redefinir sua senha por e-mail.";
+                } else if (msg.toLowerCase().includes("email not confirmed")) {
+                    msg = "O e-mail ainda não foi confirmado.\n\nAcesse a caixa de entrada do e-mail (" + email + ") e clique no link de confirmação enviado pelo sistema.";
+                }
+                alert("Erro ao realizar login:\n\n" + msg);
             } finally {
                 if (btnSubmit) btnSubmit.disabled = false;
                 if (btnText) btnText.innerText = "Entrar";
