@@ -625,7 +625,6 @@
                                 <i id="iconeFormAgenda" data-lucide="calendar-plus" class="w-5 h-5 text-amber-400"></i>
                                 <h2 id="tituloFormAgenda" class="font-semibold text-slate-100 flex items-center gap-2">
                                     <span>Programar Evento / Culto</span>
-                                    <span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 ml-2">Julho/2026</span>
                                 </h2>
                             </div>
                             <button id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
@@ -691,14 +690,57 @@
                     </section>
 
                     <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i> Cronograma da Agenda Semanal
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
+                                <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i>
+                                <span>Cronograma da Agenda Semanal</span>
+                                <span id="labelPeriodoAgenda" class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/20 ml-1">Semana Corrente</span>
                             </h2>
-                            <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-sm rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
-                                <i data-lucide="printer" class="w-4 h-4"></i>
-                                <span>Imprimir Agenda para Mural</span>
-                            </button>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <div class="flex items-center gap-1 text-slate-400 text-xs">
+                                    <i data-lucide="filter" class="w-4 h-4 text-amber-400"></i>
+                                    <span class="font-medium hidden sm:inline">Exibir:</span>
+                                </div>
+                                <select id="filtroPeriodoAgenda" onchange="alternarModoFiltroAgenda(); carregarAgenda();" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500 transition-all">
+                                    <option value="semana_atual" selected>Semana Corrente (Padrão)</option>
+                                    <option value="mes_ano">Por Mês e Ano</option>
+                                    <option value="todos">Todos os Eventos</option>
+                                </select>
+                                
+                                <div id="containerFiltrosMesAnoAgenda" class="hidden flex flex-wrap items-center gap-2">
+                                    <select id="filtroMesAgenda" onchange="carregarAgenda()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500 transition-all">
+                                        <option value="">Todos os Meses</option>
+                                        <option value="01">01 - Janeiro</option>
+                                        <option value="02">02 - Fevereiro</option>
+                                        <option value="03">03 - Março</option>
+                                        <option value="04">04 - Abril</option>
+                                        <option value="05">05 - Maio</option>
+                                        <option value="06">06 - Junho</option>
+                                        <option value="07">07 - Julho</option>
+                                        <option value="08">08 - Agosto</option>
+                                        <option value="09">09 - Setembro</option>
+                                        <option value="10">10 - Outubro</option>
+                                        <option value="11">11 - Novembro</option>
+                                        <option value="12">12 - Dezembro</option>
+                                    </select>
+
+                                    <select id="filtroAnoAgenda" onchange="carregarAgenda()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500 transition-all">
+                                        <option value="">Todos os Anos</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                    </select>
+                                </div>
+
+                                <input type="text" id="buscaAgenda" oninput="carregarAgenda()" placeholder="Buscar evento..." class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500 transition-all w-32 sm:w-40">
+
+                                <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-xs rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span>Imprimir Agenda</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
@@ -1874,7 +1916,7 @@
                 botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
                 topbarTitulo.innerText = "Agenda Semanal";
                 if (subtituloTopbar) {
-                    subtituloTopbar.innerHTML = 'Módulos Ativos <span class="text-emerald-400 font-bold ml-1">Julho/2026</span>';
+                    subtituloTopbar.innerHTML = 'Módulos Ativos <span class="text-amber-400 font-bold ml-1">Cronograma</span>';
                 }
                 topbarIconContainer.className = "bg-amber-600 p-2 rounded-lg text-white shadow-lg shadow-amber-500/20";
                 iconeHeader.setAttribute('data-lucide', 'calendar');
@@ -3181,18 +3223,132 @@
             inputDiaSemana.value = obterDiaSemanaAbreviado(dataInput);
         }
         
+        let agendaCacheGlobal = [];
+        let agendaFiltradaCache = [];
+
+        function alternarModoFiltroAgenda() {
+            const modo = document.getElementById('filtroPeriodoAgenda')?.value || 'semana_atual';
+            const container = document.getElementById('containerFiltrosMesAnoAgenda');
+            if (container) {
+                if (modo === 'mes_ano') {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+        }
+
+        function obterIntervaloSemanaAtual() {
+            const hoje = new Date();
+            const diaSemana = hoje.getDay(); // 0 = Dom, 1 = Seg, ..., 6 = Sab
+            const diffSegunda = (diaSemana === 0 ? -6 : 1 - diaSemana);
+            
+            const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + diffSegunda, 0, 0, 0);
+            const fim = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + 6, 23, 59, 59);
+
+            return { inicio, fim };
+        }
+
+        function formatarDataISO(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const dia = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${dia}`;
+        }
+
         async function carregarAgenda() {
             try {
                 if (!_supabase) {
                     console.warn('Conexão com o banco de dados temporariamente indisponível.');
                     return;
                 }
+
+                // 1. Busca TODOS os eventos do Supabase (registros passados e futuros permanecem no banco sem exclusão)
                 const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
                 if (error) throw error;
+
+                agendaCacheGlobal = data || [];
+                
+                const modo = document.getElementById('filtroPeriodoAgenda')?.value || 'semana_atual';
+                const mesFiltro = document.getElementById('filtroMesAgenda')?.value || '';
+                const anoFiltro = document.getElementById('filtroAnoAgenda')?.value || '';
+                const buscaTermo = document.getElementById('buscaAgenda')?.value?.toLowerCase().trim() || '';
+                const labelPeriodo = document.getElementById('labelPeriodoAgenda');
+
+                let eventosExibicao = [];
+                let textoLabelPeriodo = '';
+
+                if (modo === 'semana_atual') {
+                    const { inicio, fim } = obterIntervaloSemanaAtual();
+                    const inicioStr = formatarDataISO(inicio);
+                    const fimStr = formatarDataISO(fim);
+
+                    eventosExibicao = agendaCacheGlobal.filter(ag => {
+                        if (!ag.data) return false;
+                        return ag.data >= inicioStr && ag.data <= fimStr;
+                    });
+
+                    const dataInicioFmt = formatarData(inicioStr);
+                    const dataFimFmt = formatarData(fimStr);
+                    textoLabelPeriodo = `Semana Corrente (${dataInicioFmt} a ${dataFimFmt})`;
+
+                } else if (modo === 'mes_ano') {
+                    const mesesNomesMap = {
+                        '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril',
+                        '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto',
+                        '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+                    };
+
+                    eventosExibicao = agendaCacheGlobal.filter(ag => {
+                        if (!ag.data) return false;
+                        const partes = ag.data.split('-');
+                        if (partes.length !== 3) return false;
+                        const anoAg = partes[0];
+                        const mesAg = partes[1];
+
+                        if (mesFiltro && mesAg !== mesFiltro) return false;
+                        if (anoFiltro && anoAg !== anoFiltro) return false;
+                        return true;
+                    });
+
+                    const nomeMes = mesFiltro ? mesesNomesMap[mesFiltro] : 'Todos os Meses';
+                    const nomeAno = anoFiltro ? anoFiltro : 'Todos os Anos';
+                    textoLabelPeriodo = `Período: ${nomeMes} / ${nomeAno}`;
+
+                } else if (modo === 'todos') {
+                    eventosExibicao = [...agendaCacheGlobal];
+                    textoLabelPeriodo = 'Todos os Registros em Banco';
+                }
+
+                if (buscaTermo) {
+                    eventosExibicao = eventosExibicao.filter(ag => {
+                        const strFull = `${ag.tipo_evento || ''} ${ag.dirigente || ''} ${ag.pregador || ''} ${ag.escala_portaria || ''} ${ag.escala_ofertas || ''} ${ag.saida_visita || ''}`.toLowerCase();
+                        return strFull.includes(buscaTermo);
+                    });
+                }
+
+                if (labelPeriodo) {
+                    labelPeriodo.innerText = textoLabelPeriodo;
+                }
+
+                // Guardar lista filtrada atual para o botão de impressão
+                agendaFiltradaCache = eventosExibicao;
+
                 const tbody = document.getElementById('tabelaAgenda');
+                if (!tbody) return;
                 tbody.innerHTML = '';
 
-                data.forEach(ag => {
+                if (eventosExibicao.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm italic">
+                                Nenhum evento encontrado para o filtro selecionado (${textoLabelPeriodo}).
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                eventosExibicao.forEach(ag => {
                     const obsTexto = ag.saida_visita ? ag.saida_visita : '---';
                     const dataReal = ag.data || '';
                     const diaAbrev = obterDiaSemanaAbreviado(dataReal);
@@ -3214,13 +3370,15 @@
                             </td>
                             <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarAgenda('${ag.id}')" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarAgenda('${ag.id}')" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editarAgenda('${ag.id}')" title="Editar Evento" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deletarAgenda('${ag.id}')" title="Excluir Evento" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>`;
                 });
                 lucide.createIcons();
-            } catch (err) { console.error(err.message); }
+            } catch (err) {
+                console.error("Erro ao carregar agenda:", err.message);
+            }
         }
 
         document.getElementById('formAgenda').addEventListener('submit', async (e) => {
@@ -3228,6 +3386,18 @@
             const btn = document.getElementById('btnSalvarAgenda');
             btn.disabled = true;
             const dataInput = document.getElementById('agenda_data').value;
+
+            let mesNome = "Janeiro";
+            let anoNum = 2026;
+            if (dataInput) {
+                const partes = dataInput.split('-');
+                if (partes.length === 3) {
+                    anoNum = parseInt(partes[0], 10);
+                    const mIndex = parseInt(partes[1], 10) - 1;
+                    const mesesList = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                    if (mIndex >= 0 && mIndex < 12) mesNome = mesesList[mIndex];
+                }
+            }
 
             const r = {
                 tipo_evento: document.getElementById('agenda_tipo_evento').value,
@@ -3237,8 +3407,8 @@
                 escala_ofertas: document.getElementById('agenda_escala_ofertas').value || null,
                 dirigente: document.getElementById('agenda_dirigente').value || null,
                 saida_visita: document.getElementById('agenda_saida_visita').value || null,
-                mes_referencia: "Julho",
-                ano_referencia: 2026,
+                mes_referencia: mesNome,
+                ano_referencia: anoNum,
                 data: dataInput
             };
 
@@ -3246,8 +3416,13 @@
                 ? await _supabase.from('agenda_semanal').update(r).eq('id', editandoAgendaID)
                 : await _supabase.from('agenda_semanal').insert([r]);
 
-            if (error) alert("Erro: " + error.message);
-            else { alert("Agenda updated!"); resetarEstadoAgenda(); carregarAgenda(); }
+            if (error) {
+                alert("Erro ao salvar agenda: " + error.message);
+            } else {
+                alert(editandoAgendaID ? "Evento da agenda atualizado com sucesso!" : "Evento programado na agenda com sucesso!");
+                resetarEstadoAgenda();
+                carregarAgenda();
+            }
             btn.disabled = false;
         });
 
@@ -3269,7 +3444,7 @@
                 document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Agenda";
                 document.getElementById('btnCancelarAgenda').classList.remove('hidden');
                 document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
-            } catch (err) { alert("Erro: " + err.message); }
+            } catch (err) { alert("Erro ao carregar evento: " + err.message); }
         }
 
         function resetarEstadoAgenda() {
@@ -3281,9 +3456,143 @@
         }
 
         async function deletarAgenda(id) {
-            if (confirm("Remover este evento?")) {
+            if (confirm("Remover este evento da agenda?")) {
                 const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
                 if (!error) carregarAgenda();
+                else alert("Erro ao excluir: " + error.message);
+            }
+        }
+
+        function imprimirAgendaSemanal() {
+            if (!agendaFiltradaCache || agendaFiltradaCache.length === 0) {
+                alert("Nenhum evento exibido na tela no momento para ser impresso.");
+                return;
+            }
+
+            const labelPeriodo = document.getElementById('labelPeriodoAgenda')?.innerText || 'Semana Corrente';
+
+            let linhasHTML = '';
+            agendaFiltradaCache.forEach(ag => {
+                const dataFmt = formatarData(ag.data);
+                const diaAbrev = obterDiaSemanaAbreviado(ag.data);
+                const horarioFmt = ag.horario ? `${ag.horario}` : '-';
+                const tipoEv = ag.tipo_evento || '-';
+                const dirigente = ag.dirigente || '-';
+                const pregador = ag.pregador || '-';
+                const portaria = ag.escala_portaria || '-';
+                const ofertas = ag.escala_ofertas || '-';
+                const obs = ag.saida_visita || '-';
+
+                linhasHTML += `
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 10px 12px; font-weight: bold; color: #1e293b; text-align: center; font-size: 13px;">
+                            ${dataFmt}<br><span style="color: #d97706; font-size: 11px;">(${diaAbrev})</span>
+                        </td>
+                        <td style="padding: 10px 12px; text-align: center; font-size: 13px; font-weight: 600;">${horarioFmt}</td>
+                        <td style="padding: 10px 12px; font-weight: bold; color: #0f172a; font-size: 13px;">${tipoEv}</td>
+                        <td style="padding: 10px 12px; font-size: 12px; color: #334155;">
+                            <div><strong>Dirigente:</strong> ${dirigente}</div>
+                            <div><strong>Pregador:</strong> ${pregador}</div>
+                        </td>
+                        <td style="padding: 10px 12px; font-size: 12px; color: #334155;">
+                            <div><strong>Portaria:</strong> ${portaria}</div>
+                            <div><strong>Ofertas:</strong> ${ofertas}</div>
+                        </td>
+                        <td style="padding: 10px 12px; font-size: 11px; color: #64748b; font-style: italic;">${obs}</td>
+                    </tr>
+                `;
+            });
+
+            const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+            const htmlImpressao = `
+            <!DOCTYPE html>
+            <html lang="pt-br">
+            <head>
+                <meta charset="UTF-8">
+                <title>Imprimir Agenda Semanal - Igreja Digital</title>
+                <style>
+                    @page { size: landscape; margin: 12mm; }
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #1e293b; margin: 0; padding: 25px; }
+                    .header-container { text-align: center; border-bottom: 3px double #d97706; padding-bottom: 15px; margin-bottom: 20px; }
+                    .header-title { font-size: 22px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+                    .header-sub { font-size: 14px; color: #475569; font-weight: 600; margin-top: 5px; }
+                    .badge-periodo { display: inline-block; background-color: #fef3c7; color: #92400e; border: 1px solid #f59e0b; padding: 5px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-top: 10px; text-transform: uppercase; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th { background-color: #0f172a; color: #ffffff; text-transform: uppercase; font-size: 11px; font-weight: 700; padding: 10px 12px; letter-spacing: 0.5px; }
+                    td { vertical-align: middle; }
+                    .signatures { margin-top: 50px; display: flex; justify-content: space-around; text-align: center; }
+                    .sig-line { width: 220px; border-top: 1px solid #64748b; padding-top: 5px; margin-top: 40px; font-size: 12px; font-weight: 600; color: #334155; }
+                    .footer-info { margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 10px; text-align: center; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+                    @media print {
+                        .no-print { display: none !important; }
+                        body { padding: 0; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+                    <button onclick="window.print()" style="background-color: #d97706; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                        🖨️ Confirmar Impressão
+                    </button>
+                    <button onclick="window.close()" style="background-color: #64748b; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-left: 10px;">
+                        Fechar
+                    </button>
+                </div>
+
+                <div class="header-container">
+                    <h1 class="header-title">IGREJA DIGITAL — SUB-MARILENA</h1>
+                    <div class="header-sub">CRONOGRAMA DE ATIVIDADES E AGENDA DE CULTOS</div>
+                    <div class="badge-periodo">${labelPeriodo}</div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">Data / Dia</th>
+                            <th style="width: 10%;">Horário</th>
+                            <th style="width: 25%;">Programação / Evento</th>
+                            <th style="width: 23%;">Dirigente / Pregador</th>
+                            <th style="width: 20%;">Portaria / Ofertas</th>
+                            <th style="width: 10%;">Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${linhasHTML}
+                    </tbody>
+                </table>
+
+                <div class="signatures">
+                    <div>
+                        <div class="sig-line">Secretaria Executiva</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Pastor Dirigente / Liderança</div>
+                    </div>
+                </div>
+
+                <div class="footer-info">
+                    Relatório Oficial de Agenda Semanal • Emitido em ${dataHoje} • Sistema Igreja Digital
+                </div>
+
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 400);
+                    };
+                <\/script>
+            </body>
+            </html>
+            `;
+
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.open();
+                win.document.write(htmlImpressao);
+                win.document.close();
+            } else {
+                alert("Por favor, permita pop-ups no navegador para imprimir a agenda.");
             }
         }
 
