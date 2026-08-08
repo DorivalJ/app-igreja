@@ -1085,8 +1085,27 @@
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
                                 <div class="flex items-center gap-2">
+                                    <label class="text-xs text-slate-400 font-medium">Mês:</label>
+                                    <select id="rep-diz-mes" onchange="carregarRelatorioDizimos()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="">Todos os Meses</option>
+                                        <option value="01">01 - Janeiro</option>
+                                        <option value="02">02 - Fevereiro</option>
+                                        <option value="03">03 - Março</option>
+                                        <option value="04">04 - Abril</option>
+                                        <option value="05">05 - Maio</option>
+                                        <option value="06">06 - Junho</option>
+                                        <option value="07">07 - Julho</option>
+                                        <option value="08">08 - Agosto</option>
+                                        <option value="09">09 - Setembro</option>
+                                        <option value="10">10 - Outubro</option>
+                                        <option value="11">11 - Novembro</option>
+                                        <option value="12">12 - Dezembro</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-2">
                                     <label class="text-xs text-slate-400 font-medium">Ano:</label>
                                     <select id="rep-diz-ano" onchange="carregarRelatorioDizimos()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                                        <option value="">Todos os Anos</option>
                                         <option value="2024">2024</option>
                                         <option value="2025">2025</option>
                                         <option value="2026" selected>2026</option>
@@ -4240,27 +4259,46 @@
 
         async function carregarRelatorioDizimos() {
             if (!_supabase) return;
-            const anoSelecionado = parseInt(document.getElementById('rep-diz-ano').value) || 2026;
-            const busca = document.getElementById('rep-diz-busca').value.toLowerCase().trim();
+            const anoSelecionado = document.getElementById('rep-diz-ano')?.value || '';
+            const mesSelecionado = document.getElementById('rep-diz-mes')?.value || '';
+            const busca = document.getElementById('rep-diz-busca')?.value.toLowerCase().trim() || '';
             const tbody = document.getElementById('tabelaRelatorioDizimos');
             
-            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500 text-sm italic">Buscando dízimos do ano...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500 text-sm italic">Buscando dízimos...</td></tr>';
             
             try {
-                const { data, error } = await _supabase
+                let query = _supabase
                     .from('financeiro')
                     .select('*')
                     .eq('tipo', 'Dízimo')
-                    .gte('data_lancamento', `${anoSelecionado}-01-01`)
-                    .lte('data_lancamento', `${anoSelecionado}-12-31`)
                     .order('data_lancamento', { ascending: false });
                 
+                if (anoSelecionado && mesSelecionado) {
+                    const anoInt = parseInt(anoSelecionado);
+                    const mesInt = parseInt(mesSelecionado);
+                    const ultimoDia = new Date(anoInt, mesInt, 0).getDate();
+                    const diaFmt = String(ultimoDia).padStart(2, '0');
+                    query = query
+                        .gte('data_lancamento', `${anoSelecionado}-${mesSelecionado}-01`)
+                        .lte('data_lancamento', `${anoSelecionado}-${mesSelecionado}-${diaFmt}`);
+                } else if (anoSelecionado) {
+                    query = query
+                        .gte('data_lancamento', `${anoSelecionado}-01-01`)
+                        .lte('data_lancamento', `${anoSelecionado}-12-31`);
+                }
+                
+                const { data, error } = await query;
                 if (error) throw error;
                 
-                // Filtrar em memória por nome do dizimista
+                // Filtrar em memória se apenas mesSelecionado foi informado (sem ano) ou pela busca por nome
                 const dízimosFiltrados = (data || []).filter(item => {
-                    if (!busca) return true;
-                    return item.descricao && item.descricao.toLowerCase().includes(busca);
+                    if (!item.data_lancamento) return false;
+                    const partes = item.data_lancamento.split('-');
+                    const mesAg = partes[1];
+
+                    if (mesSelecionado && !anoSelecionado && mesAg !== mesSelecionado) return false;
+                    if (busca && (!item.descricao || !item.descricao.toLowerCase().includes(busca))) return false;
+                    return true;
                 });
                 
                 relatorioDizimosCache = dízimosFiltrados;
@@ -4282,7 +4320,7 @@
                 
                 dízimosFiltrados.forEach(item => {
                     const partes = (item.data_lancamento || '').split('-');
-                    const ano = partes[0] || anoSelecionado;
+                    const ano = partes[0] || (anoSelecionado || '');
                     const mesCod = partes[1] || '01';
                     const mesNome = mesesNomesAbrev[mesCod] || 'Janeiro';
                     const valor = parseFloat(item.valor) || 0;
@@ -4311,15 +4349,27 @@
                 alert("Não há dízimos listados para gerar impressão.");
                 return;
             }
-            const anoSelecionado = parseInt(document.getElementById('rep-diz-ano').value) || 2026;
-            
-            let totalSoma = 0;
-            let rowsHtml = '';
+            const anoSelecionado = document.getElementById('rep-diz-ano')?.value || '';
+            const mesSelecionado = document.getElementById('rep-diz-mes')?.value || '';
             
             const mesesNomesAbrev = {
                 '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril', '05': 'Maio', '06': 'Junho',
                 '07': 'Julho', '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
             };
+
+            let competenciaLabel = '';
+            if (mesSelecionado && anoSelecionado) {
+                competenciaLabel = `${mesesNomesAbrev[mesSelecionado]} de ${anoSelecionado}`;
+            } else if (anoSelecionado) {
+                competenciaLabel = `Ano de ${anoSelecionado}`;
+            } else if (mesSelecionado) {
+                competenciaLabel = `Mês de ${mesesNomesAbrev[mesSelecionado]}`;
+            } else {
+                competenciaLabel = "Todos os Períodos";
+            }
+            
+            let totalSoma = 0;
+            let rowsHtml = '';
 
             // Order by contributor name and then month
             const dízimosOrdenados = [...relatorioDizimosCache].sort((a, b) => {
@@ -4330,6 +4380,7 @@
             
             dízimosOrdenados.forEach(item => {
                 const partes = (item.data_lancamento || '').split('-');
+                const anoItem = partes[0] || anoSelecionado;
                 const mesCod = partes[1] || '01';
                 const mesNome = mesesNomesAbrev[mesCod] || 'Janeiro';
                 const valor = parseFloat(item.valor) || 0;
@@ -4337,7 +4388,7 @@
                 
                 rowsHtml += `
                     <tr>
-                        <td class="text-center">${anoSelecionado}</td>
+                        <td class="text-center">${anoItem}</td>
                         <td>${mesNome}</td>
                         <td><strong>${item.descricao || 'Contribuinte Geral'}</strong></td>
                         <td>${item.cargo || 'Membro'}</td>
@@ -4351,7 +4402,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Dízimos Anual por Dizimista — ${anoSelecionado}</title>
+                    <title>Relatório de Dízimos — ${competenciaLabel}</title>
                     <style>
                         @page { size: landscape; margin: 10mm 15mm 10mm 15mm; }
                         body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; margin: 30px; background-color: #fff; }
@@ -4383,8 +4434,8 @@
                 <body>
                     <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
                     <div class="header">
-                        <h1>RELATÓRIO DE DÍZIMOS ANUAL</h1>
-                        <p>Dízimos Anual por Dizimista — Ano de Exercício: ${anoSelecionado}</p>
+                        <h1>RELATÓRIO DE DÍZIMOS</h1>
+                        <p>Dízimos por Dizimista — Competência: ${competenciaLabel}</p>
                     </div>
                     
                     <div class="card-total">
