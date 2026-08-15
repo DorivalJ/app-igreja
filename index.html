@@ -810,13 +810,23 @@
                                 <div class="md:col-span-6 border-t border-slate-800/60 my-2"></div>
 
                                 <div class="md:col-span-3" id="box-doc-alvo">
-                                    <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Convidado</label>
-                                    <input type="text" id="doc_alvo" list="lista-sugestoes-alvo" required placeholder="Nome completo ou Instituição" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Convidado</label>
+                                        <button type="button" id="btn-excluir-preletor-sugestao" onclick="excluirPreletorAtual()" title="Excluir este nome das sugestões salvas" class="hidden text-xs text-red-400 hover:text-red-300 font-medium transition-colors items-center gap-1">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i> Excluir das sugestões (✕)
+                                        </button>
+                                    </div>
+                                    <div class="relative flex items-center">
+                                        <input type="text" id="doc_alvo" list="lista-sugestoes-alvo" required placeholder="Nome completo ou Instituição" oninput="verificarPreletorDigitado()" onchange="verificarPreletorDigitado()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                        <button type="button" id="btn-limpar-preletor" onclick="limparEExcluirPreletor()" title="Excluir preletor das sugestões" class="hidden absolute right-2.5 p-1 text-slate-400 hover:text-red-400 hover:bg-slate-700/50 rounded-lg transition-colors">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
                                     <datalist id="lista-sugestoes-alvo"></datalist>
                                 </div>
 
                                 <div class="md:col-span-3 hidden" id="box-doc-local">
-                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Evento</label>
+                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Evento / Departamento Coberto</label>
                                     <input type="text" id="doc_local" list="lista-sugestoes-local" placeholder="Ex: Sede, Congregação X, Congresso de Jovens" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                     <datalist id="lista-sugestoes-local"></datalist>
                                 </div>
@@ -2645,6 +2655,126 @@
             janelaImpressao.document.close();
         }
 
+        const LS_PRELETORES_KEY = 'ad_guarulhos_preletores_externos_v1';
+
+        function obterPreletoresSalvos() {
+            try {
+                const salvos = localStorage.getItem(LS_PRELETORES_KEY);
+                if (salvos) {
+                    const arr = JSON.parse(salvos);
+                    if (Array.isArray(arr)) return arr;
+                }
+            } catch (e) {
+                console.error("Erro ao carregar preletores", e);
+            }
+            return [];
+        }
+
+        function salvarPreletorNoHistorico(nome) {
+            if (!nome) return;
+            const nomeLimpo = nome.trim();
+            if (!nomeLimpo) return;
+            let lista = obterPreletoresSalvos();
+            const indexExistente = lista.findIndex(n => n.toLowerCase() === nomeLimpo.toLowerCase());
+            if (indexExistente !== -1) {
+                lista.splice(indexExistente, 1);
+            }
+            lista.unshift(nomeLimpo);
+            try {
+                localStorage.setItem(LS_PRELETORES_KEY, JSON.stringify(lista));
+            } catch (e) {}
+            atualizarDatalistPreletores();
+        }
+
+        function excluirPreletorAtual() {
+            const inp = document.getElementById('doc_alvo');
+            if (!inp) return;
+            const nomeExcluir = inp.value.trim();
+            if (!nomeExcluir) return;
+
+            let lista = obterPreletoresSalvos();
+            lista = lista.filter(n => n.toLowerCase() !== nomeExcluir.toLowerCase());
+            try {
+                localStorage.setItem(LS_PRELETORES_KEY, JSON.stringify(lista));
+            } catch (e) {}
+            inp.value = '';
+            atualizarDatalistPreletores();
+            verificarPreletorDigitado();
+            inp.focus();
+        }
+
+        function limparEExcluirPreletor() {
+            const inp = document.getElementById('doc_alvo');
+            if (!inp) return;
+            const nomeExcluir = inp.value.trim();
+            if (nomeExcluir) {
+                let lista = obterPreletoresSalvos();
+                const existe = lista.some(n => n.toLowerCase() === nomeExcluir.toLowerCase());
+                if (existe) {
+                    lista = lista.filter(n => n.toLowerCase() !== nomeExcluir.toLowerCase());
+                    try {
+                        localStorage.setItem(LS_PRELETORES_KEY, JSON.stringify(lista));
+                    } catch (e) {}
+                }
+            }
+            inp.value = '';
+            atualizarDatalistPreletores();
+            verificarPreletorDigitado();
+            inp.focus();
+        }
+
+        function verificarPreletorDigitado() {
+            const categoria = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            const inp = document.getElementById('doc_alvo');
+            const btnLimpar = document.getElementById('btn-limpar-preletor');
+            const btnExcluir = document.getElementById('btn-excluir-preletor-sugestao');
+            if (!inp) return;
+
+            const val = inp.value.trim();
+            if (val && categoria === 'Convite' && tipo === 'Preletores') {
+                const salvos = obterPreletoresSalvos();
+                const existeSalvo = salvos.some(n => n.toLowerCase() === val.toLowerCase());
+                if (btnLimpar) btnLimpar.classList.remove('hidden');
+                if (btnExcluir) {
+                    if (existeSalvo) {
+                        btnExcluir.classList.remove('hidden');
+                        btnExcluir.classList.add('flex');
+                    } else {
+                        btnExcluir.classList.add('hidden');
+                        btnExcluir.classList.remove('flex');
+                    }
+                }
+            } else if (val) {
+                if (btnLimpar) btnLimpar.classList.remove('hidden');
+                if (btnExcluir) {
+                    btnExcluir.classList.add('hidden');
+                    btnExcluir.classList.remove('flex');
+                }
+            } else {
+                if (btnLimpar) btnLimpar.classList.add('hidden');
+                if (btnExcluir) {
+                    btnExcluir.classList.add('hidden');
+                    btnExcluir.classList.remove('flex');
+                }
+            }
+        }
+
+        function atualizarDatalistPreletores() {
+            const categoria = document.getElementById('doc_categoria').value;
+            const tipo = document.getElementById('doc_tipo').value;
+            if (categoria === 'Convite' && tipo === 'Preletores') {
+                const datalistAlvo = document.getElementById('lista-sugestoes-alvo');
+                if (datalistAlvo) {
+                    datalistAlvo.innerHTML = '';
+                    const salvos = obterPreletoresSalvos();
+                    salvos.forEach(nome => {
+                        datalistAlvo.innerHTML += `<option value="${nome}">`;
+                    });
+                }
+            }
+        }
+
         function atualizarTiposDocumento() {
             const category = document.getElementById('doc_categoria').value;
             const selectTipo = document.getElementById('doc_tipo');
@@ -2678,6 +2808,8 @@
             boxData.classList.add('hidden');
             boxHora.classList.add('hidden');
             if (boxTema) boxTema.classList.add('hidden');
+
+            inpAlvo.setAttribute('list', 'lista-sugestoes-alvo');
 
             if (category === 'Carta') {
                 lblAlvo.innerText = "Nome do Membro";
@@ -2718,6 +2850,7 @@
             }
 
             atualizarSugestoesDocumento(category, tipo);
+            verificarPreletorDigitado();
         }
 
         function atualizarSugestoesDocumento(category, tipo) {
@@ -2748,19 +2881,8 @@
                         datalistAlvo.innerHTML += `<option value="${ig}">`;
                     });
                 } else if (tipo === 'Preletores') {
-                    const lideres = (listaMembrosCache || []).filter(m => {
-                        const cargo = (m.cargo || '').toLowerCase();
-                        return cargo.includes('pastor') || cargo.includes('presb') || cargo.includes('evang') || cargo.includes('dirigente') || cargo.includes('obreiro');
-                    }).map(m => `${m.cargo ? m.cargo + ' ' : ''}${m.nome}`);
-
-                    const sugestoesPreletores = [
-                        'Pr. Presidente',
-                        'Pr. Vice-Presidente',
-                        'Evangelista Convidado',
-                        'Preletor Oficial'
-                    ];
-                    const unicos = Array.from(new Set([...lideres, ...membrosNomes, ...sugestoesPreletores]));
-                    unicos.forEach(nome => {
+                    const salvos = obterPreletoresSalvos();
+                    salvos.forEach(nome => {
                         datalistAlvo.innerHTML += `<option value="${nome}">`;
                     });
                 } else if (tipo === 'Cantores') {
@@ -2833,6 +2955,10 @@
             if(!alvo) {
                 alert('Por favor, defina o campo do destinatário/membro principal ou convidado/instituição.');
                 return;
+            }
+
+            if (categoria === 'Convite' && tipo === 'Preletores' && alvo.trim()) {
+                salvarPreletorNoHistorico(alvo.trim());
             }
 
             const dataHoje = new Date();
