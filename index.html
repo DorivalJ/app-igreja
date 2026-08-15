@@ -795,14 +795,14 @@
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Categoria do Documento</label>
                                     <select id="doc_categoria" onchange="atualizarTiposDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                                        <option value="Convite">Convite</option>
                                         <option value="Carta">Carta</option>
                                         <option value="Memorando">Memorando</option>
-                                        <option value="Convite">Convite</option>
                                     </select>
                                 </div>
 
                                 <div class="md:col-span-3">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo Específico</label>
+                                    <label id="label-doc-tipo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo Específico</label>
                                     <select id="doc_tipo" onchange="ajustarFormularioDocumento()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50">
                                     </select>
                                 </div>
@@ -810,13 +810,15 @@
                                 <div class="md:col-span-6 border-t border-slate-800/60 my-2"></div>
 
                                 <div class="md:col-span-3" id="box-doc-alvo">
-                                    <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Membro / Destinatário</label>
-                                    <input type="text" id="doc_alvo" required placeholder="Nome completo" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <label id="label-doc-alvo" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Convidado / Instituição</label>
+                                    <input type="text" id="doc_alvo" list="lista-sugestoes-alvo" required placeholder="Nome completo ou Instituição" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <datalist id="lista-sugestoes-alvo"></datalist>
                                 </div>
 
                                 <div class="md:col-span-3 hidden" id="box-doc-local">
-                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Igreja de Destino / Local</label>
-                                    <input type="text" id="doc_local" placeholder="Ex: Sede, Congregação X, Igreja Y" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <label id="label-doc-local" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Evento / Departamento Coberto</label>
+                                    <input type="text" id="doc_local" list="lista-sugestoes-local" placeholder="Ex: Sede, Congregação X, Congresso de Jovens" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                    <datalist id="lista-sugestoes-local"></datalist>
                                 </div>
 
                                 <div class="md:col-span-2 hidden" id="box-doc-data">
@@ -825,13 +827,18 @@
                                 </div>
 
                                 <div class="md:col-span-2 hidden" id="box-doc-hora">
-                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
+                                    <label id="label-doc-hora" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Horário</label>
                                     <input type="text" id="doc_hora" placeholder="Ex: 19:00" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
+                                </div>
+
+                                <div class="md:col-span-2 hidden" id="box-doc-tema">
+                                    <label id="label-doc-tema" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tema do Evento</label>
+                                    <input type="text" id="doc_tema" placeholder="Ex: 'Grandes coisas fez o Senhor...' (Sl 126:3)" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
 
                                 <div class="md:col-span-6">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Texto Adicional / Observações Importantes</label>
-                                    <textarea id="doc_texto" rows="4" placeholder="Digite detalhes que devam constar no documento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
+                                    <textarea id="doc_texto" rows="3" placeholder="Digite detalhes que devam constar no documento..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none resize-none"></textarea>
                                 </div>
                             </div>
 
@@ -1858,7 +1865,7 @@
         const opcoesDocumentos = {
             Carta: ['Mudança', 'Transferência', 'Apresentação'],
             Memorando: ['Desligamento', 'Reintegração', 'Integração', 'Suspensão', 'Exclusão', 'Memorando Interno', 'Apresentação na Sede'],
-            Convite: ['Preletores', 'Cantores', 'Igrejas', 'Abadguar', 'Congresso Com Jovens', 'Congresso Com Adolescentes', 'Congresso Com as Irmãs', 'Outros Cultos']
+            Convite: ['Preletores', 'Cantores', 'Igrejas']
         };
 
         const estruturaCargosEclesiasticos = [
@@ -2642,7 +2649,8 @@
             const category = document.getElementById('doc_categoria').value;
             const selectTipo = document.getElementById('doc_tipo');
             selectTipo.innerHTML = '';
-            opcoesDocumentos[category].forEach(tipo => {
+            const listaOpcoes = opcoesDocumentos[category] || [];
+            listaOpcoes.forEach(tipo => {
                 selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
             });
             ajustarFormularioDocumento();
@@ -2655,19 +2663,28 @@
             const inpAlvo = document.getElementById('doc_alvo');
             const boxLocal = document.getElementById('box-doc-local');
             const lblLocal = document.getElementById('label-doc-local');
+            const inpLocal = document.getElementById('doc_local');
             const boxData = document.getElementById('box-doc-data');
             const lblData = document.getElementById('label-doc-data');
             const boxHora = document.getElementById('box-doc-hora');
+            const boxTema = document.getElementById('box-doc-tema');
+            const lblTipo = document.getElementById('label-doc-tipo');
+
+            if (lblTipo) {
+                lblTipo.innerText = "Tipo Específico";
+            }
 
             boxLocal.classList.add('hidden');
             boxData.classList.add('hidden');
             boxHora.classList.add('hidden');
+            if (boxTema) boxTema.classList.add('hidden');
 
             if (category === 'Carta') {
                 lblAlvo.innerText = "Nome do Membro";
                 inpAlvo.placeholder = "Ex: Nome Completo do Irmão/Irmã";
                 boxLocal.classList.remove('hidden');
                 lblLocal.innerText = "Igreja de Destino";
+                inpLocal.placeholder = "Ex: Igreja Assembleia de Deus - Itapetininga - SP";
             } else if (category === 'Memorando') {
                 lblAlvo.innerText = "Membro Alvo / Assunto";
                 inpAlvo.placeholder = "Ex: Nome do Membro ou Departamento Coberto";
@@ -2680,12 +2697,126 @@
                 }
             } else if (category === 'Convite') {
                 lblAlvo.innerText = "Convidado / Instituição";
-                inpAlvo.placeholder = "Ex: Pr. Cláudio Duarte / Ministério de Louvor X";
+                if (tipo === 'Igrejas') {
+                    inpAlvo.placeholder = "Ex: Igreja Assembleia de Deus - Ministério Madureira";
+                } else if (tipo === 'Preletores') {
+                    inpAlvo.placeholder = "Ex: Pr. Carlos Alberto / Ev. Marcos Silva";
+                } else if (tipo === 'Cantores') {
+                    inpAlvo.placeholder = "Ex: Cantora Sarah Farias / Grupo de Louvor Asafe";
+                } else {
+                    inpAlvo.placeholder = "Ex: Nome do Convidado ou Instituição";
+                }
+
                 boxLocal.classList.remove('hidden');
-                lblLocal.innerText = "Evento / Departamento Coberto";
+                lblLocal.innerText = "Nome do Evento / Departamento";
+                inpLocal.placeholder = "Ex: Congresso de Jovens, Culto de Missões, Aniversário do Círculo de Oração";
+                
                 boxData.classList.remove('hidden');
                 lblData.innerText = "Data do Evento";
                 boxHora.classList.remove('hidden');
+                if (boxTema) boxTema.classList.remove('hidden');
+            }
+
+            atualizarSugestoesDocumento(category, tipo);
+        }
+
+        function atualizarSugestoesDocumento(category, tipo) {
+            const datalistAlvo = document.getElementById('lista-sugestoes-alvo');
+            const datalistLocal = document.getElementById('lista-sugestoes-local');
+            if (!datalistAlvo) return;
+
+            datalistAlvo.innerHTML = '';
+            if (datalistLocal) datalistLocal.innerHTML = '';
+
+            const membrosNomes = (listaMembrosCache || []).map(m => m.nome).filter(Boolean);
+
+            if (category === 'Convite') {
+                if (tipo === 'Igrejas') {
+                    const igrejasSugeridas = [
+                        'Igreja Evangélica Assembleia de Deus - Sede AD Brás',
+                        'Igreja Assembleia de Deus Ministério Madureira - Guarulhos',
+                        'Igreja Assembleia de Deus - Congregação Jd. Marilena',
+                        'Igreja Assembleia de Deus - Congregação Taboão',
+                        'Igreja Assembleia de Deus - Congregação Lavras',
+                        'Igreja Assembleia de Deus - Congregação Cumbica',
+                        'Igreja Assembleia de Deus - Congregação Cecap',
+                        'Igreja Assembleia de Deus - Congregação Pimentas',
+                        'Igreja Assembleia de Deus - Congregação Bonsucesso',
+                        'Igreja Assembleia de Deus - Congregação São João'
+                    ];
+                    igrejasSugeridas.forEach(ig => {
+                        datalistAlvo.innerHTML += `<option value="${ig}">`;
+                    });
+                } else if (tipo === 'Preletores') {
+                    const lideres = (listaMembrosCache || []).filter(m => {
+                        const cargo = (m.cargo || '').toLowerCase();
+                        return cargo.includes('pastor') || cargo.includes('presb') || cargo.includes('evang') || cargo.includes('dirigente') || cargo.includes('obreiro');
+                    }).map(m => `${m.cargo ? m.cargo + ' ' : ''}${m.nome}`);
+
+                    const sugestoesPreletores = [
+                        'Pr. Presidente',
+                        'Pr. Vice-Presidente',
+                        'Evangelista Convidado',
+                        'Preletor Oficial'
+                    ];
+                    const unicos = Array.from(new Set([...lideres, ...membrosNomes, ...sugestoesPreletores]));
+                    unicos.forEach(nome => {
+                        datalistAlvo.innerHTML += `<option value="${nome}">`;
+                    });
+                } else if (tipo === 'Cantores') {
+                    const sugestoesCantores = [
+                        'Coral de Mulheres',
+                        'Conjunto de Jovens (UMAD)',
+                        'Conjunto de Adolescentes',
+                        'Conjunto de Crianças',
+                        'Ministério de Louvor e Adoração',
+                        'Quarteto Vocal',
+                        'Cantor(a) Solista Convidado(a)'
+                    ];
+                    const unicos = Array.from(new Set([...membrosNomes, ...sugestoesCantores]));
+                    unicos.forEach(nome => {
+                        datalistAlvo.innerHTML += `<option value="${nome}">`;
+                    });
+                }
+
+                if (datalistLocal) {
+                    const eventosSugeridos = [
+                        'Culto de Ensino da Palavra',
+                        'Culto da Família',
+                        'Culto de Missões e Evangelismo',
+                        'Congresso de Jovens',
+                        'Congresso de Adolescentes',
+                        'Aniversário do Círculo de Oração',
+                        'Aniversário da Congregação',
+                        'Vigília de Adoração e Oração',
+                        'Culto de Santa Ceia do Senhor',
+                        'Cruzada Evangelística'
+                    ];
+                    eventosSugeridos.forEach(ev => {
+                        datalistLocal.innerHTML += `<option value="${ev}">`;
+                    });
+                }
+            } else if (category === 'Carta') {
+                membrosNomes.forEach(nome => {
+                    datalistAlvo.innerHTML += `<option value="${nome}">`;
+                });
+                if (datalistLocal) {
+                    const igrejasDestino = [
+                        'Igreja Evangélica Assembleia de Deus - Sede AD Brás',
+                        'Igreja Assembleia de Deus - Itapetininga - SP',
+                        'Igreja Assembleia de Deus Ministério Madureira - Guarulhos - SP',
+                        'Igreja Assembleia de Deus - Congregação Taboão - Guarulhos - SP',
+                        'Igreja Assembleia de Deus - São Paulo - SP',
+                        'Igreja Assembleia de Deus - Rio de Janeiro - RJ'
+                    ];
+                    igrejasDestino.forEach(ig => {
+                        datalistLocal.innerHTML += `<option value="${ig}">`;
+                    });
+                }
+            } else if (category === 'Memorando') {
+                membrosNomes.forEach(nome => {
+                    datalistAlvo.innerHTML += `<option value="${nome}">`;
+                });
             }
         }
 
@@ -2696,17 +2827,18 @@
             const local = document.getElementById('doc_local').value || '';
             const dataInput = document.getElementById('doc_data').value || '';
             const hora = document.getElementById('doc_hora').value || '';
+            const tema = document.getElementById('doc_tema') ? document.getElementById('doc_tema').value : '';
             const textoAdicional = document.getElementById('doc_texto').value || '';
 
             if(!alvo) {
-                alert('Por favor, defina o campo do destinatário/membro principal.');
+                alert('Por favor, defina o campo do destinatário/membro principal ou convidado/instituição.');
                 return;
             }
 
             const dataHoje = new Date();
             const novoDoc = {
                 id: Date.now(),
-                categoria, tipo, alvo, local, data: dataInput, hora, texto: textoAdicional,
+                categoria, tipo, alvo, local, data: dataInput, hora, tema, texto: textoAdicional,
                 data_emissao: dataHoje.toLocaleDateString('pt-BR')
             };
 
@@ -2719,6 +2851,24 @@
             atualizarTiposDocumento();
         }
 
+        function extrairCidadeEstado(localStr) {
+            if (!localStr) return '';
+            let str = localStr.trim();
+            const partes = str.split(/\s*[-–—]\s*/);
+            if (partes.length >= 2) {
+                const primeiraParte = partes[0].toLowerCase();
+                const eIgreja = /igreja|assembleia|congregaç|congregac|ministério|ministerio|\bad\b/i.test(primeiraParte);
+                if (eIgreja && partes.length > 2) {
+                    return partes.slice(1).join(' - ');
+                }
+                if (eIgreja && partes.length === 2 && partes[1].length > 3) {
+                    return partes[1];
+                }
+            }
+            let limpo = str.replace(/^(Igreja\s+)?(Evangélica\s+)?(Assembleia\s+de\s+Deus|AD|Congregação|Ministério|Comunidade)(\s+Madureira|\s+AD\s+Brás)?(\s*[-–—]\s*|\s+de\s+|\s+em\s+|\s+)/i, '').trim();
+            return limpo || str;
+        }
+
         function dispararImpressaoDocumento(doc) {
             // Gerando string de data dinâmica: "Guarulhos, DD de Mês de AAAA."
             const dataHoje = new Date();
@@ -2726,29 +2876,81 @@
             const localEDataDinamica = `Guarulhos, ${String(dataHoje.getDate()).padStart(2, '0')} de ${mesesPorExtenso[dataHoje.getMonth()]} de ${dataHoje.getFullYear()}.`;
 
             let corpoTemplate = '';
+            let cabecalhoIgreja = '';
             const dataFormatada = doc.data ? formatarData(doc.data) : '';
 
+            // Formatação de data e horário para convites
+            let dataHoraPrevista = '';
+            if (dataFormatada && doc.hora) {
+                dataHoraPrevista = `${dataFormatada} às ${doc.hora}`;
+            } else if (dataFormatada) {
+                dataHoraPrevista = dataFormatada;
+            } else if (doc.hora) {
+                dataHoraPrevista = `horário: ${doc.hora}`;
+            } else {
+                dataHoraPrevista = 'data a confirmar';
+            }
+
             if (doc.categoria === 'Carta') {
+                const localCidadeEstado = extrairCidadeEstado(doc.local);
+                cabecalhoIgreja = `<p style="text-indent: 0; font-weight: bold; margin-bottom: 25px;">À igreja: ${doc.local || ''}</p>`;
                 corpoTemplate = `
                     <p>Prezados Irmãos em Cristo,</p>
-                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${doc.alvo}</strong>, que está se deslocando para a localidade de <strong>${doc.local}</strong>.</p>
-                    <p>Solicitamos que o(a) recebam na paz do Senhor e prestem o auxílio e comunhão necessários para o seu bom desenvolvimento espiritual na nova comunidade.</p>
-                    <p>${doc.texto || ''}</p>
+                    <p>Vimos por meio desta apresentar e recomendar o(a) amado(a) irmão(ã) <strong>${doc.alvo}</strong>, que está se deslocando para a localidade de <strong>${localCidadeEstado}</strong>.</p>
+                    <p>Solicitamos que o(a) recebam na paz do Senhor e prestem o auxílio e comunhão necessários para o seu bom desenvolvimento espiritual nesta Cogregação.</p>
+                    ${doc.texto ? `<p>${doc.texto}</p>` : ''}
                 `;
             } else if (doc.categoria === 'Memorando') {
+                cabecalhoIgreja = '';
                 corpoTemplate = `
                     <p><strong>Assunto:</strong> Registro e Medida Administrativa de ${doc.tipo}</p>
                     <p>Comunicamos a toda a diretoria e corpo administrativo que, a partir da data de <strong>${dataFormatada || doc.data_emissao}</strong>, ficam estabelecidas novas diretrizes ou status referentes a <strong>${doc.alvo}</strong>.</p>
                     <p>Esta decisão visa a manutenção da ordem, paz e conformidade com as diretrizes regimentais estabelecidas pela instituição.</p>
-                    <p>${doc.texto || ''}</p>
+                    ${doc.texto ? `<p>${doc.texto}</p>` : ''}
                 `;
             } else if (doc.categoria === 'Convite') {
-                corpoTemplate = `
-                    <p>Graça e Paz!</p>
-                    <p>Temos a honra de convidar cordialmente <strong>${doc.alvo}</strong> para cooperar conosco no evento <strong>${doc.local}</strong>.</p>
-                    <p>O cronograma oficial está previsto para o dia <strong>${dataFormatada}</strong> às <strong>${doc.hora}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
-                    <p>${doc.texto || ''}</p>
-                `;
+                const nomeConvidado = doc.alvo || '';
+                const nomeEvento = doc.local || 'Evento Especial';
+                const temaHtml = doc.tema ? `<p style="margin-top: 15px;"><strong>Tema:</strong> ${doc.tema}</p>` : '';
+                const obsHtml = doc.texto ? `<p style="margin-top: 15px;">${doc.texto}</p>` : '';
+
+                if (doc.tipo === 'Igrejas') {
+                    cabecalhoIgreja = `<p style="text-indent: 0; font-weight: bold; margin-bottom: 25px;">À igreja: ${nomeConvidado}</p>`;
+                    corpoTemplate = `
+                        <p>Graça e Paz!</p>
+                        <p>Temos a honra de convidar cordialmente a <strong>${nomeConvidado}</strong> para cooperar conosco no evento <strong>${nomeEvento}</strong>.</p>
+                        <p>A data oficial para a amada igreja está prevista para o dia <strong>${dataHoraPrevista}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                        ${temaHtml}
+                        ${obsHtml}
+                    `;
+                } else if (doc.tipo === 'Preletores') {
+                    cabecalhoIgreja = `<p style="text-indent: 0; font-weight: bold; margin-bottom: 25px;">Ao(À) amado(a) Preletor(a): ${nomeConvidado}</p>`;
+                    corpoTemplate = `
+                        <p>Graça e Paz!</p>
+                        <p>Temos a honra de convidar cordialmente o(a) amado(a) <strong>${nomeConvidado}</strong> para ministrar a Palavra de Deus conosco no evento <strong>${nomeEvento}</strong>.</p>
+                        <p>A data oficial para sua ministração está prevista para o dia <strong>${dataHoraPrevista}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                        ${temaHtml}
+                        ${obsHtml}
+                    `;
+                } else if (doc.tipo === 'Cantores') {
+                    cabecalhoIgreja = `<p style="text-indent: 0; font-weight: bold; margin-bottom: 25px;">Ao(À) amado(a) Cantor(a) / Grupo: ${nomeConvidado}</p>`;
+                    corpoTemplate = `
+                        <p>Graça e Paz!</p>
+                        <p>Temos a honra de convidar cordialmente o(a) amado(a) <strong>${nomeConvidado}</strong> para louvar e adorar a Deus conosco no evento <strong>${nomeEvento}</strong>.</p>
+                        <p>A data oficial para sua participação está prevista para o dia <strong>${dataHoraPrevista}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                        ${temaHtml}
+                        ${obsHtml}
+                    `;
+                } else {
+                    cabecalhoIgreja = `<p style="text-indent: 0; font-weight: bold; margin-bottom: 25px;">Convidado(a): ${nomeConvidado}</p>`;
+                    corpoTemplate = `
+                        <p>Graça e Paz!</p>
+                        <p>Temos a honra de convidar cordialmente <strong>${nomeConvidado}</strong> para cooperar conosco no evento <strong>${nomeEvento}</strong>.</p>
+                        <p>A data oficial está prevista para o dia <strong>${dataHoraPrevista}</strong>. Contamos com sua valiosa presença para somar na adoração ao Senhor.</p>
+                        ${temaHtml}
+                        ${obsHtml}
+                    `;
+                }
             }
 
             const janelaImpressao = window.open('', '_blank');
@@ -2784,7 +2986,7 @@
                     </div>
                     <div class="titulo-doc">${doc.categoria} Oficial: ${doc.tipo}</div>
                     <div class="corpo">
-                        <p style="text-indent: 0; font-weight: bold; margin-bottom: 25px;">À igreja: </p>
+                        ${cabecalhoIgreja}
                         ${corpoTemplate}
                     </div>
                     <div class="data-local">${localEDataDinamica}</div>
