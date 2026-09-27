@@ -2509,7 +2509,7 @@
                         <tr>
                             <td>${formatarData(f.data_lancamento)}</td>
                             <td><strong>${obterDiaSemanaAbreviado(f.data_lancamento)}</strong></td>
-                            <td><strong>${f.tipo}</strong></td>
+                            <td class="${f.tipo === 'Despesa' ? 'text-danger' : ''}"><strong>${f.tipo}</strong></td>
                             <td>${f.descricao || '-'}</td>
                             <td><span class="tag-cargo">${f.cargo || '-'}</span></td>
                             <td>${f.observacao || '-'}</td>
@@ -2556,8 +2556,8 @@
                             tr:hover { background-color: #f1f5f9; }
                             
                             .text-right { text-align: right; }
-                            .text-success { color: #10b981; font-weight: 600; }
-                            .text-danger { color: #f43f5e; font-weight: 600; }
+                            .text-success { color: #10b981; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            .text-danger { color: #f43f5e; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                             .tag-cargo { font-size: 10px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; border: 1px solid #e2e8f0; }
                             
                             .footer { text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 24px; margin-top: 40px; clear: both; page-break-inside: avoid; }
@@ -3628,7 +3628,7 @@
                     <tr class="hover:bg-slate-800/30 transition-colors">
                         <td class="px-6 py-4 text-sm">${formatarData(f.data_lancamento)}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-slate-400">${obterDiaSemanaAbreviado(f.data_lancamento)}</td>
-                        <td class="px-6 py-4 font-medium text-slate-400">${f.tipo}</td>
+                        <td class="px-6 py-4 font-medium ${f.tipo === 'Despesa' ? 'text-rose-400 font-semibold' : 'text-slate-400'}">${f.tipo}</td>
                         <td class="px-6 py-4 text-slate-200">${f.descricao}</td>
                         <td class="px-6 py-4">${exibicaoCargo}</td>
                         <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
