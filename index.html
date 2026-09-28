@@ -2589,6 +2589,7 @@
 
                 const saldoTotal = d + o - de;
                 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                const dataAtual = new Date().toLocaleDateString('pt-BR');
                 
                 let competenciaLabel = '';
                 if (mesFiltro && anoFiltro) {
@@ -2604,35 +2605,72 @@
                 const janelaImpressao = window.open('', '_blank');
                 janelaImpressao.document.write(`
                     <!DOCTYPE html>
-                    <html>
+                    <html lang="pt-BR">
                     <head>
+                        <meta charset="UTF-8">
                         <title>Relatório Financeiro - Livro Caixa</title>
                         <style>
-                            @page { size: landscape; margin: 1.2cm 1cm 1.8cm 1cm; }
-                            body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1e293b; margin: 0; padding: 10px; background-color: #fff; }
+                            @page {
+                                size: landscape;
+                                margin-top: 1.2cm;
+                                margin-left: 1cm;
+                                margin-right: 1cm;
+                                margin-bottom: 2.2cm;
+
+                                @bottom-left {
+                                    content: "GERADO EM ${dataAtual} POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.";
+                                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                                    font-size: 9px;
+                                    color: #475569;
+                                    font-weight: 500;
+                                    letter-spacing: 0.3px;
+                                }
+
+                                @bottom-right {
+                                    content: "Página " counter(page) " de " counter(pages);
+                                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                                    font-size: 9px;
+                                    color: #475569;
+                                    font-weight: 500;
+                                    white-space: nowrap;
+                                }
+                            }
+
+                            * { box-sizing: border-box; }
+                            body {
+                                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                                color: #1e293b;
+                                margin: 0;
+                                padding: 10px;
+                                background-color: #fff;
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+
                             .header { text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 20px; }
                             .header h1 { margin: 0; font-size: 24px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; }
                             .header p { margin: 6px 0 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #10b981; font-weight: bold; }
                             
-                            .cards-resumo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+                            .cards-resumo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; page-break-inside: avoid; }
                             .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; background: #f8fafc; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
                             .card p { margin: 0; font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px; }
                             .card h3 { margin: 5px 0 0 0; font-size: 16px; color: #0f172a; font-weight: 800; }
                             
-                            table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
-                            th { background-color: #f8fafc; color: #475569; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; padding: 10px 12px; border: 1px solid #e2e8f0; text-align: left; }
-                            td { padding: 8px 12px; border: 1px solid #e2e8f0; font-size: 12px; color: #334155; white-space: nowrap; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: auto; }
+                            thead { display: table-header-group; }
+                            tr { page-break-inside: avoid; page-break-after: auto; }
+                            th { background-color: #f8fafc; color: #475569; font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; padding: 7px 10px; border: 1px solid #e2e8f0; text-align: left; }
+                            td { padding: 5px 10px; border: 1px solid #e2e8f0; font-size: 9px; color: #334155; white-space: nowrap; }
                             tr:nth-child(even) { background-color: #f8fafc; }
                             tr:hover { background-color: #f1f5f9; }
                             
                             .text-right { text-align: right; }
                             .text-success { color: #10b981; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                             .text-danger { color: #f43f5e; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                            .tag-cargo { font-size: 10px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; border: 1px solid #e2e8f0; }
+                            .tag-cargo { font-size: 9px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500; border: 1px solid #e2e8f0; }
                             
-                            .footer { text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 24px; margin-top: 40px; clear: both; page-break-inside: avoid; }
-                            .assinaturas { margin-top: 40px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-                            .linha-signature { text-align: center; width: 250px; font-size: 11px; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 6px; font-weight: 500; }
+                            .assinaturas { margin-top: 36px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+                            .linha-signature { text-align: center; width: 250px; font-size: 9px; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 6px; font-weight: 500; }
                             
                             @media print { 
                                 body { margin: 0; padding: 0; } 
@@ -2679,8 +2717,6 @@
                             <div class="linha-signature">Tesouraria Local</div>
                             <div class="linha-signature">Pastor Dirigente</div>
                         </div>
-
-                        <div class="footer">GERADO EM ${new Date().toLocaleDateString('pt-BR')} POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
                     </body>
                     </html>
                 `);
