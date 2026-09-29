@@ -13,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/html2pdf.bundle.min.js"></script>
     <script src="logo_base64.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -2526,6 +2527,10 @@
             } catch (err) { alert("Erro ao fluxo dados da agenda para impressão: " + err.message); }
         }
 
+        function baixarRelatorioFinanceiroPDF() {
+            imprimirRelatorioFinanceiro();
+        }
+
         async function imprimirRelatorioFinanceiro() {
             try {
                 const tipoFiltro = document.getElementById('filtroTipo').value;
@@ -2602,6 +2607,10 @@
                     competenciaLabel = "Todos os Períodos";
                 }
 
+                const cleanLabel = (competenciaLabel || 'Geral').replace(/[^a-zA-Z0-9]/g, '_');
+                const nomeArquivo = 'Relatorio_Tesouraria_Livro_Caixa_' + cleanLabel + '.pdf';
+                const scriptLocalUrl = window.location.origin + '/html2pdf.bundle.min.js';
+
                 const janelaImpressao = window.open('', '_blank');
                 janelaImpressao.document.write(`
                     <!DOCTYPE html>
@@ -2609,6 +2618,8 @@
                     <head>
                         <meta charset="UTF-8">
                         <title>Relatório Financeiro - Livro Caixa</title>
+                        ${'<' + 'script src="' + scriptLocalUrl + '"><' + '/script>'}
+                        ${'<' + 'script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><' + '/script>'}
                         <style>
                             @page {
                                 size: landscape;
@@ -2647,13 +2658,72 @@
                                 print-color-adjust: exact;
                             }
 
+                            .actions-bar { 
+                                position: fixed; 
+                                top: 16px; 
+                                right: 16px; 
+                                display: flex; 
+                                align-items: center; 
+                                gap: 10px; 
+                                z-index: 9999; 
+                            }
+                            .btn-action {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 8px;
+                                padding: 10px 18px;
+                                border: none;
+                                border-radius: 8px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                font-size: 13px;
+                                transition: all 0.2s;
+                                font-family: system-ui, -apple-system, sans-serif;
+                            }
+                            .btn-action:disabled {
+                                opacity: 0.65;
+                                cursor: not-allowed;
+                                transform: none !important;
+                            }
+                            .btn-pdf { 
+                                background: #4f46e5; 
+                                color: #fff; 
+                                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25); 
+                            }
+                            .btn-pdf:hover:not(:disabled) { 
+                                background: #4338ca; 
+                                transform: translateY(-1px); 
+                                box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35); 
+                            }
+                            .btn-print { 
+                                background: #10b981; 
+                                color: #fff; 
+                                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); 
+                            }
+                            .btn-print:hover { 
+                                background: #059669; 
+                                transform: translateY(-1px); 
+                                box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); 
+                            }
+                            @keyframes spin {
+                                from { transform: rotate(0deg); }
+                                to { transform: rotate(360deg); }
+                            }
+                            @media print { 
+                                body { margin: 0; padding: 0; } 
+                                .actions-bar { display: none !important; } 
+                                .card { box-shadow: none; border: 1px solid #cbd5e1; }
+                                table { border: 1px solid #cbd5e1; }
+                                th, td { border: 1px solid #cbd5e1; }
+                            }
+
                             .header { text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 20px; }
                             .header h1 { margin: 0; font-size: 18px; color: #0f172a; font-weight: 800; letter-spacing: -0.3px; }
                             .header .sub-congregacao { margin: 3px 0 0 0; font-size: 12px; color: #475569; font-weight: 600; text-transform: none; letter-spacing: 0.2px; }
                             .header p { margin: 6px 0 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #10b981; font-weight: bold; }
                             
-                            .cards-resumo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; page-break-inside: avoid; }
-                            .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; background: #f8fafc; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+                            .cards-resumo { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; page-break-inside: avoid; }
+                            .card { flex: 1; min-width: 0; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; background: #f8fafc; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
                             .card p { margin: 0; font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px; }
                             .card h3 { margin: 5px 0 0 0; font-size: 16px; color: #0f172a; font-weight: 800; }
                             
@@ -2672,53 +2742,148 @@
                             
                             .assinaturas { margin-top: 36px; display: flex; justify-content: space-between; page-break-inside: avoid; }
                             .linha-signature { text-align: center; width: 250px; font-size: 9px; color: #475569; border-top: 1px solid #cbd5e1; padding-top: 6px; font-weight: 500; }
-                            
-                            @media print { 
-                                body { margin: 0; padding: 0; } 
-                                .btn-print { display: none; } 
-                                .card { box-shadow: none; border: 1px solid #cbd5e1; }
-                                table { border: 1px solid #cbd5e1; }
-                                th, td { border: 1px solid #cbd5e1; }
-                            }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: all 0.2s; }
-                            .btn-print:hover { background: #059669; transform: translateY(-1px); }
                         </style>
                     </head>
                     <body>
-                        <button class="btn-print" onclick="window.print()">Imprimir Relatório</button>
-                        <div class="header">
-                            <h1>RELATÓRIO TESOURARIA</h1>
-                            <div class="sub-congregacao">Sub-Congregação Jd. Marilena</div>
-                            <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${competenciaLabel}</p>
-                        </div>
-                        
-                        <div class="cards-resumo">
-                            <div class="card"><p>Dízimos (+)</p><h3 style="color: #10b981;">R$ ${d.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
-                            <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
-                            <div class="card"><p>Dízimos + Ofertas (+)</p><h3 style="color: #0284c7;">R$ ${(d + o).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
-                            <div class="card"><p>Despesas (-)</p><h3 style="color: #f43f5e;">R$ ${de.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
-                            <div class="card"><p>Sede</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                        <div class="actions-bar">
+                            <button class="btn-action btn-pdf" id="btnBaixarPdf" onclick="baixarPDF()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span>Baixar em PDF</span>
+                            </button>
+                            <button class="btn-action btn-print" onclick="window.print()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                                <span>Imprimir Relatório</span>
+                            </button>
                         </div>
 
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Dia</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição / Contribuinte</th>
-                                    <th>Cargo</th>
-                                    <th>Observação</th>
-                                    <th class="text-right">Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody>${linesTabelaHtml}</tbody>
-                        </table>
+                        <div id="relatorio-conteudo">
+                            <div class="header">
+                                <h1>RELATÓRIO TESOURARIA</h1>
+                                <div class="sub-congregacao">Sub-Congregação Jd. Marilena</div>
+                                <p>Demonstrativo de Entradas e Saídas Financeiras — Competência: ${competenciaLabel}</p>
+                            </div>
+                            
+                            <div class="cards-resumo">
+                                <div class="card"><p>Dízimos (+)</p><h3 style="color: #10b981;">R$ ${d.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                                <div class="card"><p>Ofertas (+)</p><h3 style="color: #0d9488;">R$ ${o.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                                <div class="card"><p>Dízimos + Ofertas (+)</p><h3 style="color: #0284c7;">R$ ${(d + o).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                                <div class="card"><p>Despesas (-)</p><h3 style="color: #f43f5e;">R$ ${de.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                                <div class="card"><p>Sede</p><h3 style="color: #0f172a;">R$ ${saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3></div>
+                            </div>
 
-                        <div class="assinaturas">
-                            <div class="linha-signature">Tesouraria Local</div>
-                            <div class="linha-signature">Pastor Dirigente</div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Dia</th>
+                                        <th>Tipo</th>
+                                        <th>Descrição / Contribuinte</th>
+                                        <th>Cargo</th>
+                                        <th>Observação</th>
+                                        <th class="text-right">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${linesTabelaHtml}</tbody>
+                            </table>
+
+                            <div class="assinaturas">
+                                <div class="linha-signature">Tesouraria Local</div>
+                                <div class="linha-signature">Pastor Dirigente</div>
+                            </div>
                         </div>
+
+                        ${'<' + 'script>' + `
+                        async function baixarPDF() {
+                            const btn = document.getElementById('btnBaixarPdf');
+                            const originalText = btn.innerHTML;
+                            btn.disabled = true;
+                            btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg style="animation:spin 1s linear infinite;width:15px;height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg> Gerando PDF...</span>';
+
+                            try {
+                                if (typeof html2pdf !== 'function') {
+                                    throw new Error('A ferramenta de PDF ainda está carregando. Por favor, aguarde 2 segundos e clique novamente.');
+                                }
+
+                                const element = document.getElementById('relatorio-conteudo');
+                                const opt = {
+                                    margin: [8, 8, 12, 8],
+                                    filename: '${nomeArquivo}',
+                                    image: { type: 'jpeg', quality: 0.98 },
+                                    html2canvas: { 
+                                        scale: 2, 
+                                        useCORS: true, 
+                                        logging: false,
+                                        backgroundColor: '#ffffff'
+                                    },
+                                    jsPDF: { 
+                                        unit: 'mm', 
+                                        format: 'a4', 
+                                        orientation: 'landscape' 
+                                    },
+                                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                                };
+
+                                const pdfInstance = await html2pdf().set(opt).from(element).toPdf().get('pdf').then(function(pdf) {
+                                    const totalPages = pdf.internal.getNumberOfPages();
+                                    for (let i = 1; i <= totalPages; i++) {
+                                        pdf.setPage(i);
+                                        pdf.setFontSize(7.5);
+                                        pdf.setTextColor(71, 85, 105);
+                                        pdf.text("GERADO EM ${dataAtual} POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.", 8, pdf.internal.pageSize.getHeight() - 5);
+                                        pdf.text("Página " + i + " de " + totalPages, pdf.internal.pageSize.getWidth() - 8, pdf.internal.pageSize.getHeight() - 5, { align: 'right' });
+                                    }
+                                    return pdf;
+                                });
+
+                                const blob = pdfInstance.output('blob');
+                                const blobUrl = URL.createObjectURL(blob);
+
+                                const a = document.createElement('a');
+                                a.style.display = 'none';
+                                a.href = blobUrl;
+                                a.download = '${nomeArquivo}';
+                                document.body.appendChild(a);
+                                a.click();
+
+                                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                                    window.navigator.msSaveOrOpenBlob(blob, '${nomeArquivo}');
+                                }
+
+                                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <span>PDF Baixado!</span>';
+
+                                let directLink = document.getElementById('linkSalvarManual');
+                                if (!directLink) {
+                                    directLink = document.createElement('a');
+                                    directLink.id = 'linkSalvarManual';
+                                    directLink.className = 'btn-action';
+                                    directLink.style.background = '#2563eb';
+                                    directLink.style.color = '#ffffff';
+                                    directLink.style.textDecoration = 'none';
+                                    directLink.style.padding = '10px 14px';
+                                    directLink.innerText = 'Salvar PDF';
+                                    const actionsBar = document.querySelector('.actions-bar');
+                                    if (actionsBar) actionsBar.appendChild(directLink);
+                                }
+                                directLink.href = blobUrl;
+                                directLink.download = '${nomeArquivo}';
+
+                                setTimeout(() => {
+                                    try { document.body.removeChild(a); } catch(e) {}
+                                }, 2000);
+
+                                setTimeout(() => {
+                                    btn.innerHTML = originalText;
+                                    btn.disabled = false;
+                                }, 4000);
+
+                            } catch (err) {
+                                console.error('Erro na exportação para PDF:', err);
+                                alert('Aviso: ' + (err.message || err));
+                                btn.innerHTML = originalText;
+                                btn.disabled = false;
+                            }
+                        }
+                        ` + '<' + '/script>'}
                     </body>
                     </html>
                 `);
