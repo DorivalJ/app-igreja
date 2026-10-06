@@ -1701,12 +1701,6 @@
         }
 
         function notificarAcessoNegadoTesouraria() {
-            const mensagem = "Acesso negado.\nVocê não tem permissão para abrir este documento, consulte o Administrador do Sistema";
-            try {
-                alert(mensagem);
-            } catch (e) {
-                console.warn("Alerta nativo bloqueado:", e);
-            }
             const modal = document.getElementById('modal-acesso-negado-tesouraria');
             if (modal) {
                 modal.classList.remove('hidden');
