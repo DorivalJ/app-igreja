@@ -1455,7 +1455,7 @@
                                 <p class="font-semibold text-indigo-400 flex items-center gap-1.5">
                                     <i data-lucide="shield-check" class="w-4 h-4"></i> Informação sobre Nível de Acesso
                                 </p>
-                                <p class="leading-relaxed">Todos os usuários cadastrados terão acesso completo a todos os módulos do sistema (Membros, Tesouraria, Agenda, Mural, Cartas e Relatórios).</p>
+                                <p class="leading-relaxed">Todos os usuários cadastrados terão acesso aos módulos do sistema (Membros, Agenda, Mural, Cartas e Relatórios). O acesso à Tesouraria é restrito exclusivamente aos usuários autorizados (dorival14@yahoo.com e Jb617551@gmail.com).</p>
                                 <p class="leading-relaxed text-slate-500">Após a criação, o novo usuário já poderá entrar no aplicativo usando seu e-mail e senha cadastrados.</p>
                             </div>
 
@@ -1617,11 +1617,119 @@
         </div>
     </div>
 
+    <!-- MODAL: Acesso Negado à Tesouraria -->
+    <div id="modal-acesso-negado-tesouraria" onclick="if(event.target === this) fecharModalAcessoNegadoTesouraria()" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-slate-900 border border-rose-500/30 rounded-2xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-5 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-rose-400 text-base">Acesso Negado</h3>
+                        <p class="text-xs text-slate-400">Controle de Segurança e Privacidade</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharModalAcessoNegadoTesouraria()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors cursor-pointer" title="Fechar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="text-sm text-slate-200 bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-2 leading-relaxed">
+                    <p class="font-bold text-rose-400 text-base">Acesso negado.</p>
+                    <p class="text-slate-300">Você não tem permissão para abrir este documento, consulte o Administrador do Sistema</p>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/90 flex items-center justify-end">
+                <button type="button" onclick="fecharModalAcessoNegadoTesouraria()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition-all cursor-pointer">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
         const EMAIL_ADMINISTRADOR = 'dorival14@yahoo.com';
         let usuarioLogadoAtual = null;
+
+        // Usuários autorizados com acesso exclusivo ao módulo de Tesouraria
+        const USUARIOS_ACESSO_TESOURARIA = [
+            'dorival14@yahoo.com',
+            'jb617551@gmail.com'
+        ];
+
+        function obterEmailUsuarioAtual() {
+            if (usuarioLogadoAtual && usuarioLogadoAtual.email) {
+                return usuarioLogadoAtual.email.trim().toLowerCase();
+            }
+            try {
+                const topbarEmail = document.getElementById('topbar-email-usuario');
+                if (topbarEmail && topbarEmail.innerText && topbarEmail.innerText.includes('@')) {
+                    return topbarEmail.innerText.trim().toLowerCase();
+                }
+                const txtEmail = document.getElementById('txt-email-usuario-logado');
+                if (txtEmail && txtEmail.innerText && txtEmail.innerText.includes('@')) {
+                    return txtEmail.innerText.trim().toLowerCase();
+                }
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.startsWith('sb-') || k.includes('auth'))) {
+                        const raw = localStorage.getItem(k);
+                        if (raw && raw.startsWith('{')) {
+                            const item = JSON.parse(raw);
+                            if (item && item.user && item.user.email) {
+                                return item.user.email.trim().toLowerCase();
+                            }
+                            if (item && item.email) {
+                                return item.email.trim().toLowerCase();
+                            }
+                        }
+                    }
+                }
+            } catch(e) {}
+            return '';
+        }
+
+        function temAcessoTesouraria(emailOpcional) {
+            const email = (emailOpcional || obterEmailUsuarioAtual()).trim().toLowerCase();
+            if (!email) return false;
+            return USUARIOS_ACESSO_TESOURARIA.includes(email);
+        }
+
+        function notificarAcessoNegadoTesouraria() {
+            const mensagem = "Acesso negado.\nVocê não tem permissão para abrir este documento, consulte o Administrador do Sistema";
+            try {
+                alert(mensagem);
+            } catch (e) {
+                console.warn("Alerta nativo bloqueado:", e);
+            }
+            const modal = document.getElementById('modal-acesso-negado-tesouraria');
+            if (modal) {
+                modal.classList.remove('hidden');
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        function fecharModalAcessoNegadoTesouraria() {
+            const modal = document.getElementById('modal-acesso-negado-tesouraria');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                fecharModalAcessoNegadoTesouraria();
+            }
+        });
+
+        window.temAcessoTesouraria = temAcessoTesouraria;
+        window.notificarAcessoNegadoTesouraria = notificarAcessoNegadoTesouraria;
+        window.fecharModalAcessoNegadoTesouraria = fecharModalAcessoNegadoTesouraria;
 
         function isUsuarioAdmin(email) {
             if (!email) return false;
@@ -2073,6 +2181,14 @@
         ];
 
         function navegarPara(idTela) {
+            // Controle estrito de acesso à Tesouraria
+            if (idTela === 'financeiro') {
+                if (!temAcessoTesouraria()) {
+                    notificarAcessoNegadoTesouraria();
+                    return;
+                }
+            }
+
             document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
 
@@ -2505,10 +2621,18 @@
         }
 
         function baixarRelatorioFinanceiroPDF() {
+            if (!temAcessoTesouraria()) {
+                notificarAcessoNegadoTesouraria();
+                return;
+            }
             imprimirRelatorioFinanceiro();
         }
 
         async function imprimirRelatorioFinanceiro() {
+            if (!temAcessoTesouraria()) {
+                notificarAcessoNegadoTesouraria();
+                return;
+            }
             try {
                 const tipoFiltro = document.getElementById('filtroTipo').value;
                 const mesFiltro = document.getElementById('filtroMes').value;
@@ -4343,6 +4467,10 @@
 
         document.getElementById('formFinanceiro').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!temAcessoTesouraria()) {
+                notificarAcessoNegadoTesouraria();
+                return;
+            }
             const tipo = document.getElementById('fin_tipo').value;
             let desc = ''; let dia = null; let cargoMembro = null;
 
@@ -4446,6 +4574,9 @@
         }
 
         async function carregarFinancas() {
+            if (!temAcessoTesouraria()) {
+                return;
+            }
             if (!_supabase) {
                 console.warn('Conexão com o banco de dados temporariamente indisponível.');
                 return;
@@ -4633,7 +4764,16 @@
             ajustarCamposFinancas(); 
         }
         
-        async function deletarFinanca(id) { if(confirm("Excluir fluxo?")) { await _supabase.from('financeiro').delete().eq('id', id); carregarFinancas(); } }
+        async function deletarFinanca(id) { 
+            if (!temAcessoTesouraria()) {
+                notificarAcessoNegadoTesouraria();
+                return;
+            }
+            if(confirm("Excluir fluxo?")) { 
+                await _supabase.from('financeiro').delete().eq('id', id); 
+                carregarFinancas(); 
+            } 
+        }
 
         function obterDiaSemanaAbreviado(dataStr) {
             if (!dataStr) return '';
