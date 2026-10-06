@@ -172,7 +172,7 @@
 
                     <button id="btn-menu-agenda" onclick="navegarPara('agenda')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <i data-lucide="calendar" class="w-5 h-5"></i>
-                        <span>Agenda Semanal</span>
+                        <span>Agenda Semanal / Mensal</span>
                     </button>
 
                     <button id="btn-menu-mural" onclick="navegarPara('mural')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
@@ -410,7 +410,7 @@
 
                                 <div class="md:col-span-2" id="container-descricao-membro">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome do Membro (Opcional)</label>
-                                    <select id="fin_membro_nome" onchange="autopreencherCargoMembro()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none">
+                                    <select id="fin_membro_nome" onchange="autopreencherCargoMembro(); verificarDizimoDuplicadoLive();" oninput="autopreencherCargoMembro(); verificarDizimoDuplicadoLive();" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 cursor-pointer focus:outline-none transition-colors">
                                         <option value="Contribuinte Geral">Geral / Anônimo</option>
                                     </select>
                                     <div id="avisoDizimistaDuplicado" class="hidden mt-2 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-400 font-medium flex items-center gap-2">
@@ -477,7 +477,7 @@
 
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Data</label>
-                                    <input type="date" id="fin_data" required onchange="atualizarDiaSemanaFinancas()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark]">
+                                    <input type="date" id="fin_data" required onchange="atualizarDiaSemanaFinancas(); verificarDizimoDuplicadoLive();" oninput="atualizarDiaSemanaFinancas(); verificarDizimoDuplicadoLive();" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none [color-scheme:dark] transition-colors">
                                 </div>
 
                                 <div class="md:col-span-2">
@@ -647,12 +647,36 @@
                 </div>
 
                 <div id="tela-agenda" class="hidden space-y-8 dynamic-screen">
+                    <!-- Seletor do Modo Principal: Agenda Semanal ou Agenda Mensal -->
+                    <div class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20">
+                                <i data-lucide="layers" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
+                                    <span>Modo de Operação da Agenda</span>
+                                    <span id="badgeModoAgenda" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">Semanal</span>
+                                </h3>
+                                <p id="descModoAgenda" class="text-xs text-slate-400 mt-0.5">Gerenciando escalas e cultos da semana selecionada</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">Tipo de Agenda:</span>
+                            <select id="seletorModoAgendaGeral" onchange="alternarModoPrincipalAgenda()" class="w-full md:w-auto px-4 py-2.5 bg-slate-950 border border-amber-500/40 rounded-xl text-xs sm:text-sm font-bold text-amber-300 focus:outline-none focus:border-amber-400 shadow-md shadow-amber-500/5 cursor-pointer">
+                                <option value="semanal" selected>📅 Agenda Semanal (Escala da Semana)</option>
+                                <option value="mensal">🗓️ Agenda Mensal (Programação do Mês)</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <section id="secaoFormAgenda" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <i id="iconeFormAgenda" data-lucide="calendar-plus" class="w-5 h-5 text-amber-400"></i>
                                 <h2 id="tituloFormAgenda" class="font-semibold text-slate-100 flex items-center gap-2">
-                                    <span>Programar Evento / Culto</span>
+                                    <span>Programar Evento / Culto (Agenda Semanal)</span>
                                 </h2>
                             </div>
                             <button id="btnCancelarAgenda" onclick="resetarEstadoAgenda()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
@@ -721,8 +745,8 @@
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                             <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
                                 <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i>
-                                <span>Cronograma da Agenda Semanal</span>
-                                <span id="labelPeriodoAgenda" class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/20 ml-1">Semana Corrente</span>
+                                <span id="tituloTabelaAgenda">Cronograma da Agenda Semanal</span>
+                                <span id="labelPeriodoAgenda" class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/20 ml-1">Semana Atual</span>
                             </h2>
                             <div class="flex flex-wrap items-center gap-2">
                                 <div class="flex items-center gap-1 text-slate-400 text-xs">
@@ -730,9 +754,9 @@
                                     <span class="font-medium hidden sm:inline">Exibir:</span>
                                 </div>
                                 <select id="filtroPeriodoAgenda" onchange="alternarModoFiltroAgenda(); carregarAgenda();" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500 transition-all">
-                                    <option value="semana_atual" selected>Semana Corrente (Padrão)</option>
-                                    <option value="mes_ano">Por Mês e Ano</option>
-                                    <option value="todos">Todos os Eventos</option>
+                                    <option value="semana_atual" selected>Semana Atual (7 dias)</option>
+                                    <option value="proxima_semana">Próxima Semana</option>
+                                    <option value="todos">Todas as Semanas</option>
                                 </select>
                                 
                                 <div id="containerFiltrosMesAnoAgenda" class="hidden flex flex-wrap items-center gap-2">
@@ -766,7 +790,7 @@
 
                                 <button onclick="imprimirAgendaSemanal()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold text-xs rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-amber-600/10">
                                     <i data-lucide="printer" class="w-4 h-4"></i>
-                                    <span>Imprimir Agenda</span>
+                                    <span id="textoBtnImprimirAgenda">Imprimir Agenda Semanal</span>
                                 </button>
                             </div>
                         </div>
@@ -1557,6 +1581,42 @@
         </div>
     </div>
 
+    <!-- MODAL: Confirmação de Exclusão de Evento da Agenda -->
+    <div id="modal-confirmar-exclusao-agenda" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-5 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base">Excluir Evento da Agenda</h3>
+                        <p class="text-xs text-slate-400">Confirmação de exclusão permanente</p>
+                    </div>
+                </div>
+                <button onclick="fecharModalExclusaoAgenda()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors cursor-pointer" title="Fechar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <p id="textoDescricaoExcluirAgenda" class="text-sm text-slate-300 bg-slate-950/50 p-4 rounded-xl border border-slate-800 leading-relaxed">
+                    Tem certeza de que deseja remover este evento da programação?
+                </p>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/90 flex items-center justify-end gap-3">
+                <button type="button" onclick="fecharModalExclusaoAgenda()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold border border-slate-700 transition-all cursor-pointer">
+                    Cancelar
+                </button>
+                <button type="button" id="btnConfirmarExclusaoAgenda" onclick="confirmarExclusaoAgendaDefinitiva()" class="inline-flex items-center gap-2 px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-600/20 transition-all cursor-pointer">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span>Confirmar Exclusão</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
@@ -2076,7 +2136,7 @@
                 carregarFinancas();
             } else if (idTela === 'agenda') {
                 botoesMenu.agenda.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-amber-600 text-white shadow-lg shadow-amber-900/20";
-                topbarTitulo.innerText = "Agenda Semanal";
+                topbarTitulo.innerText = "Agenda Semanal / Mensal";
                 if (subtituloTopbar) {
                     subtituloTopbar.innerHTML = 'Módulos Ativos <span class="text-amber-400 font-bold ml-1">Cronograma</span>';
                 }
@@ -2442,93 +2502,6 @@
                 `);
                 janelaImpressao.document.close();
             } catch (err) { alert("Erro ao preparar documento de impressão: " + err.message); }
-        }
-
-        async function imprimirAgendaSemanal() {
-            try {
-                const { data, error } = await _supabase.from('agenda_semanal').select('*').order('data', { ascending: true });
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    alert("Não há programações agendadas para gerar a impressão mural.");
-                    return;
-                }
-
-                let linhasTabelaHtml = '';
-                const diasOrdenados = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-
-                data.forEach(ag => {
-                    const dataReal = ag.data || '';
-                    const diaSemanaExibicao = obterDiaSemanaAbreviado(dataReal);
-                    const horarioStr = ag.horario ? (diaSemanaExibicao ? `${ag.horario} - ${diaSemanaExibicao}` : ag.horario) : (diaSemanaExibicao || '-');
-
-                    linhasTabelaHtml += `
-                        <tr>
-                            <td class="col-data">
-                                <strong>${formatarData(dataReal)}</strong><br>
-                                <span class="dia-semana">${diaSemanaExibicao}</span>
-                            </td>
-                            <td class="col-horario">${horarioStr}</td>
-                            <td class="col-evento"><strong>${ag.tipo_evento || '-'}</strong></td>
-                            <td class="col-escalas">
-                                <div><strong>Dirigente:</strong> ${ag.dirigente || '-'}</div>
-                                <div><strong>Pregador:</strong> ${ag.pregador || '-'}</div>
-                            </td>
-                            <td class="col-escalas">
-                                <div><strong>Portaria:</strong> ${ag.escala_portaria || '-'}</div>
-                                <div><strong>Ofertas:</strong> ${ag.escala_ofertas || '-'}</div>
-                            </td>
-                            <td class="col-obs">${ag.saida_visita || '-'}</td>
-                        </tr>`;
-                });
-
-                const janelaImpressao = window.open('', '_blank');
-                janelaImpressao.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Agenda Semanal de Atividades</title>
-                        <style>
-                            @page { size: landscape; margin: 10mm 15mm 15mm 15mm; }
-                            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; margin: 10px; background-color: #fff; }
-                            .header { text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; }
-                            .header h1 { margin: 0; font-size: 30px; letter-spacing: 1px; color: #0f172a; }
-                            .header p { margin: 5px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 4px; color: #475569; font-weight: 600; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                            th { background-color: #f8fafc; color: #334155; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
-                            td { padding: 12px 10px; border: 1px solid #cbd5e1; font-size: 13px; vertical-align: top; color: #334155; }
-                            .col-data { width: 14%; } .col-horario { width: 8%; font-weight: bold; color: #b45309; } .col-evento { width: 26%; font-size: 14px; color: #1e293b; } .col-escalas { width: 18%; font-size: 12px; line-height: 1.6; } .col-obs { width: 16%; font-size: 11px; color: #64748b; font-style: italic; }
-                            .dia-semana { color: #4f46e5; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-                            .footer { text-align: center; font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding-top: 24px; margin-top: 40px; clear: both; page-break-inside: avoid; }
-                            @media print { body { margin: 0; } .btn-print { display: none; } th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-                            .btn-print { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #d97706; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-                        </style>
-                    </head>
-                    <body>
-                        <button class="btn-print" onclick="window.print()">Imprimir Agenda para o Mural</button>
-                        <div class="header">
-                            <h1>CRONOGRAMA E AGENDA SEMANAL</h1>
-                            <p>Escala de Cultos, Eventos e Atividades Oficiais</p>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Data / Dia</th>
-                                    <th>Horário</th>
-                                    <th>Programação / Evento</th>
-                                    <th>Ministério Eclesiástico</th>
-                                    <th>Escala de Apoio</th>
-                                    <th>Observações</th>
-                                </tr>
-                            </thead>
-                            <tbody>${linhasTabelaHtml}</tbody>
-                        </table>
-                        <div class="footer">GERADO EM ${new Date().toLocaleDateString('pt-BR')} POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.</div>
-                    </body>
-                    </html>
-                `);
-                janelaImpressao.document.close();
-            } catch (err) { alert("Erro ao fluxo dados da agenda para impressão: " + err.message); }
         }
 
         function baixarRelatorioFinanceiroPDF() {
@@ -3999,16 +3972,102 @@
             if (modal) modal.classList.add('hidden');
         }
 
+        let idAgendaParaExcluir = null;
+
+        function abrirModalExclusaoAgenda(id) {
+            idAgendaParaExcluir = id;
+            const evento = (agendaCacheGlobal || []).find(ev => String(ev.id) === String(id));
+            const txtDesc = document.getElementById('textoDescricaoExcluirAgenda');
+            if (txtDesc) {
+                if (evento) {
+                    const dataFmt = formatarData(evento.data);
+                    const tipo = evento.tipo_evento || 'Evento sem título';
+                    const horario = evento.horario ? ` às ${evento.horario}` : '';
+                    txtDesc.innerHTML = `Tem certeza de que deseja excluir o evento <strong class="text-white">${tipo}</strong> marcado para <strong class="text-amber-400">${dataFmt}${horario}</strong>?<br><span class="text-xs text-rose-400 mt-2 block font-medium">Esta ação removerá o evento definitivamente do cronograma.</span>`;
+                } else {
+                    txtDesc.innerText = 'Tem certeza de que deseja remover este evento da programação?';
+                }
+            }
+            const modal = document.getElementById('modal-confirmar-exclusao-agenda');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function fecharModalExclusaoAgenda() {
+            const modal = document.getElementById('modal-confirmar-exclusao-agenda');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            idAgendaParaExcluir = null;
+            const btn = document.getElementById('btnConfirmarExclusaoAgenda');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i><span>Confirmar Exclusão</span>`;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        async function confirmarExclusaoAgendaDefinitiva() {
+            if (!idAgendaParaExcluir) {
+                fecharModalExclusaoAgenda();
+                return;
+            }
+
+            const btn = document.getElementById('btnConfirmarExclusaoAgenda');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span>Excluindo...</span>`;
+            }
+
+            try {
+                const { error } = await _supabase.from('agenda_semanal').delete().eq('id', idAgendaParaExcluir);
+                if (error) throw error;
+
+                if (typeof editandoAgendaID !== 'undefined' && editandoAgendaID === idAgendaParaExcluir) {
+                    resetarEstadoAgenda();
+                }
+
+                fecharModalExclusaoAgenda();
+                await carregarAgenda();
+            } catch (err) {
+                console.error("Erro ao excluir evento:", err);
+                alert("Erro ao excluir evento: " + (err.message || err));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i><span>Confirmar Exclusão</span>`;
+                    if (window.lucide) lucide.createIcons();
+                }
+            }
+        }
+
+        function deletarAgenda(id) {
+            abrirModalExclusaoAgenda(id);
+        }
+
+        window.abrirModalExclusaoAgenda = abrirModalExclusaoAgenda;
+        window.fecharModalExclusaoAgenda = fecharModalExclusaoAgenda;
+        window.confirmarExclusaoAgendaDefinitiva = confirmarExclusaoAgendaDefinitiva;
+        window.deletarAgenda = deletarAgenda;
+
         // Fechar modal ao clicar fora ou na tecla Esc
         document.addEventListener('click', (e) => {
             const modal = document.getElementById('modal-lembrete-aniversarios');
             if (modal && !modal.classList.contains('hidden') && e.target === modal) {
                 fecharModalAniversariantes();
             }
+            const modalAgenda = document.getElementById('modal-confirmar-exclusao-agenda');
+            if (modalAgenda && !modalAgenda.classList.contains('hidden') && e.target === modalAgenda) {
+                fecharModalExclusaoAgenda();
+            }
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') fecharModalAniversariantes();
+            if (e.key === 'Escape') {
+                fecharModalAniversariantes();
+                fecharModalExclusaoAgenda();
+            }
         });
 
         function formatarData(dataString) {
@@ -4163,57 +4222,109 @@
             verificarDizimoDuplicadoLive();
         }
 
+        let requisicaoVerificacaoDizimoSeq = 0;
+
         async function verificarDizimoDuplicadoLive() {
+            const seq = ++requisicaoVerificacaoDizimoSeq;
             const aviso = document.getElementById('avisoDizimistaDuplicado');
             const textoAviso = document.getElementById('textoAvisoDizimistaDuplicado');
+            const selMembro = document.getElementById('fin_membro_nome');
             const tipo = document.getElementById('fin_tipo')?.value;
 
+            const limparAviso = () => {
+                if (aviso) {
+                    aviso.classList.add('hidden');
+                    aviso.style.display = 'none';
+                }
+                if (selMembro) {
+                    selMembro.classList.remove('border-amber-500', 'text-amber-300');
+                    selMembro.classList.add('border-slate-700');
+                }
+            };
+
             if (tipo !== 'Dízimo') {
-                if (aviso) aviso.classList.add('hidden');
+                limparAviso();
                 return;
             }
 
             const membro = (document.getElementById('fin_membro_nome')?.value || '').trim();
-            const dataLanc = document.getElementById('fin_data')?.value;
-
-            if (!membro || membro === 'Contribuinte Geral' || !dataLanc || !_supabase) {
-                if (aviso) aviso.classList.add('hidden');
+            if (!membro || membro === 'Contribuinte Geral' || !_supabase) {
+                limparAviso();
                 return;
             }
 
-            const partes = dataLanc.split('-');
+            // Garantir que a data esteja definida (preenche com hoje se ainda estiver vazia)
+            let dataLanc = document.getElementById('fin_data')?.value;
+            if (!dataLanc) {
+                const hoje = new Date();
+                const anoH = hoje.getFullYear();
+                const mesH = String(hoje.getMonth() + 1).padStart(2, '0');
+                const diaH = String(hoje.getDate()).padStart(2, '0');
+                dataLanc = `${anoH}-${mesH}-${diaH}`;
+                const finDataEl = document.getElementById('fin_data');
+                if (finDataEl) finDataEl.value = dataLanc;
+                const inputDia = document.getElementById('fin_dia');
+                if (inputDia) inputDia.value = obterDiaSemanaAbreviado(dataLanc);
+            }
+
+            const partes = dataLanc.split(/[-T\s/]/);
             if (partes.length < 2) {
-                if (aviso) aviso.classList.add('hidden');
+                limparAviso();
                 return;
             }
 
-            const ano = partes[0];
-            const mes = partes[1];
-            const ultimoDia = new Date(parseInt(ano, 10), parseInt(mes, 10), 0).getDate();
-            const dataInicio = `${ano}-${mes}-01`;
-            const dataFim = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+            const anoAlvo = partes[0];
+            const mesAlvo = String(parseInt(partes[1], 10)).padStart(2, '0');
 
-            let q = _supabase
-                .from('financeiro')
-                .select('id, data_lancamento')
-                .eq('tipo', 'Dízimo')
-                .eq('descricao', membro)
-                .gte('data_lancamento', dataInicio)
-                .lte('data_lancamento', dataFim);
+            try {
+                let q = _supabase
+                    .from('financeiro')
+                    .select('id, data_lancamento, descricao')
+                    .eq('tipo', 'Dízimo')
+                    .ilike('descricao', membro);
 
-            if (editandoFinanceiroID) {
-                q = q.neq('id', editandoFinanceiroID);
+                if (editandoFinanceiroID) {
+                    q = q.neq('id', editandoFinanceiroID);
+                }
+
+                const { data, error } = await q;
+
+                // Descarta caso outra requisição mais nova tenha sido iniciada
+                if (seq !== requisicaoVerificacaoDizimoSeq) return;
+
+                if (!error && Array.isArray(data)) {
+                    const duplicado = data.find(item => {
+                        if (editandoFinanceiroID && String(item.id) === String(editandoFinanceiroID)) return false;
+                        if (!item.data_lancamento) return false;
+                        const partesItem = String(item.data_lancamento).split(/[-T\s/]/);
+                        if (partesItem.length >= 2) {
+                            const aItem = partesItem[0];
+                            const mItem = String(parseInt(partesItem[1], 10)).padStart(2, '0');
+                            return aItem === anoAlvo && mItem === mesAlvo;
+                        }
+                        return false;
+                    });
+
+                    if (duplicado) {
+                        if (aviso && textoAviso) {
+                            textoAviso.innerText = `Dizimista ${membro} já dizimou neste mês, para alterações clique em Editar.`;
+                            aviso.classList.remove('hidden');
+                            aviso.style.display = 'flex';
+                            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                        }
+                        if (selMembro) {
+                            selMembro.classList.remove('border-slate-700');
+                            selMembro.classList.add('border-amber-500', 'text-amber-300');
+                        }
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Erro na verificação instantânea de dízimo duplicado:", err);
             }
 
-            const { data, error } = await q;
-            if (!error && data && data.length > 0) {
-                if (aviso && textoAviso) {
-                    textoAviso.innerText = `Dizimista ${membro} já dizimou neste mês, para alterações clique em Editar.`;
-                    aviso.classList.remove('hidden');
-                    if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
-                }
-            } else {
-                if (aviso) aviso.classList.add('hidden');
+            if (seq === requisicaoVerificacaoDizimoSeq) {
+                limparAviso();
             }
         }
 
@@ -4236,36 +4347,53 @@
             let desc = ''; let dia = null; let cargoMembro = null;
 
             if(tipo === 'Dízimo') {
-                desc = document.getElementById('fin_membro_nome').value;
+                desc = (document.getElementById('fin_membro_nome').value || '').trim();
                 cargoMembro = document.getElementById('fin_membro_cargo').value || 'Membro';
 
                 // Validação de lançamento duplicado para dízimo no mesmo mês/ano
                 if (desc && desc !== 'Contribuinte Geral') {
-                    const dataLanc = document.getElementById('fin_data').value;
-                    if (dataLanc) {
-                        const partes = dataLanc.split('-');
+                    let dataLanc = document.getElementById('fin_data').value;
+                    if (!dataLanc) {
+                        const hoje = new Date();
+                        const anoH = hoje.getFullYear();
+                        const mesH = String(hoje.getMonth() + 1).padStart(2, '0');
+                        const diaH = String(hoje.getDate()).padStart(2, '0');
+                        dataLanc = `${anoH}-${mesH}-${diaH}`;
+                        document.getElementById('fin_data').value = dataLanc;
+                    }
+                    const partes = dataLanc.split(/[-T\s/]/);
+                    if (partes.length >= 2) {
                         const anoLanc = partes[0];
-                        const mesLanc = partes[1];
-                        const ultimoDia = new Date(parseInt(anoLanc, 10), parseInt(mesLanc, 10), 0).getDate();
-                        const dataInicio = `${anoLanc}-${mesLanc}-01`;
-                        const dataFim = `${anoLanc}-${mesLanc}-${String(ultimoDia).padStart(2, '0')}`;
+                        const mesLanc = String(parseInt(partes[1], 10)).padStart(2, '0');
 
                         let queryCheck = _supabase
                             .from('financeiro')
-                            .select('id')
+                            .select('id, data_lancamento, descricao')
                             .eq('tipo', 'Dízimo')
-                            .eq('descricao', desc)
-                            .gte('data_lancamento', dataInicio)
-                            .lte('data_lancamento', dataFim);
+                            .ilike('descricao', desc);
 
                         if (editandoFinanceiroID) {
                             queryCheck = queryCheck.neq('id', editandoFinanceiroID);
                         }
 
                         const { data: jaDizimou, error: erroCheck } = await queryCheck;
-                        if (!erroCheck && jaDizimou && jaDizimou.length > 0) {
-                            alert(`Dizimista ${desc} já dizimou neste mês, para alterações clique em Editar.`);
-                            return;
+                        if (!erroCheck && Array.isArray(jaDizimou)) {
+                            const jaExiste = jaDizimou.some(item => {
+                                if (editandoFinanceiroID && String(item.id) === String(editandoFinanceiroID)) return false;
+                                if (!item.data_lancamento) return false;
+                                const partesItem = String(item.data_lancamento).split(/[-T\s/]/);
+                                if (partesItem.length >= 2) {
+                                    const aItem = partesItem[0];
+                                    const mItem = String(parseInt(partesItem[1], 10)).padStart(2, '0');
+                                    return aItem === anoLanc && mItem === mesLanc;
+                                }
+                                return false;
+                            });
+
+                            if (jaExiste) {
+                                alert(`Dizimista ${desc} já dizimou neste mês, para alterações clique em Editar.`);
+                                return;
+                            }
                         }
                     }
                 }
@@ -4475,8 +4603,33 @@
             document.getElementById('tituloFormFinanceiro').innerText = "Lançamento de Caixa";
             document.getElementById('textoBtnSalvarFinanceiro').innerText = "Confirmar Lançamento";
             document.getElementById('btnCancelarFinanceiro').classList.add('hidden');
+
+            // Garantir que a data inicial seja a data de hoje para validações de competência instantâneas
+            const hoje = new Date();
+            const anoH = hoje.getFullYear();
+            const mesH = String(hoje.getMonth() + 1).padStart(2, '0');
+            const diaH = String(hoje.getDate()).padStart(2, '0');
+            const dataHojeISO = `${anoH}-${mesH}-${diaH}`;
+            const finDataEl = document.getElementById('fin_data');
+            if (finDataEl) {
+                finDataEl.value = dataHojeISO;
+            }
+            const inputDia = document.getElementById('fin_dia');
+            if (inputDia) {
+                inputDia.value = obterDiaSemanaAbreviado(dataHojeISO);
+            }
+
             const aviso = document.getElementById('avisoDizimistaDuplicado');
-            if (aviso) aviso.classList.add('hidden');
+            if (aviso) {
+                aviso.classList.add('hidden');
+                aviso.style.display = 'none';
+            }
+            const selMembro = document.getElementById('fin_membro_nome');
+            if (selMembro) {
+                selMembro.classList.remove('border-amber-500', 'text-amber-300');
+                selMembro.classList.add('border-slate-700');
+            }
+
             ajustarCamposFinancas(); 
         }
         
@@ -4523,12 +4676,71 @@
         
         let agendaCacheGlobal = [];
         let agendaFiltradaCache = [];
+        let modoAgendaPrincipal = 'semanal'; // 'semanal' ou 'mensal'
+
+        function alternarModoPrincipalAgenda() {
+            const seletor = document.getElementById('seletorModoAgendaGeral');
+            modoAgendaPrincipal = seletor ? seletor.value : 'semanal';
+
+            const badge = document.getElementById('badgeModoAgenda');
+            const desc = document.getElementById('descModoAgenda');
+            const tituloForm = document.getElementById('tituloFormAgenda');
+            const tituloTabela = document.getElementById('tituloTabelaAgenda');
+            const textoBtnImprimir = document.getElementById('textoBtnImprimirAgenda');
+            const containerMesAno = document.getElementById('containerFiltrosMesAnoAgenda');
+            const selectFiltro = document.getElementById('filtroPeriodoAgenda');
+
+            if (modoAgendaPrincipal === 'semanal') {
+                if (badge) {
+                    badge.innerText = "Semanal";
+                    badge.className = "text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                }
+                if (desc) desc.innerText = "Gerenciando escalas e cultos da semana selecionada";
+                if (tituloForm && !editandoAgendaID) {
+                    tituloForm.innerHTML = '<span>Programar Evento / Culto (Agenda Semanal)</span>';
+                }
+                if (tituloTabela) tituloTabela.innerText = "Cronograma da Agenda Semanal";
+                if (textoBtnImprimir) textoBtnImprimir.innerText = "Imprimir Agenda Semanal";
+                if (containerMesAno) containerMesAno.classList.add('hidden');
+
+                if (selectFiltro) {
+                    selectFiltro.innerHTML = `
+                        <option value="semana_atual" selected>Semana Atual (7 dias)</option>
+                        <option value="proxima_semana">Próxima Semana</option>
+                        <option value="todos">Todas as Semanas</option>
+                    `;
+                }
+            } else {
+                if (badge) {
+                    badge.innerText = "Mensal";
+                    badge.className = "text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+                }
+                if (desc) desc.innerText = "Gerenciando a programação e cultos do mês selecionado";
+                if (tituloForm && !editandoAgendaID) {
+                    tituloForm.innerHTML = '<span>Programar Evento / Culto (Agenda Mensal)</span>';
+                }
+                if (tituloTabela) tituloTabela.innerText = "Cronograma da Agenda Mensal";
+                if (textoBtnImprimir) textoBtnImprimir.innerText = "Imprimir Agenda Mensal";
+                if (containerMesAno) containerMesAno.classList.remove('hidden');
+
+                if (selectFiltro) {
+                    selectFiltro.innerHTML = `
+                        <option value="mes_ano" selected>Mês Selecionado</option>
+                        <option value="proximos">Próximos Eventos (A partir de Hoje)</option>
+                        <option value="todos">Todos os Eventos do Ano</option>
+                    `;
+                }
+            }
+
+            carregarAgenda();
+            lucide.createIcons();
+        }
 
         function alternarModoFiltroAgenda() {
             const modo = document.getElementById('filtroPeriodoAgenda')?.value || 'semana_atual';
             const container = document.getElementById('containerFiltrosMesAnoAgenda');
             if (container) {
-                if (modo === 'mes_ano') {
+                if (modo === 'mes_ano' || modoAgendaPrincipal === 'mensal') {
                     container.classList.remove('hidden');
                 } else {
                     container.classList.add('hidden');
@@ -4539,12 +4751,16 @@
         function obterIntervaloSemanaAtual() {
             const hoje = new Date();
             const diaSemana = hoje.getDay(); // 0 = Dom, 1 = Seg, ..., 6 = Sab
-            const diffSegunda = (diaSemana === 0 ? -6 : 1 - diaSemana);
-            
-            const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + diffSegunda, 0, 0, 0);
+            const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - diaSemana, 0, 0, 0);
             const fim = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + 6, 23, 59, 59);
-
             return { inicio, fim };
+        }
+
+        function obterIntervaloProximaSemana() {
+            const { inicio } = obterIntervaloSemanaAtual();
+            const proxInicio = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + 7, 0, 0, 0);
+            const proxFim = new Date(proxInicio.getFullYear(), proxInicio.getMonth(), proxInicio.getDate() + 6, 23, 59, 59);
+            return { inicio: proxInicio, fim: proxFim };
         }
 
         function formatarDataISO(d) {
@@ -4567,7 +4783,7 @@
 
                 agendaCacheGlobal = data || [];
                 
-                const modo = document.getElementById('filtroPeriodoAgenda')?.value || 'semana_atual';
+                const modo = document.getElementById('filtroPeriodoAgenda')?.value || 'mes_ano';
                 const mesFiltro = document.getElementById('filtroMesAgenda')?.value || '';
                 const anoFiltro = document.getElementById('filtroAnoAgenda')?.value || '';
                 const buscaTermo = document.getElementById('buscaAgenda')?.value?.toLowerCase().trim() || '';
@@ -4576,21 +4792,7 @@
                 let eventosExibicao = [];
                 let textoLabelPeriodo = '';
 
-                if (modo === 'semana_atual') {
-                    const { inicio, fim } = obterIntervaloSemanaAtual();
-                    const inicioStr = formatarDataISO(inicio);
-                    const fimStr = formatarDataISO(fim);
-
-                    eventosExibicao = agendaCacheGlobal.filter(ag => {
-                        if (!ag.data) return false;
-                        return ag.data >= inicioStr && ag.data <= fimStr;
-                    });
-
-                    const dataInicioFmt = formatarData(inicioStr);
-                    const dataFimFmt = formatarData(fimStr);
-                    textoLabelPeriodo = `Semana Corrente (${dataInicioFmt} a ${dataFimFmt})`;
-
-                } else if (modo === 'mes_ano') {
+                if (modo === 'mes_ano') {
                     const mesesNomesMap = {
                         '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril',
                         '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto',
@@ -4612,6 +4814,42 @@
                     const nomeMes = mesFiltro ? mesesNomesMap[mesFiltro] : 'Todos os Meses';
                     const nomeAno = anoFiltro ? anoFiltro : 'Todos os Anos';
                     textoLabelPeriodo = `Período: ${nomeMes} / ${nomeAno}`;
+
+                } else if (modo === 'semana_atual') {
+                    const { inicio, fim } = obterIntervaloSemanaAtual();
+                    const inicioStr = formatarDataISO(inicio);
+                    const fimStr = formatarDataISO(fim);
+
+                    eventosExibicao = agendaCacheGlobal.filter(ag => {
+                        if (!ag.data) return false;
+                        return ag.data >= inicioStr && ag.data <= fimStr;
+                    });
+
+                    const dataInicioFmt = formatarData(inicioStr);
+                    const dataFimFmt = formatarData(fimStr);
+                    textoLabelPeriodo = `Semana Atual (${dataInicioFmt} a ${dataFimFmt})`;
+
+                } else if (modo === 'proxima_semana') {
+                    const { inicio, fim } = obterIntervaloProximaSemana();
+                    const inicioStr = formatarDataISO(inicio);
+                    const fimStr = formatarDataISO(fim);
+
+                    eventosExibicao = agendaCacheGlobal.filter(ag => {
+                        if (!ag.data) return false;
+                        return ag.data >= inicioStr && ag.data <= fimStr;
+                    });
+
+                    const dataInicioFmt = formatarData(inicioStr);
+                    const dataFimFmt = formatarData(fimStr);
+                    textoLabelPeriodo = `Próxima Semana (${dataInicioFmt} a ${dataFimFmt})`;
+
+                } else if (modo === 'proximos') {
+                    const hojeStr = formatarDataISO(new Date());
+                    eventosExibicao = agendaCacheGlobal.filter(ag => {
+                        if (!ag.data) return false;
+                        return ag.data >= hojeStr;
+                    });
+                    textoLabelPeriodo = 'Próximos Eventos (A partir de Hoje)';
 
                 } else if (modo === 'todos') {
                     eventosExibicao = [...agendaCacheGlobal];
@@ -4651,6 +4889,7 @@
                     const dataReal = ag.data || '';
                     const diaAbrev = obterDiaSemanaAbreviado(dataReal);
                     const horarioExibicao = ag.horario ? (diaAbrev ? `${ag.horario} - ${diaAbrev}` : ag.horario) : (diaAbrev || '');
+
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4">
@@ -4668,8 +4907,8 @@
                             </td>
                             <td class="px-6 py-4 text-slate-400 text-xs max-w-[150px] truncate" title="${obsTexto}">${obsTexto}</td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <button onclick="editarAgenda('${ag.id}')" title="Editar Evento" class="text-amber-400 mr-3 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                <button onclick="deletarAgenda('${ag.id}')" title="Excluir Evento" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="editarAgenda('${ag.id}')" title="Editar Evento" class="text-amber-400 hover:text-amber-300 mr-3 hover:scale-110 transition-transform cursor-pointer p-1 inline-flex items-center"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="deletarAgenda('${ag.id}')" title="Excluir Evento" class="text-rose-400 hover:text-rose-300 hover:scale-110 transition-transform cursor-pointer p-1 inline-flex items-center"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </td>
                         </tr>`;
                 });
@@ -4718,8 +4957,51 @@
                 alert("Erro ao salvar agenda: " + error.message);
             } else {
                 alert(editandoAgendaID ? "Evento da agenda atualizado com sucesso!" : "Evento programado na agenda com sucesso!");
+                
+                // Sincronizar o filtro com a data do evento para garantir exibição imediata
+                if (dataInput) {
+                    const partes = dataInput.split('-');
+                    if (partes.length === 3) {
+                        const anoEv = partes[0];
+                        const mesEv = partes[1];
+                        
+                        const fMes = document.getElementById('filtroMesAgenda');
+                        const fAno = document.getElementById('filtroAnoAgenda');
+                        if (fMes) fMes.value = mesEv;
+                        if (fAno) fAno.value = anoEv;
+                        
+                        const fModo = document.getElementById('filtroPeriodoAgenda');
+                        if (modoAgendaPrincipal === 'semanal') {
+                            const { inicio, fim } = obterIntervaloSemanaAtual();
+                            const iniStr = formatarDataISO(inicio);
+                            const fimStr = formatarDataISO(fim);
+                            if (dataInput < iniStr || dataInput > fimStr) {
+                                const prox = obterIntervaloProximaSemana();
+                                const proxIniStr = formatarDataISO(prox.inicio);
+                                const proxFimStr = formatarDataISO(prox.fim);
+                                if (dataInput >= proxIniStr && dataInput <= proxFimStr) {
+                                    if (fModo) fModo.value = 'proxima_semana';
+                                } else {
+                                    if (fModo) fModo.value = 'todos';
+                                }
+                            } else {
+                                if (fModo) fModo.value = 'semana_atual';
+                            }
+                        } else {
+                            if (fModo) fModo.value = 'mes_ano';
+                        }
+                    }
+                }
+
                 resetarEstadoAgenda();
-                carregarAgenda();
+                await carregarAgenda();
+                
+                setTimeout(() => {
+                    const secaoTabela = document.getElementById('tabelaAgenda');
+                    if (secaoTabela) {
+                        secaoTabela.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }, 100);
             }
             btn.disabled = false;
         });
@@ -4738,7 +5020,7 @@
                 document.getElementById('agenda_escala_portaria').value = data.escala_portaria || '';
                 document.getElementById('agenda_escala_ofertas').value = data.escala_ofertas || '';
                 document.getElementById('agenda_saida_visita').value = data.saida_visita || '';
-                document.getElementById('tituloFormAgenda').innerText = "Editando Cronograma da Agenda";
+                document.getElementById('tituloFormAgenda').innerHTML = `<span>Editando Evento (${modoAgendaPrincipal === 'mensal' ? 'Agenda Mensal' : 'Agenda Semanal'})</span>`;
                 document.getElementById('textoBtnSalvarAgenda').innerText = "Atualizar Agenda";
                 document.getElementById('btnCancelarAgenda').classList.remove('hidden');
                 document.getElementById('secaoFormAgenda').scrollIntoView({ behavior: 'smooth' });
@@ -4748,26 +5030,55 @@
         function resetarEstadoAgenda() {
             editandoAgendaID = null;
             document.getElementById('formAgenda').reset();
-            document.getElementById('tituloFormAgenda').innerText = "Programar Evento / Culto";
+            const inputDiaSemana = document.getElementById('agenda_dia_semana');
+            if (inputDiaSemana) inputDiaSemana.value = '';
+            
+            const tituloForm = document.getElementById('tituloFormAgenda');
+            if (tituloForm) {
+                tituloForm.innerHTML = modoAgendaPrincipal === 'mensal'
+                    ? '<span>Programar Evento / Culto (Agenda Mensal)</span>'
+                    : '<span>Programar Evento / Culto (Agenda Semanal)</span>';
+            }
             document.getElementById('textoBtnSalvarAgenda').innerText = "Salvar Agenda";
             document.getElementById('btnCancelarAgenda').classList.add('hidden');
         }
 
-        async function deletarAgenda(id) {
-            if (confirm("Remover este evento da agenda?")) {
-                const { error } = await _supabase.from('agenda_semanal').delete().eq('id', id);
-                if (!error) carregarAgenda();
-                else alert("Erro ao excluir: " + error.message);
-            }
-        }
-
         function imprimirAgendaSemanal() {
             if (!agendaFiltradaCache || agendaFiltradaCache.length === 0) {
-                alert("Nenhum evento exibido na tela no momento para ser impresso.");
+                if (agendaCacheGlobal && agendaCacheGlobal.length > 0) {
+                    const mudar = confirm("Nenhum evento exibido no filtro atual. Deseja exibir 'Todos os Eventos' para realizar a impressão?");
+                    if (mudar) {
+                        const fModo = document.getElementById('filtroPeriodoAgenda');
+                        if (fModo) {
+                            fModo.value = 'todos';
+                            alternarModoFiltroAgenda();
+                            carregarAgenda();
+                        }
+                    }
+                } else {
+                    alert("Nenhum evento programado no banco de dados para ser impresso.");
+                }
                 return;
             }
 
-            const labelPeriodo = document.getElementById('labelPeriodoAgenda')?.innerText || 'Semana Corrente';
+            const labelPeriodo = document.getElementById('labelPeriodoAgenda')?.innerText || (modoAgendaPrincipal === 'mensal' ? 'Mês Vigente' : 'Semana Atual');
+
+            const tituloRelatorio = modoAgendaPrincipal === 'mensal'
+                ? 'AGENDA MENSAL DE ATIVIDADES E CULTOS'
+                : 'CRONOGRAMA DE ATIVIDADES E AGENDA SEMANAL';
+
+            const subtituloRelatorio = modoAgendaPrincipal === 'mensal'
+                ? 'PROGRAMAÇÃO GERAL MENSAL DE CULTOS E DEPARTAMENTOS'
+                : 'ESCALA SEMANAL DE CULTOS, PORTARIA E OFERTAS';
+
+            const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+            const rodapeRelatorio = modoAgendaPrincipal === 'mensal'
+                ? `RELATÓRIO OFICIAL DE AGENDA MENSAL . EMITIDO ${dataHoje} POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.`
+                : `RELATÓRIO OFICIAL DE AGENDA SEMANAL . EMITIDO ${dataHoje} POR SISTEMA IGREJA DIGITAL - DESENVOLVIDO POR DORIVAL J.`;
+
+            const nomeArquivo = (modoAgendaPrincipal === 'mensal' ? 'Relatorio_Agenda_Mensal_' : 'Relatorio_Agenda_Semanal_') + new Date().toISOString().slice(0, 10) + '.pdf';
+            const scriptLocalUrl = window.location.origin + '/html2pdf.bundle.min.js';
 
             let linhasHTML = '';
             agendaFiltradaCache.forEach((ag, idx) => {
@@ -4785,82 +5096,306 @@
 
                 linhasHTML += `
                     <tr style="background-color: ${bgCor};">
-                        <td style="padding: 4px 6px 1px 6px; font-weight: 800; color: #0f172a; text-align: center; font-size: 11px; border-top: 1px solid #cbd5e1;">
+                        <td style="padding: 3px 6px 1px 6px; font-weight: 800; color: #0f172a; text-align: center; font-size: 10px; border-top: 1px solid #cbd5e1;">
                             ${dataFmt}
                         </td>
-                        <td style="padding: 4px 6px 1px 6px; font-weight: 700; color: #0f172a; font-size: 11px; border-top: 1px solid #cbd5e1;">
+                        <td style="padding: 3px 6px 1px 6px; font-weight: 700; color: #0f172a; font-size: 10px; border-top: 1px solid #cbd5e1;">
                             ${tipoEv}
                         </td>
-                        <td style="padding: 4px 6px 1px 6px; font-size: 10.5px; color: #1e293b; border-top: 1px solid #cbd5e1;">
-                            <span style="color: #64748b; font-size: 9px; font-weight: 700;">DIRIGENTE:</span> <strong>${dirigente}</strong>
+                        <td style="padding: 3px 6px 1px 6px; font-size: 9.5px; color: #1e293b; border-top: 1px solid #cbd5e1;">
+                            <span style="color: #64748b; font-size: 8.5px; font-weight: 700;">DIRIGENTE:</span> <strong>${dirigente}</strong>
                         </td>
-                        <td style="padding: 4px 6px 1px 6px; font-size: 10.5px; color: #1e293b; border-top: 1px solid #cbd5e1;">
-                            <span style="color: #64748b; font-size: 9px; font-weight: 700;">PORTARIA:</span> <strong>${portaria}</strong>
+                        <td style="padding: 3px 6px 1px 6px; font-size: 9.5px; color: #1e293b; border-top: 1px solid #cbd5e1;">
+                            <span style="color: #64748b; font-size: 8.5px; font-weight: 700;">PORTARIA:</span> <strong>${portaria}</strong>
                         </td>
-                        <td style="padding: 4px 6px 1px 6px; font-size: 10px; color: #475569; border-top: 1px solid #cbd5e1; font-style: italic;">
-                            <span style="color: #64748b; font-size: 9px; font-weight: 700; font-style: normal;">LOCAL/OBS:</span> ${obs}
+                        <td style="padding: 3px 6px 1px 6px; font-size: 9px; color: #475569; border-top: 1px solid #cbd5e1; font-style: italic;">
+                            <span style="color: #64748b; font-size: 8.5px; font-weight: 700; font-style: normal;">LOCAL/OBS:</span> ${obs}
                         </td>
                     </tr>
                     <tr style="background-color: ${bgCor}; border-bottom: 1.5px solid #94a3b8;">
-                        <td style="padding: 1px 6px 4px 6px; font-weight: 700; color: #d97706; text-align: center; font-size: 10px;">
+                        <td style="padding: 1px 6px 3px 6px; font-weight: 700; color: #d97706; text-align: center; font-size: 9.5px;">
                             ${diaExtenso}
                         </td>
-                        <td style="padding: 1px 6px 4px 6px; font-weight: 700; color: #b45309; font-size: 10px;">
-                            <span style="color: #64748b; font-size: 9px; font-weight: 700;">HORÁRIO:</span> ${horarioFmt}
+                        <td style="padding: 1px 6px 3px 6px; font-weight: 700; color: #b45309; font-size: 9.5px;">
+                            <span style="color: #64748b; font-size: 8.5px; font-weight: 700;">HORÁRIO:</span> ${horarioFmt}
                         </td>
-                        <td style="padding: 1px 6px 4px 6px; font-size: 10.5px; color: #334155;">
-                            <span style="color: #64748b; font-size: 9px; font-weight: 700;">PREGADOR:</span> <strong>${pregador}</strong>
+                        <td style="padding: 1px 6px 3px 6px; font-size: 9.5px; color: #334155;">
+                            <span style="color: #64748b; font-size: 8.5px; font-weight: 700;">PREGADOR:</span> <strong>${pregador}</strong>
                         </td>
-                        <td style="padding: 1px 6px 4px 6px; font-size: 10.5px; color: #334155;">
-                            <span style="color: #64748b; font-size: 9px; font-weight: 700;">OFERTAS:</span> <strong>${ofertas}</strong>
+                        <td style="padding: 1px 6px 3px 6px; font-size: 9.5px; color: #334155;">
+                            <span style="color: #64748b; font-size: 8.5px; font-weight: 700;">OFERTAS:</span> <strong>${ofertas}</strong>
                         </td>
-                        <td style="padding: 1px 6px 4px 6px; font-size: 9.5px; color: #64748b;"></td>
+                        <td style="padding: 1px 6px 3px 6px; font-size: 8.5px; color: #64748b;"></td>
                     </tr>
                 `;
             });
 
-            const dataHoje = new Date().toLocaleDateString('pt-BR');
-
             const htmlImpressao = `
             <!DOCTYPE html>
-            <html lang="pt-br">
+            <html lang="pt-BR">
             <head>
                 <meta charset="UTF-8">
-                <title>Imprimir Agenda Semanal - Igreja Digital</title>
+                <title>${tituloRelatorio} - Igreja Digital</title>
+                ${'<' + 'script src="' + scriptLocalUrl + '"><' + '/script>'}
+                ${'<' + 'script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><' + '/script>'}
                 <style>
-                    @page { size: landscape; margin: 6mm 8mm; }
-                    html, body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #1e293b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    .header-container { text-align: center; border-bottom: 2px solid #d97706; padding-bottom: 4px; margin-bottom: 5px; }
-                    .header-title { font-size: 17px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-                    .header-sub { font-size: 11px; color: #475569; font-weight: 700; margin-top: 1px; }
-                    .badge-periodo { display: inline-block; background-color: #fef3c7; color: #92400e; border: 1px solid #f59e0b; padding: 2px 12px; border-radius: 10px; font-size: 10px; font-weight: 700; margin-top: 3px; text-transform: uppercase; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 10.5px; }
-                    th { background-color: #0f172a !important; color: #ffffff !important; text-transform: uppercase; font-size: 9.5px; font-weight: 700; padding: 4px 6px; letter-spacing: 0.5px; }
-                    td { vertical-align: middle; }
-                    .signatures { margin-top: 14px; display: flex; justify-content: space-around; text-align: center; }
-                    .sig-line { width: 220px; border-top: 1px solid #475569; padding-top: 2px; margin-top: 20px; font-size: 10.5px; font-weight: 700; color: #1e293b; }
-                    .footer-info { margin-top: 8px; border-top: 1px solid #cbd5e1; padding-top: 4px; text-align: center; font-size: 8.5px; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+                    @page {
+                        size: landscape;
+                        margin-top: 0.8cm;
+                        margin-left: 0.8cm;
+                        margin-right: 0.8cm;
+                        margin-bottom: 1.8cm;
+
+                        @bottom-left {
+                            content: "${rodapeRelatorio}";
+                            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                            font-size: 8.5px;
+                            color: #475569;
+                            font-weight: 500;
+                            letter-spacing: 0.3px;
+                        }
+
+                        @bottom-right {
+                            content: "Página " counter(page) " de " counter(pages);
+                            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                            font-size: 8.5px;
+                            color: #475569;
+                            font-weight: 500;
+                            white-space: nowrap;
+                        }
+                    }
+
+                    * { box-sizing: border-box; }
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                        background: #ffffff;
+                        color: #1e293b;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+
+                    .actions-bar {
+                        position: fixed;
+                        top: 16px;
+                        right: 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        z-index: 9999;
+                    }
+
+                    .btn-action {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 9px 16px;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-size: 12px;
+                        transition: all 0.2s;
+                        font-family: system-ui, -apple-system, sans-serif;
+                    }
+
+                    .btn-action:disabled {
+                        opacity: 0.65;
+                        cursor: not-allowed;
+                        transform: none !important;
+                    }
+
+                    .btn-pdf {
+                        background: #4f46e5;
+                        color: #ffffff;
+                        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+                    }
+
+                    .btn-pdf:hover:not(:disabled) {
+                        background: #4338ca;
+                        transform: translateY(-1px);
+                        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+                    }
+
+                    .btn-print {
+                        background: #d97706;
+                        color: #ffffff;
+                        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+                    }
+
+                    .btn-print:hover {
+                        background: #b45309;
+                        transform: translateY(-1px);
+                        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+                    }
+
+                    .btn-close {
+                        background: #64748b;
+                        color: #ffffff;
+                    }
+
+                    .btn-close:hover {
+                        background: #475569;
+                    }
+
+                    #relatorio-conteudo {
+                        padding: 12px 18px 0 18px;
+                    }
+
+                    .header-container {
+                        text-align: center;
+                        border-bottom: 2px solid #d97706;
+                        padding-bottom: 5px;
+                        margin-bottom: 6px;
+                    }
+
+                    .header-title {
+                        font-size: 16px;
+                        font-weight: 800;
+                        color: #0f172a;
+                        text-transform: uppercase;
+                        letter-spacing: 0.8px;
+                        margin: 0;
+                    }
+
+                    .header-sub {
+                        font-size: 11px;
+                        color: #475569;
+                        font-weight: 700;
+                        margin-top: 2px;
+                        letter-spacing: 0.2px;
+                    }
+
+                    .badge-periodo {
+                        display: inline-block;
+                        background-color: #fef3c7;
+                        color: #92400e;
+                        border: 1px solid #f59e0b;
+                        padding: 2px 12px;
+                        border-radius: 10px;
+                        font-size: 9.5px;
+                        font-weight: 700;
+                        margin-top: 3px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.4px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 6px;
+                        font-size: 10px;
+                        page-break-inside: auto;
+                    }
+
+                    thead {
+                        display: table-header-group;
+                    }
+
+                    tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+
+                    th {
+                        background-color: #0f172a !important;
+                        color: #ffffff !important;
+                        text-transform: uppercase;
+                        font-size: 9px;
+                        font-weight: 700;
+                        padding: 4px 6px;
+                        letter-spacing: 0.5px;
+                    }
+
+                    td {
+                        vertical-align: middle;
+                    }
+
+                    .signatures {
+                        margin-top: 16px;
+                        display: flex;
+                        justify-content: space-around;
+                        text-align: center;
+                        page-break-inside: avoid;
+                        break-inside: avoid;
+                    }
+
+                    .sig-line {
+                        width: 230px;
+                        border-top: 1px solid #475569;
+                        padding-top: 3px;
+                        margin-top: 16px;
+                        font-size: 9.5px;
+                        font-weight: 700;
+                        color: #1e293b;
+                    }
+
+                    /* Rodapé visível apenas na tela/monitor antes de imprimir */
+                    .screen-footer-bar {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-top: 1px solid #cbd5e1;
+                        padding-top: 6px;
+                        margin-top: 20px;
+                        font-size: 8.5px;
+                        color: #64748b;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.3px;
+                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    }
+
                     @media print {
-                        .no-print { display: none !important; }
-                        body { padding: 0; }
+                        .actions-bar, .screen-footer-bar {
+                            display: none !important;
+                        }
+                        html, body {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            background: #ffffff !important;
+                            height: auto !important;
+                            overflow: hidden !important;
+                        }
+                        #relatorio-conteudo {
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            page-break-inside: avoid !important;
+                            page-break-after: avoid !important;
+                            break-inside: avoid !important;
+                            break-after: avoid !important;
+                        }
+                        .signatures {
+                            page-break-inside: avoid !important;
+                            page-break-after: avoid !important;
+                            break-inside: avoid !important;
+                            break-after: avoid !important;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <div class="no-print" style="margin: 8px 12px 4px 12px; text-align: right;">
-                    <button onclick="window.print()" style="background-color: #d97706; color: white; border: none; padding: 6px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                        🖨️ Confirmar Impressão
+                <div class="actions-bar">
+                    <button class="btn-action btn-pdf" id="btnBaixarPdf" onclick="baixarPDF()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Baixar em PDF</span>
                     </button>
-                    <button onclick="window.close()" style="background-color: #64748b; color: white; border: none; padding: 6px 14px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-left: 8px; font-size: 12px;">
-                        Fechar
+                    <button class="btn-action btn-print" onclick="window.print()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        <span>Imprimir Relatório</span>
+                    </button>
+                    <button class="btn-action btn-close" onclick="window.close()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <span>Fechar</span>
                     </button>
                 </div>
 
-                <div style="padding: 6px 12px;">
+                <div id="relatorio-conteudo">
                     <div class="header-container">
                         <h1 class="header-title">IGREJA DIGITAL — SUB-MARILENA</h1>
-                        <div class="header-sub">CRONOGRAMA DE ATIVIDADES E AGENDA DE CULTOS</div>
-                        <div class="badge-periodo">${labelPeriodo}</div>
+                        <div class="header-sub">${tituloRelatorio}</div>
+                        <div class="badge-periodo">${labelPeriodo} — ${subtituloRelatorio}</div>
                     </div>
 
                     <table>
@@ -4887,18 +5422,93 @@
                         </div>
                     </div>
 
-                    <div class="footer-info">
-                        RELATÓRIO OFICIAL DE AGENDA SEMANAL . EMITIDO EM ${dataHoje} POR SISTEMA IGREJA DIGITAL- DESENVOLVIDO POR DORIVAL J.
+                    <div class="screen-footer-bar">
+                        <span>${rodapeRelatorio}</span>
+                        <span>SISTEMA IGREJA DIGITAL</span>
                     </div>
                 </div>
 
-                <script>
-                    window.onload = function() {
-                        setTimeout(function() {
-                            window.print();
-                        }, 400);
-                    };
-                <\/script>
+                ${'<' + 'script>' + `
+                async function baixarPDF() {
+                    const btn = document.getElementById('btnBaixarPdf');
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg style="animation:spin 1s linear infinite;width:15px;height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg> Gerando PDF...</span>';
+
+                    try {
+                        if (typeof html2pdf !== 'function') {
+                            throw new Error('A ferramenta de PDF ainda está carregando. Por favor, aguarde 2 segundos e clique novamente.');
+                        }
+
+                        const element = document.getElementById('relatorio-conteudo');
+                        const opt = {
+                            margin: [6, 8, 10, 8],
+                            filename: '${nomeArquivo}',
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { 
+                                scale: 2, 
+                                useCORS: true, 
+                                logging: false, 
+                                backgroundColor: '#ffffff' 
+                            },
+                            jsPDF: { 
+                                unit: 'mm', 
+                                format: 'a4', 
+                                orientation: 'landscape' 
+                            },
+                            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                        };
+
+                        const pdfInstance = await html2pdf().set(opt).from(element).toPdf().get('pdf').then(function(pdf) {
+                            const totalPages = pdf.internal.getNumberOfPages();
+                            for (let i = 1; i <= totalPages; i++) {
+                                pdf.setPage(i);
+                                pdf.setFontSize(7.5);
+                                pdf.setTextColor(71, 85, 105);
+                                pdf.text("${rodapeRelatorio}", 8, pdf.internal.pageSize.getHeight() - 5);
+                                pdf.text("Página " + i + " de " + totalPages, pdf.internal.pageSize.getWidth() - 8, pdf.internal.pageSize.getHeight() - 5, { align: 'right' });
+                            }
+                            return pdf;
+                        });
+
+                        const blob = pdfInstance.output('blob');
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = blobUrl;
+                        a.download = '${nomeArquivo}';
+                        document.body.appendChild(a);
+                        a.click();
+
+                        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                            window.navigator.msSaveOrOpenBlob(blob, '${nomeArquivo}');
+                        }
+
+                        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <span>PDF Baixado!</span>';
+
+                        setTimeout(() => {
+                            try { document.body.removeChild(a); } catch(e) {}
+                        }, 2000);
+
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }, 4000);
+
+                    } catch (err) {
+                        console.error('Erro na exportação para PDF:', err);
+                        alert('Aviso: ' + (err.message || err));
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                }
+
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 400);
+                };
+                ` + '<' + '/script>'}
             </body>
             </html>
             `;
@@ -6200,11 +6810,45 @@
             if (fMesOferta) fMesOferta.value = mesesNomes[dataHoje.getMonth()];
             if (fAnoOferta) fAnoOferta.value = anoAtualString;
 
+            // Inicializar filtros da Agenda Semanal com mês/ano atuais
+            const fMesAgenda = document.getElementById('filtroMesAgenda');
+            const fAnoAgenda = document.getElementById('filtroAnoAgenda');
+            if (fMesAgenda) fMesAgenda.value = mesAtualString;
+            if (fAnoAgenda) fAnoAgenda.value = anoAtualString;
+
             resetarEstadoOfertas();
+
+            if (typeof alternarModoPrincipalAgenda === 'function') {
+                alternarModoPrincipalAgenda();
+            }
 
             atualizarPreviewLogoUI();
 
             lucide.createIcons();
+
+            // Listeners para validação instantânea de duplicidade de dízimo no formulário financeiro
+            const finMembroEl = document.getElementById('fin_membro_nome');
+            if (finMembroEl) {
+                finMembroEl.addEventListener('change', () => {
+                    autopreencherCargoMembro();
+                    verificarDizimoDuplicadoLive();
+                });
+                finMembroEl.addEventListener('input', () => {
+                    autopreencherCargoMembro();
+                    verificarDizimoDuplicadoLive();
+                });
+            }
+            const finDataEl = document.getElementById('fin_data');
+            if (finDataEl) {
+                finDataEl.addEventListener('change', () => {
+                    atualizarDiaSemanaFinancas();
+                    verificarDizimoDuplicadoLive();
+                });
+                finDataEl.addEventListener('input', () => {
+                    atualizarDiaSemanaFinancas();
+                    verificarDizimoDuplicadoLive();
+                });
+            }
 
             // Verificar sessão para decidir se carrega os dados
             if (_supabase) {
