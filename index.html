@@ -5312,25 +5312,6 @@
                         vertical-align: middle;
                     }
 
-                    .signatures {
-                        margin-top: 16px;
-                        display: flex;
-                        justify-content: space-around;
-                        text-align: center;
-                        page-break-inside: avoid;
-                        break-inside: avoid;
-                    }
-
-                    .sig-line {
-                        width: 230px;
-                        border-top: 1px solid #475569;
-                        padding-top: 3px;
-                        margin-top: 16px;
-                        font-size: 9.5px;
-                        font-weight: 700;
-                        color: #1e293b;
-                    }
-
                     /* Rodapé visível apenas na tela/monitor antes de imprimir */
                     .screen-footer-bar {
                         display: flex;
@@ -5361,12 +5342,6 @@
                         #relatorio-conteudo {
                             padding: 0 !important;
                             margin: 0 !important;
-                            page-break-inside: avoid !important;
-                            page-break-after: avoid !important;
-                            break-inside: avoid !important;
-                            break-after: avoid !important;
-                        }
-                        .signatures {
                             page-break-inside: avoid !important;
                             page-break-after: avoid !important;
                             break-inside: avoid !important;
@@ -5412,15 +5387,6 @@
                             ${linhasHTML}
                         </tbody>
                     </table>
-
-                    <div class="signatures">
-                        <div>
-                            <div class="sig-line">Secretaria Executiva</div>
-                        </div>
-                        <div>
-                            <div class="sig-line">Pastor Dirigente / Liderança</div>
-                        </div>
-                    </div>
 
                     <div class="screen-footer-bar">
                         <span>${rodapeRelatorio}</span>
