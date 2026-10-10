@@ -422,6 +422,16 @@
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Função</label>
                                     <input type="text" id="fin_membro_cargo" readonly value="Membro" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
                                 </div>
+                                <div class="md:col-span-2" id="container-celular-membro">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">WhatsApp / Celular</label>
+                                        <span class="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Auto do Cadastro</span>
+                                    </div>
+                                    <div class="relative">
+                                        <input type="text" id="fin_membro_celular" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors">
+                                        <i data-lucide="phone" class="w-4 h-4 text-emerald-400 absolute left-3 top-3.5"></i>
+                                    </div>
+                                </div>
 
                                 <div class="md:col-span-2 hidden" id="container-oferta-culto">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Culto</label>
@@ -485,17 +495,25 @@
                                     <input type="text" id="fin_dia" readonly placeholder="Preenchido pela Data" class="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed font-medium">
                                 </div>
 
-                                <div class="md:col-span-6">
+                                <div class="md:col-span-4" id="container-observacoes-financas">
                                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Observações do Lançamento</label>
                                     <input type="text" id="fin_observacao" placeholder="Algum detalhe importante..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none">
                                 </div>
                             </div>
 
-                            <div class="mt-8 flex justify-end">
-                                <button type="submit" id="btnSalvarFinanceiro" class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20">
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                    <span id="textoBtnSalvarFinanceiro">Confirmar Lançamento</span>
-                                </button>
+                            <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div id="container-btn-whatsapp-dizimo" class="w-full sm:w-auto">
+                                    <button type="button" onclick="enviarComprovanteWhatsAppForm()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600/15 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 hover:border-emerald-600 font-bold rounded-xl transition-all shadow-lg shadow-emerald-950/40 group cursor-pointer">
+                                        <i data-lucide="message-circle" class="w-5 h-5 text-emerald-400 group-hover:text-white transition-colors"></i>
+                                        <span>Enviar por WhatsApp</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                                    <button type="submit" id="btnSalvarFinanceiro" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20 cursor-pointer">
+                                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                        <span id="textoBtnSalvarFinanceiro">Confirmar Lançamento</span>
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </section>
@@ -1650,6 +1668,74 @@
         </div>
     </div>
 
+    <!-- MODAL: Enviar Comprovante de Dízimo por WhatsApp -->
+    <div id="modal-comprovante-whatsapp-dizimo" onclick="if(event.target === this) fecharModalComprovanteWhatsApp()" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-5 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
+                        <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 id="whats-modal-titulo" class="font-bold text-slate-100 text-sm">Enviar Comprovante por WhatsApp</h3>
+                        <p id="whats-modal-subtitulo" class="text-xs text-slate-400">Comprovante de recebimento de dízimo</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharModalComprovanteWhatsApp()" class="text-slate-400 hover:text-white p-2 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer" title="Fechar">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <!-- Resumo do Dízimo -->
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Dizimista:</span>
+                        <span id="whats-modal-membro" class="font-semibold text-slate-200">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Valor do Dízimo:</span>
+                        <span id="whats-modal-valor" class="font-bold text-emerald-400 text-sm">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Data de Lançamento:</span>
+                        <span id="whats-modal-data" class="font-medium text-slate-300">-</span>
+                    </div>
+                </div>
+
+                <!-- Campo de Telefone Celular / WhatsApp -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">WhatsApp / Celular de Destino</label>
+                    <div class="relative">
+                        <input type="text" id="whats-modal-telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15)" class="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500 font-medium">
+                        <i data-lucide="phone" class="w-4 h-4 text-emerald-400 absolute left-3 top-3.5"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span>Buscado automaticamente do cadastro de membros. Você pode alterar se necessário.</span>
+                    </p>
+                </div>
+
+                <!-- Prévia da Mensagem -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Mensagem do Comprovante</label>
+                    <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs text-emerald-400/90 font-mono whitespace-pre-wrap leading-relaxed select-all" id="whats-modal-preview-msg">
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/90 flex items-center justify-between gap-3">
+                <button type="button" onclick="fecharModalComprovanteWhatsApp()" id="whats-modal-btn-cancelar" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold border border-slate-700 transition-all cursor-pointer">
+                    Cancelar
+                </button>
+                <button type="button" onclick="confirmarEnvioWhatsAppModal()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-600/30 cursor-pointer">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    <span>Abrir no WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://nysikpghdbzvtzrnbasi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wyj6ORO3Ko1DB3nbTdTqhQ_2uGEVA4W'; 
@@ -1718,6 +1804,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 fecharModalAcessoNegadoTesouraria();
+                fecharModalComprovanteWhatsApp();
             }
         });
 
@@ -2158,6 +2245,8 @@
         let editandoFinanceiroID = null; 
         let editandoAgendaID = null; 
         let listaMembrosCache = []; 
+        let dadosFinancasCache = [];
+        let dadosEnvioWhatsAppAtual = null;
         let filaDocumentosCache = [];
 
         const opcoesDocumentos = {
@@ -4246,6 +4335,7 @@
                 document.getElementById('dashTotal').textContent = data.length;
                 document.getElementById('totalMembros').innerHTML = `Total: <span class="text-emerald-500 font-bold text-sm">${data.length}</span> Membros`;
                 lucide.createIcons();
+                atualizarListaMembrosNoFormFinanceiro();
             } catch (err) { console.error(err); }
         }
 
@@ -4306,21 +4396,31 @@
             const tipo = document.getElementById('fin_tipo').value;
             document.getElementById('container-descricao-membro').classList.add('hidden');
             document.getElementById('container-cargo-membro').classList.add('hidden');
+            const contCelular = document.getElementById('container-celular-membro');
+            if (contCelular) contCelular.classList.add('hidden');
             document.getElementById('container-descricao-despesa').classList.add('hidden');
             document.getElementById('container-oferta-culto').classList.add('hidden');
             document.getElementById('container-oferta-dia').classList.add('hidden');
+            const contBtnWhats = document.getElementById('container-btn-whatsapp-dizimo');
+            if (contBtnWhats) contBtnWhats.classList.add('hidden');
+            const contObs = document.getElementById('container-observacoes-financas');
             const aviso = document.getElementById('avisoDizimistaDuplicado');
             if (aviso) aviso.classList.add('hidden');
 
             if (tipo === 'Dízimo') {
                 document.getElementById('container-descricao-membro').classList.remove('hidden');
                 document.getElementById('container-cargo-membro').classList.remove('hidden');
+                if (contCelular) contCelular.classList.remove('hidden');
+                if (contBtnWhats) contBtnWhats.classList.remove('hidden');
+                if (contObs) contObs.className = 'md:col-span-4';
                 autopreencherCargoMembro();
             } else if (tipo === 'Oferta') {
                 document.getElementById('container-oferta-culto').classList.remove('hidden');
                 document.getElementById('container-oferta-dia').classList.remove('hidden');
+                if (contObs) contObs.className = 'md:col-span-6';
             } else if (tipo === 'Despesa') {
                 document.getElementById('container-descricao-despesa').classList.remove('hidden');
+                if (contObs) contObs.className = 'md:col-span-6';
             }
         }
 
@@ -4337,6 +4437,10 @@
             const nome = document.getElementById('fin_membro_nome').value;
             const m = listaMembrosCache.find(x => x.nome === nome);
             document.getElementById('fin_membro_cargo').value = m ? (m.cargo || 'Membro') : 'Membro';
+            const inputCelular = document.getElementById('fin_membro_celular');
+            if (inputCelular) {
+                inputCelular.value = m && m.celular ? m.celular : '';
+            }
             verificarDizimoDuplicadoLive();
         }
 
@@ -4451,7 +4555,7 @@
                 console.warn('Conexão com o banco de dados temporariamente indisponível.');
                 return;
             }
-            const { data } = await _supabase.from('membros').select('nome, cargo').order('nome', { ascending: true });
+            const { data } = await _supabase.from('membros').select('nome, cargo, celular').order('nome', { ascending: true });
             listaMembrosCache = data || [];
             const sel = document.getElementById('fin_membro_nome');
             sel.innerHTML = '<option value="Contribuinte Geral">Geral / Anônimo</option>';
@@ -4528,11 +4632,15 @@
                 desc = df === 'Outras Despesas' ? document.getElementById('fin_despesa_manual').value : df;
             }
 
+            const valorLanc = parseFloat(document.getElementById('fin_valor').value);
+            const dataLancamento = document.getElementById('fin_data').value;
+            const celularInformado = (document.getElementById('fin_membro_celular')?.value || '').trim();
+
             const lanc = {
                 tipo, descricao: desc, cargo: cargoMembro, 
-                dia_semana: obterDiaSemanaAbreviado(document.getElementById('fin_data').value),
-                valor: parseFloat(document.getElementById('fin_valor').value),
-                data_lancamento: document.getElementById('fin_data').value,
+                dia_semana: obterDiaSemanaAbreviado(dataLancamento),
+                valor: valorLanc,
+                data_lancamento: dataLancamento,
                 observacao: document.getElementById('fin_observacao').value || null
             };
 
@@ -4540,10 +4648,9 @@
                 ? await _supabase.from('financeiro').update(lanc).eq('id', editandoFinanceiroID) 
                 : await _supabase.from('financeiro').insert([lanc]);
 
-            if (error) alert("Erro ao salvar: " + error.message);
-            else { 
-                alert("Lançamento realizado com sucesso!"); 
-                
+            if (error) {
+                alert("Erro ao salvar: " + error.message);
+            } else { 
                 // Sincronizar filtros com o mês/ano do lançamento salvo
                 if (lanc.data_lancamento) {
                     const partes = lanc.data_lancamento.split('-');
@@ -4557,6 +4664,19 @@
                 
                 resetarEstadoFinanceiro(); 
                 carregarFinancas(); 
+
+                if (tipo === 'Dízimo') {
+                    // Abrir automaticamente o modal do comprovante de WhatsApp
+                    abrirModalComprovanteWhatsApp({
+                        nome: desc || 'Contribuinte Geral',
+                        valor: valorLanc,
+                        data: dataLancamento,
+                        telefone: celularInformado,
+                        origem: 'salvo'
+                    });
+                } else {
+                    alert("Lançamento realizado com sucesso!"); 
+                }
             }
         });
 
@@ -4610,6 +4730,7 @@
             const { data } = await query;
 
             let filtrados = data || [];
+            dadosFinancasCache = filtrados;
 
             if (mesFiltro) {
                 filtrados = filtrados.filter(f => {
@@ -4645,6 +4766,10 @@
                         <td class="px-6 py-4 text-xs text-slate-400">${f.observacao||'-'}</td>
                         <td class="px-6 py-4 text-right font-semibold ${f.tipo === 'Despesa' ? 'text-rose-400' : 'text-emerald-400'}">R$ ${f.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td class="px-6 py-4 text-right whitespace-nowrap">
+                            ${f.tipo === 'Dízimo' ? `
+                            <button type="button" onclick="enviarComprovanteWhatsAppLinha(${f.id})" title="Enviar Comprovante por WhatsApp" class="text-emerald-400 hover:text-emerald-300 mr-2 hover:scale-110 transition-transform cursor-pointer">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            </button>` : ''}
                             <button onclick="editarFinanca(${f.id})" class="text-emerald-400 mr-2 hover:scale-110 transition-transform"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                             <button onclick="deletarFinanca(${f.id})" class="text-rose-400 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
@@ -4689,6 +4814,7 @@
                 if (data.tipo === 'Dízimo') {
                     document.getElementById('fin_membro_nome').value = data.descricao;
                     document.getElementById('fin_membro_cargo').value = data.cargo || 'Membro';
+                    autopreencherCargoMembro();
                 } else if (data.tipo === 'Oferta') {
                     const selectCulto = document.getElementById('fin_oferta_culto');
                     const oDisponiveis = Array.from(selectCulto.options).map(o => o.value);
@@ -4754,6 +4880,10 @@
                 selMembro.classList.remove('border-amber-500', 'text-amber-300');
                 selMembro.classList.add('border-slate-700');
             }
+            const inputCelular = document.getElementById('fin_membro_celular');
+            if (inputCelular) {
+                inputCelular.value = '';
+            }
 
             ajustarCamposFinancas(); 
         }
@@ -4799,6 +4929,158 @@
             if (!dataInput) { inputDia.value = ''; return; }
             inputDia.value = obterDiaSemanaAbreviado(dataInput);
             verificarDizimoDuplicadoLive();
+        }
+
+        // ==========================================
+        // COMPROVANTE DE DÍZIMO VIA WHATSAPP
+        // ==========================================
+        function formatarMoedaBRL(val) {
+            const num = parseFloat(val) || 0;
+            return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function gerarMensagemWhatsAppDizimo(valor, dataLancamento) {
+            const valFmt = formatarMoedaBRL(valor);
+            const dataFmt = dataLancamento ? formatarData(dataLancamento) : formatarData(new Date().toISOString().split('T')[0]);
+            return `Tesouraria informa: Dízimo de ${valFmt} recebido e lançado com sucesso em: ${dataFmt}\. Deus abençõe.`;
+        }
+
+        function abrirModalComprovanteWhatsApp(dados) {
+            dadosEnvioWhatsAppAtual = dados;
+            const modal = document.getElementById('modal-comprovante-whatsapp-dizimo');
+            if (!modal) return;
+
+            const titulo = document.getElementById('whats-modal-titulo');
+            const subtitulo = document.getElementById('whats-modal-subtitulo');
+            const btnCancelar = document.getElementById('whats-modal-btn-cancelar');
+
+            if (dados.origem === 'salvo') {
+                if (titulo) titulo.innerText = "Lançamento Salvo! Enviar Comprovante?";
+                if (subtitulo) subtitulo.innerText = "Deseja enviar o comprovante de dízimo por WhatsApp agora?";
+                if (btnCancelar) btnCancelar.innerText = "Concluir sem Enviar";
+            } else {
+                if (titulo) titulo.innerText = "Enviar Comprovante por WhatsApp";
+                if (subtitulo) subtitulo.innerText = "Comprovante de recebimento de dízimo";
+                if (btnCancelar) btnCancelar.innerText = "Cancelar";
+            }
+
+            const membroEl = document.getElementById('whats-modal-membro');
+            if (membroEl) membroEl.innerText = dados.nome || 'Contribuinte Geral';
+
+            const valorEl = document.getElementById('whats-modal-valor');
+            if (valorEl) valorEl.innerText = formatarMoedaBRL(dados.valor);
+
+            const dataEl = document.getElementById('whats-modal-data');
+            if (dataEl) dataEl.innerText = dados.data ? formatarData(dados.data) : formatarData(new Date().toISOString().split('T')[0]);
+
+            const inputTel = document.getElementById('whats-modal-telefone');
+            if (inputTel) inputTel.value = dados.telefone || '';
+
+            const previewMsg = document.getElementById('whats-modal-preview-msg');
+            if (previewMsg) {
+                previewMsg.innerText = gerarMensagemWhatsAppDizimo(dados.valor, dados.data);
+            }
+
+            modal.classList.remove('hidden');
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+
+            if (!dados.telefone && inputTel) {
+                setTimeout(() => {
+                    inputTel.focus();
+                }, 150);
+            }
+        }
+
+        function fecharModalComprovanteWhatsApp() {
+            const modal = document.getElementById('modal-comprovante-whatsapp-dizimo');
+            if (modal) modal.classList.add('hidden');
+            dadosEnvioWhatsAppAtual = null;
+        }
+
+        function confirmarEnvioWhatsAppModal() {
+            if (!dadosEnvioWhatsAppAtual) return;
+            const inputTel = document.getElementById('whats-modal-telefone');
+            const tel = (inputTel ? inputTel.value : '').trim();
+            const limpo = tel.replace(/\D/g, '');
+
+            if (!limpo || limpo.length < 10) {
+                alert("Por favor, informe o número de WhatsApp com DDD (mínimo de 10 dígitos).");
+                if (inputTel) inputTel.focus();
+                return;
+            }
+
+            if (dadosEnvioWhatsAppAtual.origem === 'form') {
+                const campoForm = document.getElementById('fin_membro_celular');
+                if (campoForm) campoForm.value = tel;
+            }
+
+            const telFinal = (limpo.length === 10 || limpo.length === 11) ? `55${limpo}` : limpo;
+            const msg = encodeURIComponent(gerarMensagemWhatsAppDizimo(dadosEnvioWhatsAppAtual.valor, dadosEnvioWhatsAppAtual.data));
+            const url = `https://api.whatsapp.com/send?phone=${telFinal}&text=${msg}`;
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            fecharModalComprovanteWhatsApp();
+        }
+
+        function enviarComprovanteWhatsAppForm() {
+            const valStr = document.getElementById('fin_valor')?.value;
+            const valor = parseFloat(valStr);
+            if (!valor || isNaN(valor) || valor <= 0) {
+                alert("Por favor, preencha o valor do dízimo antes de enviar o comprovante.");
+                const valInput = document.getElementById('fin_valor');
+                if (valInput) valInput.focus();
+                return;
+            }
+
+            const dataLanc = document.getElementById('fin_data')?.value || '';
+            const nomeMembro = (document.getElementById('fin_membro_nome')?.value || '').trim();
+            let tel = (document.getElementById('fin_membro_celular')?.value || '').trim();
+
+            if (!tel && nomeMembro && nomeMembro !== 'Contribuinte Geral') {
+                const m = (listaMembrosCache || []).find(x => x.nome === nomeMembro);
+                if (m && m.celular) {
+                    tel = m.celular;
+                    const inputCelular = document.getElementById('fin_membro_celular');
+                    if (inputCelular) inputCelular.value = tel;
+                }
+            }
+
+            abrirModalComprovanteWhatsApp({
+                nome: nomeMembro || 'Contribuinte Geral',
+                valor: valor,
+                data: dataLanc,
+                telefone: tel,
+                origem: 'form'
+            });
+        }
+
+        function enviarComprovanteWhatsAppLinha(id) {
+            const item = (dadosFinancasCache || []).find(x => x.id === id);
+            if (!item) return;
+
+            const nomeMembro = item.descricao || '';
+            let tel = '';
+            if (nomeMembro && nomeMembro !== 'Contribuinte Geral') {
+                const m = (listaMembrosCache || []).find(x => x.nome === nomeMembro);
+                if (m && m.celular) {
+                    tel = m.celular;
+                }
+            }
+
+            abrirModalComprovanteWhatsApp({
+                nome: nomeMembro,
+                valor: item.valor,
+                data: item.data_lancamento,
+                telefone: tel,
+                origem: 'tabela'
+            });
         }
 
         function atualizarDiaSemanaAutomatico() {
