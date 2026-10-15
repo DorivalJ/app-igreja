@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão - Igreja Digital</title>
+    <meta name="description" content="Sistema completo para gestão de membros, tesouraria, fluxo de caixa, agenda semanal, emissão de cartas e controle de ofertas voluntárias.">
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
-    <link rel="apple-touch-icon" href="./icon.svg">
+    <link rel="apple-touch-icon" href="./logo_igreja.png">
     <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -87,10 +89,16 @@
                     </button>
                 </div>
                 
-                <button type="submit" id="btn-login-submit" class="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 active:scale-[0.98] transition-all shadow-lg shadow-indigo-600/20 mt-4">
-                    <span id="login-btn-texto">Entrar</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="button" onclick="cancelarLogin()" class="w-1/2 flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold rounded-xl border border-slate-700 active:scale-[0.98] transition-all cursor-pointer text-sm shadow-sm">
+                        <i data-lucide="x" class="w-4 h-4 text-slate-400"></i>
+                        <span>Cancelar</span>
+                    </button>
+                    <button type="submit" id="btn-login-submit" class="w-1/2 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl active:scale-[0.98] transition-all shadow-lg shadow-indigo-600/20 cursor-pointer text-sm">
+                        <span id="login-btn-texto">Entrar</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -168,6 +176,38 @@
                     <i data-lucide="check" class="w-4 h-4"></i>
                 </button>
             </form>
+        </div>
+
+        <!-- Card 4: Login Cancelado / Desistência -->
+        <div id="card-login-cancelado" class="hidden w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
+            <div class="inline-flex p-3 bg-slate-800/80 rounded-2xl text-slate-400 mb-1 border border-slate-700/60">
+                <i data-lucide="power" class="w-10 h-10 text-slate-300"></i>
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-2xl font-bold tracking-tight text-white">Acesso Cancelado</h2>
+                <p class="text-sm text-slate-400">Você optou por não entrar no sistema.</p>
+            </div>
+            
+            <div class="p-4 bg-slate-950/70 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed space-y-2 text-left">
+                <div class="flex items-center gap-2 text-slate-200 font-semibold">
+                    <i data-lucide="info" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+                    <span>Você já pode fechar esta janela:</span>
+                </div>
+                <p class="text-slate-400">
+                    No teclado, pressione <kbd class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 font-mono text-[11px] border border-slate-700">Alt</kbd> + <kbd class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 font-mono text-[11px] border border-slate-700">F4</kbd> ou clique no <strong>X</strong> da janela no canto superior direito.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                <button type="button" onclick="voltarParaLoginAposCancelar()" class="w-full sm:w-1/2 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl active:scale-[0.98] transition-all cursor-pointer text-xs shadow-md shadow-indigo-600/20">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Voltar ao Login</span>
+                </button>
+                <button type="button" onclick="fecharJanelaDefinitiva()" class="w-full sm:w-1/2 flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-rose-950/40 text-slate-300 hover:text-rose-300 font-semibold rounded-xl border border-slate-700 hover:border-rose-500/40 active:scale-[0.98] transition-all cursor-pointer text-xs">
+                    <i data-lucide="log-out" class="w-4 h-4 text-rose-400"></i>
+                    <span>Fechar Janela</span>
+                </button>
+            </div>
         </div>
     </section>
 
@@ -259,6 +299,10 @@
                     <i data-lucide="key-round" class="w-5 h-5 text-indigo-400"></i>
                     <span>Alterar Senha</span>
                 </button>
+                <button id="btn-menu-guia-pwa" onclick="abrirGuiaInstalacaoPwa()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-indigo-600/10 hover:text-indigo-300 rounded-xl transition font-medium cursor-pointer">
+                    <i data-lucide="monitor-down" class="w-5 h-5 text-indigo-400"></i>
+                    <span>Instalar no PC (PWA)</span>
+                </button>
                 <button onclick="fazerLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition font-medium">
                     <i data-lucide="log-out" class="w-5 h-5 text-rose-400"></i>
                     <span>Sair do Sistema</span>
@@ -286,6 +330,11 @@
                             <i data-lucide="cake" class="w-4 h-4 text-pink-400 group-hover:scale-110 transition-transform"></i>
                             <span class="hidden lg:inline text-xs font-semibold text-slate-300">Aniversariantes</span>
                             <span id="badge-topbar-aniversarios" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500 text-white animate-pulse">0</span>
+                        </button>
+
+                        <button id="btn-topbar-guia-pwa" onclick="abrirGuiaInstalacaoPwa()" title="Instalar Aplicativo na Área de Trabalho (Janela Exclusiva PWA)" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600/15 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 hover:border-indigo-500 text-xs sm:text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer group">
+                            <i data-lucide="monitor-down" class="w-4 h-4 text-indigo-400 group-hover:text-white group-hover:scale-110 transition-transform"></i>
+                            <span class="hidden sm:inline text-xs">Instalar no PC</span>
                         </button>
 
                         <div id="topbar-user-badge" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
@@ -1508,6 +1557,97 @@
                             </div>
                         </form>
                     </section>
+
+                    <!-- SEÇÃO: INSTALAÇÃO DO APLICATIVO NO COMPUTADOR (PWA / MODO JANELA INDEPENDENTE) -->
+                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden max-w-2xl mx-auto">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-indigo-600/10 rounded-xl text-indigo-400 border border-indigo-500/20">
+                                    <i data-lucide="monitor-down" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="font-bold text-lg text-slate-100">Instalar na Área de Trabalho (PWA)</h2>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Janela Exclusiva</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400">Guia para abrir o sistema em janela independente (sem abas) e maximizada no Chrome</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="abrirGuiaInstalacaoPwa()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20 shrink-0 cursor-pointer active:scale-95">
+                                <i data-lucide="book-open" class="w-4 h-4"></i>
+                                <span>Ver Guia Ilustrado</span>
+                            </button>
+                        </div>
+
+                        <div class="p-6 md:p-8 space-y-6">
+                            <!-- 3 Passos Essenciais em Cards -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                                <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2">
+                                    <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                                        <span class="w-5 h-5 rounded-md bg-indigo-600/20 flex items-center justify-center text-[11px]">1</span>
+                                        <span>Menu do Chrome</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">
+                                        Clique no ícone de computador na barra de URL ou em <strong>⋮ (3 pontinhos)</strong> ➔ <strong>Salvar e compartilhar</strong> ➔ <strong>Instalar</strong> (ou <strong>Criar atalho</strong>).
+                                    </p>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-slate-950/70 border border-emerald-500/30 space-y-2 shadow-sm shadow-emerald-950/40">
+                                    <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                                        <span class="w-5 h-5 rounded-md bg-emerald-600/20 flex items-center justify-center text-[11px]">2</span>
+                                        <span>Abrir como Janela</span>
+                                    </div>
+                                    <p class="text-xs text-slate-300 leading-relaxed">
+                                        <strong class="text-emerald-300">Ponto essencial:</strong> Marque a opção <strong>☑ "Abrir como janela"</strong>. Sem isso, ele abre como aba de site comum.
+                                    </p>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2">
+                                    <div class="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
+                                        <span class="w-5 h-5 rounded-md bg-amber-600/20 flex items-center justify-center text-[11px]">3</span>
+                                        <span>Abrir Maximizado</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">
+                                        No atalho da Área de Trabalho: <strong>Propriedades</strong> ➔ aba Atalho ➔ campo <strong>Executar:</strong> mude para <strong>"Maximizado"</strong>.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Alerta: Opção "Criar Atalho" Desabilitada no Chrome? -->
+                            <div class="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400 shrink-0 mt-0.5">
+                                        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">A opção "Criar atalho" está desabilitada/cinza no Chrome?</h4>
+                                        <p class="text-xs text-slate-400 leading-relaxed">
+                                            Isso ocorre se você estiver abrindo o arquivo localmente no computador (<code class="text-indigo-400 font-mono text-[11px] bg-slate-900 px-1 py-0.5 rounded">file:///C:/.../IgrejaDigital.html</code>) ou navegando em aba anônima. Nesses casos, o Chrome desativa o menu por segurança.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <span class="text-xs text-slate-300 font-medium">Solução rápida: crie o atalho direto no Windows com comando de execução:</span>
+                                    <button type="button" onclick="abrirGuiaInstalacaoPwa('bloqueado')" class="inline-flex items-center justify-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-white rounded-lg text-xs font-semibold border border-slate-700 transition cursor-pointer shrink-0">
+                                        <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+                                        <span>Ver Comando do Windows</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                                <button type="button" onclick="abrirGuiaInstalacaoPwa()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/20 cursor-pointer">
+                                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                    <span>Abrir Passo a Passo Ilustrado Completo</span>
+                                </button>
+                                <button type="button" onclick="dispararInstalacaoPwaDireta()" class="btn-pwa-instalar-direto w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-xl text-xs transition cursor-pointer">
+                                    <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
+                                    <span>Instalar Aplicativo Agora</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <!-- TELA DE ALTERAR SENHA (DENTRO DO SISTEMA) -->
@@ -1747,14 +1887,330 @@
                 </div>
             </div>
 
-            <div class="p-4 border-t border-slate-800 bg-slate-900/90 flex items-center justify-between gap-3">
-                <button type="button" onclick="fecharModalComprovanteWhatsApp()" id="whats-modal-btn-cancelar" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold border border-slate-700 transition-all cursor-pointer">
-                    Cancelar
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GUIA PASSO A PASSO ILUSTRADO DE INSTALAÇÃO PWA / MODO JANELA NO CHROME -->
+    <div id="modal-guia-instalacao-pwa" onclick="if(event.target === this) fecharGuiaInstalacaoPwa()" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/85 backdrop-blur-md transition-all duration-300 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+            <!-- Header do Modal -->
+            <div class="p-5 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-indigo-600/15 rounded-xl text-indigo-400 border border-indigo-500/30">
+                        <i data-lucide="monitor-down" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-white text-base sm:text-lg">Instalação na Área de Trabalho (PWA)</h3>
+                            <span class="hidden sm:inline px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Google Chrome</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Guia passo a passo ilustrado para abrir em janela independente e tela maximizada</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharGuiaInstalacaoPwa()" class="text-slate-400 hover:text-white p-2 hover:bg-slate-800 rounded-xl transition cursor-pointer" title="Fechar Guia">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
-                <button type="button" onclick="confirmarEnvioWhatsAppModal()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-600/30 cursor-pointer">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                    <span>Abrir no WhatsApp</span>
+            </div>
+
+            <!-- Abas de Navegação -->
+            <div class="flex items-center gap-1.5 p-2.5 bg-slate-950/60 border-b border-slate-800 overflow-x-auto shrink-0">
+                <button type="button" id="btn-tab-pwa-chrome" onclick="alternarTabGuiaPwa('chrome')" class="tab-guia-pwa-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white shadow-md transition cursor-pointer shrink-0">
+                    <i data-lucide="chrome" class="w-4 h-4"></i>
+                    <span>1. Instalar pelo Chrome</span>
                 </button>
+                <button type="button" id="btn-tab-pwa-bloqueado" onclick="alternarTabGuiaPwa('bloqueado')" class="tab-guia-pwa-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition cursor-pointer shrink-0">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span>2. Opção Desabilitada?</span>
+                </button>
+                <button type="button" id="btn-tab-pwa-maximizado" onclick="alternarTabGuiaPwa('maximizado')" class="tab-guia-pwa-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition cursor-pointer shrink-0">
+                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                    <span>3. Abrir Maximizado</span>
+                </button>
+            </div>
+
+            <!-- Conteúdo com Scroll -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-200 text-sm">
+                <!-- ABA 1: INSTALAR PELO CHROME -->
+                <div id="guia-pwa-tab-chrome" class="tab-guia-pwa-content space-y-5">
+                    <!-- Banner de Instalação Rápida Se Suportado -->
+                    <div class="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center shrink-0">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Instalação Direta no Navegador</h4>
+                                <p class="text-xs text-slate-300">Se o seu navegador suportar, você pode instalar o app com um clique:</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="dispararInstalacaoPwaDireta()" class="btn-pwa-instalar-direto inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/30 shrink-0 cursor-pointer">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Instalar Diretamente Agora</span>
+                        </button>
+                    </div>
+
+                    <!-- PASSO 1 ILUSTRADO -->
+                    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-indigo-600/20 flex items-center justify-center text-xs">Passo 1</span>
+                            <span>Localize o botão de instalação no Google Chrome</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            No Google Chrome, você tem duas formas simples de iniciar a instalação:
+                        </p>
+                        
+                        <!-- Mockup Visual da Barra de Endereços -->
+                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2">
+                            <div class="text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+                                <span>Opção A: Na própria barra de endereços do Chrome (ao lado dos favoritos ★)</span>
+                                <span class="text-emerald-400 font-mono text-[10px]">Mais Rápido</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 text-xs text-slate-400 font-mono">
+                                <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+                                <span class="text-slate-300 flex-1 truncate">https://.../index.html</span>
+                                <div class="flex items-center gap-1.5 bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 px-2.5 py-1 rounded-md text-[11px] font-sans font-semibold animate-pulse">
+                                    <i data-lucide="monitor-down" class="w-3.5 h-3.5"></i>
+                                    <span>Instalar Igreja Digital</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mockup Visual do Menu 3 Pontinhos -->
+                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2">
+                            <div class="text-[11px] font-semibold text-slate-400">
+                                Opção B: Pelo Menu de Opções do Chrome (3 pontinhos no canto superior direito)
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center gap-2">
+                                    <span class="font-bold text-indigo-400">1.</span>
+                                    <span>Clique nos <strong>⋮ (3 pontinhos)</strong></span>
+                                </div>
+                                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center gap-2">
+                                    <span class="font-bold text-indigo-400">2.</span>
+                                    <span><strong>Salvar e compartilhar</strong></span>
+                                </div>
+                                <div class="bg-slate-950 p-2.5 rounded-lg border border-indigo-500/40 text-indigo-300 flex items-center gap-2 font-medium">
+                                    <span class="font-bold text-indigo-400">3.</span>
+                                    <span><strong>Criar atalho...</strong> (ou <strong>Instalar</strong>)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PASSO 2 ILUSTRADO: O DETALHE CRUCIAL -->
+                    <div class="bg-emerald-950/20 border-2 border-emerald-500/50 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-emerald-600/30 flex items-center justify-center text-xs">Passo 2</span>
+                            <span>O Ponto Mais Importante: "Abrir como Janela"</span>
+                        </div>
+
+                        <!-- Mockup Ilustrado da Caixinha de Diálogo do Chrome -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 max-w-md mx-auto shadow-xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <h5 class="font-bold text-xs text-white">Criar atalho?</h5>
+                                <i data-lucide="x" class="w-3.5 h-3.5 text-slate-500"></i>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shrink-0">
+                                    <i data-lucide="church" class="w-4 h-4"></i>
+                                </div>
+                                <input type="text" readonly value="Igreja Digital - Gestão" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-medium w-full">
+                            </div>
+
+                            <!-- Caixinha destacada -->
+                            <div class="p-3 bg-emerald-950/60 border-2 border-emerald-400 rounded-xl flex items-center gap-3 shadow-lg shadow-emerald-950">
+                                <div class="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center text-slate-950 shrink-0 font-bold">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                </div>
+                                <span class="font-bold text-white text-xs">Abrir como janela</span>
+                            </div>
+
+                            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                                <span class="px-3 py-1 bg-slate-800 rounded-lg text-[11px] text-slate-400">Cancelar</span>
+                                <span class="px-3 py-1 bg-indigo-600 rounded-lg text-[11px] text-white font-bold">Criar</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1.5">
+                            <p class="font-semibold text-emerald-400 flex items-center gap-1.5">
+                                <i data-lucide="info" class="w-4 h-4"></i> Por que marcar "Abrir como janela"?
+                            </p>
+                            <p class="leading-relaxed">
+                                • <strong>Desmarcado:</strong> O Chrome cria um atalho que abre como uma aba normal de internet, com barra de endereços, favoritos e abas.<br>
+                                • <strong>Marcado (Recomendado):</strong> O Chrome remove completamente as abas e barras de navegação, abrindo o sistema como se fosse um <strong>programa nativo instalado no Windows</strong>!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 2: OPÇÃO CRIAR ATALHO DESABILITADA? -->
+                <div id="guia-pwa-tab-bloqueado" class="tab-guia-pwa-content hidden space-y-5">
+                    <div class="p-4 bg-amber-950/30 border border-amber-500/40 rounded-2xl flex items-start gap-3">
+                        <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
+                            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-amber-300 text-sm">Por que a opção "Criar atalho" ou "Instalar" fica cinza/desabilitada?</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                No Google Chrome, isso acontece por duas razões de segurança do próprio navegador:
+                            </p>
+                            <ul class="text-xs text-slate-400 list-disc list-inside space-y-1 pt-1">
+                                <li><strong>Você deu 2 cliques no arquivo local no computador:</strong> O endereço começa com <code class="text-amber-300 font-mono text-[11px]">file:///.../IgrejaDigital.html</code>. O Chrome bloqueia o menu de instalação em arquivos locais.</li>
+                                <li><strong>Janela Anônima:</strong> O Chrome não permite instalar atalhos/PWAs no modo privativo.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Solução Definitiva no Windows -->
+                    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-indigo-600/20 flex items-center justify-center text-xs">Solução Definitiva</span>
+                            <span>Criar o Atalho Exclusivo Manualmente no Windows (Funciona Sempre)</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Você pode criar um atalho no Windows com apenas 3 passos simples que força o Chrome a abrir em <strong>janela de aplicativo própria e 100% maximizada</strong>:
+                        </p>
+
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3 p-3 bg-slate-900 rounded-xl border border-slate-800">
+                                <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                                <div class="text-xs text-slate-300">
+                                    Vá na sua <strong>Área de Trabalho</strong>, clique com o botão direito em um espaço vazio ➔ <strong>Novo</strong> ➔ <strong>Atalho</strong>.
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3 p-3 bg-slate-900 rounded-xl border border-slate-800">
+                                <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                                <div class="text-xs text-slate-300 space-y-2 flex-1">
+                                    <div>No campo <em>"Digite o local do item"</em>, cole o comando abaixo:</div>
+                                    
+                                    <!-- Caixa de Código com Botão Copiar -->
+                                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-700/80 space-y-2">
+                                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                                            <span>Comando para a Versão Web Online:</span>
+                                            <button type="button" onclick="copiarComandoAtalhoPwa('web')" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[11px] font-semibold transition cursor-pointer">
+                                                <i data-lucide="copy" class="w-3 h-3"></i>
+                                                <span>Copiar Comando</span>
+                                            </button>
+                                        </div>
+                                        <div class="font-mono text-[11px] text-indigo-300 select-all break-all bg-slate-900/90 p-2 rounded border border-slate-800" id="cmd-pwa-web-preview">
+                                            "C:\Program Files\Google\Chrome\Application\chrome.exe" --app="https://..." --start-maximized
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-700/80 space-y-2">
+                                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                                            <span>Comando se você usa o arquivo local (<code class="text-amber-400 font-mono">IgrejaDigital.html</code>):</span>
+                                            <button type="button" onclick="copiarComandoAtalhoPwa('local')" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-semibold transition cursor-pointer border border-slate-700">
+                                                <i data-lucide="copy" class="w-3 h-3 text-indigo-400"></i>
+                                                <span>Copiar Comando</span>
+                                            </button>
+                                        </div>
+                                        <div class="font-mono text-[11px] text-amber-300/90 select-all break-all bg-slate-900/90 p-2 rounded border border-slate-800">
+                                            "C:\Program Files\Google\Chrome\Application\chrome.exe" --app="file:///C:/Caminho/Da/Pasta/IgrejaDigital.html" --start-maximized
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3 p-3 bg-slate-900 rounded-xl border border-slate-800">
+                                <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                                <div class="text-xs text-slate-300">
+                                    Clique em <strong>Avançar</strong>, dê o nome de <strong>Igreja Digital</strong> e clique em <strong>Concluir</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="feedback-copiar-comando-pwa" class="hidden p-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>Comando copiado para a área de transferência! Cole no campo "Digite o local do item" ao criar o atalho no Windows.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 3: COMO ABRIR SEMPRE MAXIMIZADO -->
+                <div id="guia-pwa-tab-maximizado" class="tab-guia-pwa-content hidden space-y-5">
+                    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-indigo-600/20 flex items-center justify-center text-xs">Ajuste no Windows</span>
+                            <span>Como forçar o Windows a abrir o ícone SEMPRE 100% MAXIMIZADO</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Por padrão do Windows, os atalhos abrem em <em>"Janela Normal"</em>. Você pode configurar para que ele abra sempre em tela cheia com 4 cliques:
+                        </p>
+
+                        <!-- Mockup Visual da Janela de Propriedades do Windows -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 max-w-md mx-auto shadow-2xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+                                    <span class="font-bold text-xs text-white">Propriedades de Igreja Digital</span>
+                                </div>
+                                <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">Windows</span>
+                            </div>
+
+                            <div class="space-y-3 text-xs">
+                                <div>
+                                    <label class="block text-[11px] text-slate-400 mb-1">Destino:</label>
+                                    <input type="text" readonly value="chrome.exe --app=..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-300 font-mono text-[11px]">
+                                </div>
+
+                                <!-- Campo Executar em Destaque -->
+                                <div class="p-3 bg-amber-950/40 border-2 border-amber-500/60 rounded-xl space-y-1.5 shadow-md shadow-amber-950/50">
+                                    <div class="flex items-center justify-between">
+                                        <label class="block text-xs font-bold text-amber-300">Executar:</label>
+                                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest bg-amber-500/20 px-2 py-0.5 rounded">Mudar Aqui!</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-slate-950 border border-amber-400/50 rounded-lg px-3 py-1.5 text-xs text-white font-semibold">
+                                        <span>Maximizado</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-amber-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                                <button type="button" class="text-[11px] text-indigo-400 font-medium hover:underline flex items-center gap-1">
+                                    <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                    <span>Alterar Ícone...</span>
+                                </button>
+                                <div class="flex gap-2">
+                                    <span class="px-3 py-1 bg-indigo-600 rounded-lg text-[11px] text-white font-bold">Aplicar</span>
+                                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-[11px] text-white font-semibold">OK</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Passo a Passo em Texto -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2">
+                            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
+                                <span class="font-bold text-indigo-400">1. Botão Direito no Ícone:</span>
+                                <p class="text-slate-400">Na Área de Trabalho, clique com o botão direito no ícone da Igreja Digital e selecione <strong>Propriedades</strong>.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
+                                <span class="font-bold text-emerald-400">2. Mudar para Maximizado:</span>
+                                <p class="text-slate-400">Na aba <strong>Atalho</strong>, procure o campo <strong>"Executar:"</strong> e altere de <em>Janela normal</em> para <strong>"Maximizado"</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rodapé do Modal -->
+            <div class="p-4 border-t border-slate-800 bg-slate-900/95 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                <div class="text-xs text-slate-400 flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-indigo-400"></i>
+                    <span>Igreja Digital • Sub-Marilena</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="fecharGuiaInstalacaoPwa()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition cursor-pointer">
+                        Fechar Guia
+                    </button>
+                    <button type="button" onclick="alternarTabGuiaPwaProximo()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20 cursor-pointer flex items-center gap-1.5">
+                        <span>Próximo Passo</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1828,8 +2284,151 @@
             if (e.key === 'Escape') {
                 fecharModalAcessoNegadoTesouraria();
                 fecharModalComprovanteWhatsApp();
+                fecharGuiaInstalacaoPwa();
             }
         });
+
+        // --- FUNÇÕES DO GUIA DE INSTALAÇÃO PWA (MODO JANELA INDEPENDENTE E MAXIMIZADA) ---
+        let deferredPwaInstallPrompt = null;
+        let tabAtualGuiaPwa = 'chrome';
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPwaInstallPrompt = e;
+            atualizarVisibilidadeBotoesPwa();
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPwaInstallPrompt = null;
+            atualizarVisibilidadeBotoesPwa();
+        });
+
+        function atualizarVisibilidadeBotoesPwa() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator && window.navigator.standalone === true);
+            const btnDirectInstalls = document.querySelectorAll('.btn-pwa-instalar-direto');
+            btnDirectInstalls.forEach(btn => {
+                if (isStandalone) {
+                    btn.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Aplicativo Já Instalado</span>`;
+                    btn.disabled = true;
+                    btn.classList.add('opacity-80', 'cursor-default');
+                } else if (deferredPwaInstallPrompt) {
+                    btn.innerHTML = `<i data-lucide="download" class="w-4 h-4 text-white"></i><span>Instalar Diretamente Agora</span>`;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-80', 'cursor-default');
+                }
+            });
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        async function dispararInstalacaoPwaDireta() {
+            if (deferredPwaInstallPrompt) {
+                deferredPwaInstallPrompt.prompt();
+                const choice = await deferredPwaInstallPrompt.userChoice;
+                if (choice && choice.outcome === 'accepted') {
+                    deferredPwaInstallPrompt = null;
+                    atualizarVisibilidadeBotoesPwa();
+                }
+            } else {
+                abrirGuiaInstalacaoPwa('chrome');
+            }
+        }
+
+        function abrirGuiaInstalacaoPwa(tabInicial) {
+            const modal = document.getElementById('modal-guia-instalacao-pwa');
+            if (modal) {
+                modal.classList.remove('hidden');
+                alternarTabGuiaPwa(tabInicial || 'chrome');
+                
+                // Atualizar dinamicamente o preview do comando com a URL atual
+                const cmdPreview = document.getElementById('cmd-pwa-web-preview');
+                if (cmdPreview) {
+                    const currentUrl = window.location.href.split('#')[0];
+                    cmdPreview.innerText = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="${currentUrl}" --start-maximized`;
+                }
+                
+                atualizarVisibilidadeBotoesPwa();
+                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+            }
+        }
+
+        function fecharGuiaInstalacaoPwa() {
+            const modal = document.getElementById('modal-guia-instalacao-pwa');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function alternarTabGuiaPwa(tabId) {
+            tabAtualGuiaPwa = tabId;
+            document.querySelectorAll('.tab-guia-pwa-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-guia-pwa-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-400', 'hover:bg-slate-800', 'hover:text-slate-200');
+            });
+
+            const activeContent = document.getElementById(`guia-pwa-tab-${tabId}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`btn-tab-pwa-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:bg-slate-800', 'hover:text-slate-200');
+                activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+            }
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        function alternarTabGuiaPwaProximo() {
+            if (tabAtualGuiaPwa === 'chrome') {
+                alternarTabGuiaPwa('bloqueado');
+            } else if (tabAtualGuiaPwa === 'bloqueado') {
+                alternarTabGuiaPwa('maximizado');
+            } else {
+                fecharGuiaInstalacaoPwa();
+            }
+        }
+
+        function copiarComandoAtalhoPwa(tipo) {
+            let comando = '';
+            const currentUrl = window.location.href.split('#')[0];
+            if (tipo === 'web') {
+                comando = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="${currentUrl}" --start-maximized`;
+            } else {
+                comando = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="file:///C:/Caminho/Da/Pasta/IgrejaDigital.html" --start-maximized`;
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(comando).then(() => {
+                    const feedback = document.getElementById('feedback-copiar-comando-pwa');
+                    if (feedback) {
+                        feedback.classList.remove('hidden');
+                        setTimeout(() => feedback.classList.add('hidden'), 4000);
+                    }
+                }).catch(() => {
+                    prompt("Copie o comando abaixo (Ctrl+C):", comando);
+                });
+            } else {
+                prompt("Copie o comando abaixo (Ctrl+C):", comando);
+            }
+        }
+
+        // Registro de Service Worker para PWA (quando executado via HTTP/HTTPS)
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => {
+                    console.log('ServiceWorker registration optional or ignored in current env:', err);
+                });
+            });
+        }
+
+        window.abrirGuiaInstalacaoPwa = abrirGuiaInstalacaoPwa;
+        window.fecharGuiaInstalacaoPwa = fecharGuiaInstalacaoPwa;
+        window.alternarTabGuiaPwa = alternarTabGuiaPwa;
+        window.alternarTabGuiaPwaProximo = alternarTabGuiaPwaProximo;
+        window.copiarComandoAtalhoPwa = copiarComandoAtalhoPwa;
+        window.dispararInstalacaoPwaDireta = dispararInstalacaoPwaDireta;
+        window.cancelarLogin = cancelarLogin;
+        window.voltarParaLoginAposCancelar = voltarParaLoginAposCancelar;
+        window.fecharJanelaDefinitiva = fecharJanelaDefinitiva;
 
         window.temAcessoTesouraria = temAcessoTesouraria;
         window.notificarAcessoNegadoTesouraria = notificarAcessoNegadoTesouraria;
@@ -1933,6 +2532,8 @@
             if (cardRecuperar) cardRecuperar.classList.add('hidden');
             const cardAlterar = document.getElementById('card-alterar-senha-external');
             if (cardAlterar) cardAlterar.classList.add('hidden');
+            const cardCancelado = document.getElementById('card-login-cancelado');
+            if (cardCancelado) cardCancelado.classList.add('hidden');
             if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
         }
 
@@ -1992,7 +2593,49 @@
             document.getElementById('card-recuperar-senha').classList.add('hidden');
             document.getElementById('card-alterar-senha-external').classList.add('hidden');
             document.getElementById('card-login').classList.remove('hidden');
+            const cardCancelado = document.getElementById('card-login-cancelado');
+            if (cardCancelado) cardCancelado.classList.add('hidden');
             exibirMensagem('msg-recuperacao', '', 'limpar');
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        function cancelarLogin() {
+            // Limpa os dados preenchidos
+            const inputEmail = document.getElementById('login-email');
+            const inputSenha = document.getElementById('login-senha');
+            if (inputEmail) inputEmail.value = '';
+            if (inputSenha) inputSenha.value = '';
+
+            // Tenta fechar a janela do aplicativo (em modo PWA / Atalho de Janela Exclusiva, o navegador permite o fechamento)
+            try {
+                window.close();
+            } catch (err) {
+                console.log('window.close() ignorado pelo navegador:', err);
+            }
+
+            // Exibe a tela de confirmação de desistência/fechamento caso a janela do navegador permaneça aberta
+            document.getElementById('card-login').classList.add('hidden');
+            document.getElementById('card-recuperar-senha').classList.add('hidden');
+            document.getElementById('card-alterar-senha-external').classList.add('hidden');
+            const cardCancelado = document.getElementById('card-login-cancelado');
+            if (cardCancelado) {
+                cardCancelado.classList.remove('hidden');
+            }
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        function voltarParaLoginAposCancelar() {
+            const cardCancelado = document.getElementById('card-login-cancelado');
+            if (cardCancelado) cardCancelado.classList.add('hidden');
+            const cardLogin = document.getElementById('card-login');
+            if (cardLogin) cardLogin.classList.remove('hidden');
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        function fecharJanelaDefinitiva() {
+            try {
+                window.close();
+            } catch(e) {}
         }
 
         function mostrarTelaAlterarSenhaExternal() {
