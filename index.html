@@ -1,32 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="dark">
+<html lang="pt-br" class="dark" style="background-color: #020617 !important; color-scheme: dark;">
 <head>
     <meta charset="UTF-8">
+    <title>Igreja Digital - Gestão</title>
+    <meta name="color-scheme" content="dark">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão - Igreja Digital</title>
+    <!-- Estilo Crítico Imediato: Evita clarão branco (FOUC) antes do carregamento dos scripts -->
+    <style>
+        :root, html, body {
+            background-color: #020617 !important;
+            background: #020617 !important;
+            color: #f8fafc !important;
+            color-scheme: dark !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
     <meta name="description" content="Sistema completo para gestão de membros, tesouraria, fluxo de caixa, agenda semanal, emissão de cartas e controle de ofertas voluntárias.">
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
     <link rel="apple-touch-icon" href="./logo_igreja.png">
-    <meta name="theme-color" content="#4f46e5">
+    <meta name="theme-color" content="#020617">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/html2pdf.bundle.min.js"></script>
+    <script src="./html2pdf.bundle.min.js"></script>
     <script src="logo_base64.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #020617; scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         [color-scheme:dark] { color-scheme: dark; }
     </style>
 </head>
-<body class="text-slate-200">
+<body class="text-slate-200" style="background-color: #020617 !important; background: #020617 !important; margin: 0; padding: 0;">
     <!-- Tela Neutra de Carregamento Inicial -->
     <div id="tela-carregamento-inicial" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 transition-opacity duration-200">
         <div class="flex flex-col items-center gap-4 text-center px-4">
@@ -303,6 +315,10 @@
                     <i data-lucide="monitor-down" class="w-5 h-5 text-indigo-400"></i>
                     <span>Instalar no PC (PWA)</span>
                 </button>
+                <button id="btn-menu-tela-cheia" onclick="alternarTelaCheia()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 rounded-xl transition font-medium cursor-pointer">
+                    <i id="icone-sidebar-tela-cheia" data-lucide="maximize-2" class="w-5 h-5 text-indigo-400"></i>
+                    <span id="txt-sidebar-tela-cheia">Tela Cheia / Maximizar</span>
+                </button>
                 <button onclick="fazerLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition font-medium">
                     <i data-lucide="log-out" class="w-5 h-5 text-rose-400"></i>
                     <span>Sair do Sistema</span>
@@ -325,7 +341,7 @@
                     </div>
 
                     <!-- Canto Superior Direito: Lembrete de Aniversariantes, Usuário Conectado e Botão Sair do Sistema -->
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <button id="btn-topbar-aniversarios" onclick="abrirModalAniversariantes()" title="Lembretes de Aniversariantes" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700/60 text-slate-200 text-xs sm:text-sm font-medium transition-all duration-200 shadow-sm hover:border-pink-500/40 cursor-pointer group">
                             <i data-lucide="cake" class="w-4 h-4 text-pink-400 group-hover:scale-110 transition-transform"></i>
                             <span class="hidden lg:inline text-xs font-semibold text-slate-300">Aniversariantes</span>
@@ -335,6 +351,11 @@
                         <button id="btn-topbar-guia-pwa" onclick="abrirGuiaInstalacaoPwa()" title="Instalar Aplicativo na Área de Trabalho (Janela Exclusiva PWA)" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600/15 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 hover:border-indigo-500 text-xs sm:text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer group">
                             <i data-lucide="monitor-down" class="w-4 h-4 text-indigo-400 group-hover:text-white group-hover:scale-110 transition-transform"></i>
                             <span class="hidden sm:inline text-xs">Instalar no PC</span>
+                        </button>
+
+                        <button id="btn-topbar-tela-cheia" onclick="alternarTelaCheia()" title="Alternar Modo Tela Cheia / Maximizado (F11)" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 text-xs sm:text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer group">
+                            <i id="icone-btn-tela-cheia" data-lucide="maximize-2" class="w-4 h-4 text-indigo-400 group-hover:text-white group-hover:scale-110 transition-transform"></i>
+                            <span class="hidden xl:inline text-xs" id="txt-btn-tela-cheia">Maximizar</span>
                         </button>
 
                         <div id="topbar-user-badge" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
@@ -2095,21 +2116,31 @@
                                             </button>
                                         </div>
                                         <div class="font-mono text-[11px] text-indigo-300 select-all break-all bg-slate-900/90 p-2 rounded border border-slate-800" id="cmd-pwa-web-preview">
-                                            "C:\Program Files\Google\Chrome\Application\chrome.exe" --app="https://..." --start-maximized
+                                            "C:\Program Files\Google\Chrome\Application\chrome.exe" --user-data-dir="%LOCALAPPDATA%\IgrejaDigitalApp" --start-maximized --force-dark-mode --app="https://..."
                                         </div>
                                     </div>
 
                                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-700/80 space-y-2">
                                         <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                                            <span>Comando se você usa o arquivo local (<code class="text-amber-400 font-mono">IgrejaDigital.html</code>):</span>
+                                            <span>Comando Definitivo para o Arquivo Local (<code class="text-amber-400 font-mono">IgrejaDigital.html</code>):</span>
                                             <button type="button" onclick="copiarComandoAtalhoPwa('local')" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-semibold transition cursor-pointer border border-slate-700">
                                                 <i data-lucide="copy" class="w-3 h-3 text-indigo-400"></i>
-                                                <span>Copiar Comando</span>
+                                                <span>Copiar Comando Local</span>
                                             </button>
                                         </div>
-                                        <div class="font-mono text-[11px] text-amber-300/90 select-all break-all bg-slate-900/90 p-2 rounded border border-slate-800">
-                                            "C:\Program Files\Google\Chrome\Application\chrome.exe" --app="file:///C:/Caminho/Da/Pasta/IgrejaDigital.html" --start-maximized
+                                        <div class="font-mono text-[11px] text-amber-300/90 select-all break-all bg-slate-900/90 p-2 rounded border border-slate-800" id="cmd-pwa-local-preview">
+                                            "C:\Program Files\Google\Chrome\Application\chrome.exe" --user-data-dir="%LOCALAPPDATA%\IgrejaDigitalApp" --start-maximized --force-dark-mode --app="file:///C:/Users/doriv/Documents/Testes%20HTML/IgrejaDigital.html"
                                         </div>
+                                    </div>
+                                    
+                                    <div class="p-3 bg-slate-900/90 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
+                                        <p class="font-semibold text-slate-300 flex items-center gap-1.5">
+                                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> O que cada parâmetro faz:
+                                        </p>
+                                        <p>• <strong class="text-indigo-300">--user-data-dir:</strong> Garante que o aplicativo abra isolado das suas abas de navegação comuns, forçando a janela a sempre respeitar a inicialização maximizada.</p>
+                                        <p>• <strong class="text-indigo-300">--start-maximized:</strong> Abre a tela 100% cheia desde o primeiro segundo.</p>
+                                        <p>• <strong class="text-indigo-300">--force-dark-mode:</strong> Elimina o clarão branco do Chrome no momento da abertura.</p>
+                                        <p>• <strong class="text-amber-300">Atenção com --kiosk:</strong> Não utilize <code>--kiosk</code> junto com <code>--app</code>, pois esses dois parâmetros entram em conflito no Chrome e impedem a janela de abrir no modo normal.</p>
                                     </div>
                                 </div>
                             </div>
@@ -2124,7 +2155,7 @@
 
                         <div id="feedback-copiar-comando-pwa" class="hidden p-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-2">
                             <i data-lucide="check-circle" class="w-4 h-4"></i>
-                            <span>Comando copiado para a área de transferência! Cole no campo "Digite o local do item" ao criar o atalho no Windows.</span>
+                            <span>Comando copiado para a área de transferência! Cole no campo "Digite o local do item" no atalho da Área de Trabalho.</span>
                         </div>
                     </div>
                 </div>
@@ -2134,10 +2165,10 @@
                     <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-4">
                         <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
                             <span class="w-6 h-6 rounded-lg bg-indigo-600/20 flex items-center justify-center text-xs">Ajuste no Windows</span>
-                            <span>Como forçar o Windows a abrir o ícone SEMPRE 100% MAXIMIZADO</span>
+                            <span>Como garantir que o aplicativo abra sempre 100% MAXIMIZADO</span>
                         </div>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            Por padrão do Windows, os atalhos abrem em <em>"Janela Normal"</em>. Você pode configurar para que ele abra sempre em tela cheia com 4 cliques:
+                            Se a sua janela abrir em tamanho reduzido (ex: 2/3 da tela), você tem duas opções muito simples:
                         </p>
 
                         <!-- Mockup Visual da Janela de Propriedades do Windows -->
@@ -2152,8 +2183,8 @@
 
                             <div class="space-y-3 text-xs">
                                 <div>
-                                    <label class="block text-[11px] text-slate-400 mb-1">Destino:</label>
-                                    <input type="text" readonly value="chrome.exe --app=..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-300 font-mono text-[11px]">
+                                    <label class="block text-[11px] text-slate-400 mb-1">Destino (Linha Completa):</label>
+                                    <input type="text" readonly value="chrome.exe --user-data-dir=... --start-maximized --force-dark-mode --app=..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-300 font-mono text-[10px]">
                                 </div>
 
                                 <!-- Campo Executar em Destaque -->
@@ -2184,12 +2215,12 @@
                         <!-- Passo a Passo em Texto -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2">
                             <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
-                                <span class="font-bold text-indigo-400">1. Botão Direito no Ícone:</span>
-                                <p class="text-slate-400">Na Área de Trabalho, clique com o botão direito no ícone da Igreja Digital e selecione <strong>Propriedades</strong>.</p>
+                                <span class="font-bold text-indigo-400">1. Pelo Atalho do Windows:</span>
+                                <p class="text-slate-400">Clique com o botão direito no ícone ➔ <strong>Propriedades</strong> ➔ na aba <strong>Atalho</strong>, troque <strong>"Executar:"</strong> para <strong>"Maximizado"</strong> e cole o comando isolado no campo Destino.</p>
                             </div>
                             <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
-                                <span class="font-bold text-emerald-400">2. Mudar para Maximizado:</span>
-                                <p class="text-slate-400">Na aba <strong>Atalho</strong>, procure o campo <strong>"Executar:"</strong> e altere de <em>Janela normal</em> para <strong>"Maximizado"</strong>.</p>
+                                <span class="font-bold text-emerald-400">2. Botão Rápido no Topo:</span>
+                                <p class="text-slate-400">Você também pode clicar no botão <strong>"Maximizar"</strong> no topo da barra de tarefas do sistema ou pressionar <strong>F11</strong> a qualquer momento.</p>
                             </div>
                         </div>
                     </div>
@@ -2387,13 +2418,52 @@
             }
         }
 
+        function alternarTelaCheia() {
+            try {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(() => {});
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                }
+            } catch (e) {
+                console.log('Fullscreen error:', e);
+            }
+        }
+
+        function atualizarIconeTelaCheia() {
+            const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            const iconeTopbar = document.getElementById('icone-btn-tela-cheia');
+            const txtTopbar = document.getElementById('txt-btn-tela-cheia');
+            const iconeSidebar = document.getElementById('icone-sidebar-tela-cheia');
+            const txtSidebar = document.getElementById('txt-sidebar-tela-cheia');
+
+            if (iconeTopbar) iconeTopbar.setAttribute('data-lucide', isFull ? 'minimize-2' : 'maximize-2');
+            if (txtTopbar) txtTopbar.innerText = isFull ? 'Restaurar' : 'Maximizar';
+            if (iconeSidebar) iconeSidebar.setAttribute('data-lucide', isFull ? 'minimize-2' : 'maximize-2');
+            if (txtSidebar) txtSidebar.innerText = isFull ? 'Restaurar Janela' : 'Tela Cheia / Maximizar';
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        document.addEventListener('fullscreenchange', atualizarIconeTelaCheia);
+        document.addEventListener('webkitfullscreenchange', atualizarIconeTelaCheia);
+
         function copiarComandoAtalhoPwa(tipo) {
             let comando = '';
             const currentUrl = window.location.href.split('#')[0];
             if (tipo === 'web') {
-                comando = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="${currentUrl}" --start-maximized`;
+                const targetUrl = window.location.protocol.startsWith('http') ? currentUrl : 'https://seu-servidor-ou-dominio.com/index.html';
+                comando = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%LOCALAPPDATA%\\IgrejaDigitalApp" --start-maximized --force-dark-mode --app="${targetUrl}"`;
             } else {
-                comando = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="file:///C:/Caminho/Da/Pasta/IgrejaDigital.html" --start-maximized`;
+                const targetUrl = window.location.protocol === 'file:' ? currentUrl : 'file:///C:/Users/doriv/Documents/Testes%20HTML/IgrejaDigital.html';
+                comando = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%LOCALAPPDATA%\\IgrejaDigitalApp" --start-maximized --force-dark-mode --app="${targetUrl}"`;
             }
             
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -2401,13 +2471,13 @@
                     const feedback = document.getElementById('feedback-copiar-comando-pwa');
                     if (feedback) {
                         feedback.classList.remove('hidden');
-                        setTimeout(() => feedback.classList.add('hidden'), 4000);
+                        setTimeout(() => feedback.classList.add('hidden'), 5000);
                     }
                 }).catch(() => {
-                    prompt("Copie o comando abaixo (Ctrl+C):", comando);
+                    prompt("Copie o comando definitivo abaixo (Ctrl+C):", comando);
                 });
             } else {
-                prompt("Copie o comando abaixo (Ctrl+C):", comando);
+                prompt("Copie o comando definitivo abaixo (Ctrl+C):", comando);
             }
         }
 
@@ -2426,9 +2496,11 @@
         window.alternarTabGuiaPwaProximo = alternarTabGuiaPwaProximo;
         window.copiarComandoAtalhoPwa = copiarComandoAtalhoPwa;
         window.dispararInstalacaoPwaDireta = dispararInstalacaoPwaDireta;
+        window.alternarTelaCheia = alternarTelaCheia;
         window.cancelarLogin = cancelarLogin;
         window.voltarParaLoginAposCancelar = voltarParaLoginAposCancelar;
         window.fecharJanelaDefinitiva = fecharJanelaDefinitiva;
+        window.tentarAutoMaximizarJanela = tentarAutoMaximizarJanela;
 
         window.temAcessoTesouraria = temAcessoTesouraria;
         window.notificarAcessoNegadoTesouraria = notificarAcessoNegadoTesouraria;
@@ -2551,7 +2623,32 @@
 
         let sessaoAutenticadaConfirmada = false;
 
+        // Tenta auto-maximizar a janela do aplicativo no carregamento (quando executado em modo app / standalone)
+        function tentarAutoMaximizarJanela() {
+            try {
+                if (window.screen && window.screen.availWidth && window.screen.availHeight) {
+                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                                         (window.navigator && window.navigator.standalone === true) ||
+                                         window.location.search.includes('mode=app');
+                    
+                    // Em janelas de app/standalone, redimensiona e reposiciona para ocupar 100% da área útil do monitor
+                    if (isStandalone || window.outerWidth < window.screen.availWidth * 0.98 || window.outerHeight < window.screen.availHeight * 0.98) {
+                        window.moveTo(0, 0);
+                        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+                    }
+                }
+            } catch (err) {
+                // Bloqueado silenciosamente se for uma aba comum de navegador
+            }
+        }
+
+        // Dispara a tentativa de auto-ajuste de tamanho
+        tentarAutoMaximizarJanela();
+        window.addEventListener('load', tentarAutoMaximizarJanela);
+        setTimeout(tentarAutoMaximizarJanela, 300);
+
         async function verificarSessaoInicial() {
+            tentarAutoMaximizarJanela();
             if (isRecoveryFlow) {
                 mostrarTelaAlterarSenhaExternal();
                 return;
