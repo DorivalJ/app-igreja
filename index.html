@@ -25,6 +25,29 @@
     </style>
 </head>
 <body class="text-slate-200">
+    <!-- Tela Neutra de Carregamento Inicial -->
+    <div id="tela-carregamento-inicial" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 transition-opacity duration-200">
+        <div class="flex flex-col items-center gap-4 text-center px-4">
+            <div class="p-4 bg-indigo-600/10 rounded-2xl text-indigo-400 border border-indigo-500/20 shadow-2xl shadow-indigo-950/60 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-indigo-400">
+                    <path d="m18 7 4 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9l4-2"/>
+                    <path d="M14 22v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4"/>
+                    <path d="M18 22V5l-6-3-6 3v17"/>
+                    <path d="M12 7v5"/>
+                    <path d="M10 9h4"/>
+                </svg>
+            </div>
+            <div class="space-y-1">
+                <h1 class="text-xl font-bold tracking-tight text-white">Igreja Digital</h1>
+                <p class="text-xs text-slate-400 uppercase tracking-widest font-medium">Sub-Marilena</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400 mt-2 font-medium">
+                <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin"></div>
+                <span>Carregando sistema...</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Tela de Login -->
     <section id="tela-login" class="hidden min-h-screen w-full flex items-center justify-center bg-slate-950 p-4">
         <!-- Card 1: Login -->
@@ -150,7 +173,7 @@
 
     <div class="min-h-screen flex">
         
-        <aside id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed inset-y-0 left-0 h-screen z-20 overflow-y-auto">
+        <aside id="sidebar" class="hidden w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed inset-y-0 left-0 h-screen z-20 overflow-y-auto">
             <div>
                 <div class="p-6 border-b border-slate-800">
                     <h2 class="text-xl font-bold text-indigo-400 tracking-wide text-center">
@@ -243,7 +266,7 @@
             </div>
         </aside>
 
-        <div id="painel-principal" class="flex-1 ml-64 flex flex-col min-h-screen">
+        <div id="painel-principal" class="hidden flex-1 ml-64 flex flex-col min-h-screen">
             
             <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
                 <div class="max-w-6xl mx-auto flex justify-between items-center gap-4">
@@ -1889,43 +1912,73 @@
             }
         }
 
-        const session = _supabase ? _supabase.auth.getSession() : null;
-        if (session) {
-            session.then(({ data, error }) => {
-                const isLogged = data && data.session;
-                if (isRecoveryFlow) {
-                    mostrarTelaAlterarSenhaExternal();
-                } else if (isLogged) {
-                    if (data.session.user) atualizarInfoUsuarioLogado(data.session.user);
-                    document.getElementById('tela-login').classList.add('hidden');
-                    document.getElementById('sidebar').classList.remove('hidden');
-                    document.getElementById('painel-principal').classList.remove('hidden');
-                } else {
-                    document.getElementById('tela-login').classList.remove('hidden');
-                    document.getElementById('sidebar').classList.add('hidden');
-                    document.getElementById('painel-principal').classList.add('hidden');
-                }
-            }).catch(err => {
-                console.error("Erro na verificação inicial de sessão:", err);
-                if (isRecoveryFlow) {
-                    mostrarTelaAlterarSenhaExternal();
-                } else {
-                    document.getElementById('tela-login').classList.remove('hidden');
-                    document.getElementById('sidebar').classList.add('hidden');
-                    document.getElementById('painel-principal').classList.add('hidden');
-                }
-            });
-        } else {
-            // Se não houver supabase (modo local ou visualização), libera as telas imediatamente
-            setTimeout(() => {
-                const telaLogin = document.getElementById('tela-login');
-                const sidebar = document.getElementById('sidebar');
-                const painelPrincipal = document.getElementById('painel-principal');
-                if (telaLogin) telaLogin.classList.add('hidden');
-                if (sidebar) sidebar.classList.remove('hidden');
-                if (painelPrincipal) painelPrincipal.classList.remove('hidden');
-            }, 50);
+        function ocultarTelaCarregamento() {
+            const telaCarregamento = document.getElementById('tela-carregamento-inicial');
+            if (telaCarregamento) {
+                telaCarregamento.classList.add('hidden');
+            }
         }
+
+        function exibirTelaLogin() {
+            ocultarTelaCarregamento();
+            const sidebar = document.getElementById('sidebar');
+            const painelPrincipal = document.getElementById('painel-principal');
+            const telaLogin = document.getElementById('tela-login');
+            if (sidebar) sidebar.classList.add('hidden');
+            if (painelPrincipal) painelPrincipal.classList.add('hidden');
+            if (telaLogin) telaLogin.classList.remove('hidden');
+            const cardLogin = document.getElementById('card-login');
+            if (cardLogin) cardLogin.classList.remove('hidden');
+            const cardRecuperar = document.getElementById('card-recuperar-senha');
+            if (cardRecuperar) cardRecuperar.classList.add('hidden');
+            const cardAlterar = document.getElementById('card-alterar-senha-external');
+            if (cardAlterar) cardAlterar.classList.add('hidden');
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        function exibirPainelPrincipal(usuario) {
+            ocultarTelaCarregamento();
+            const telaLogin = document.getElementById('tela-login');
+            const sidebar = document.getElementById('sidebar');
+            const painelPrincipal = document.getElementById('painel-principal');
+            if (telaLogin) telaLogin.classList.add('hidden');
+            if (sidebar) sidebar.classList.remove('hidden');
+            if (painelPrincipal) painelPrincipal.classList.remove('hidden');
+            if (usuario) atualizarInfoUsuarioLogado(usuario);
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        }
+
+        let sessaoAutenticadaConfirmada = false;
+
+        async function verificarSessaoInicial() {
+            if (isRecoveryFlow) {
+                mostrarTelaAlterarSenhaExternal();
+                return;
+            }
+
+            if (!_supabase) {
+                exibirTelaLogin();
+                return;
+            }
+
+            try {
+                const { data, error } = await _supabase.auth.getSession();
+                if (!error && data && data.session && data.session.user) {
+                    sessaoAutenticadaConfirmada = true;
+                    exibirPainelPrincipal(data.session.user);
+                    carregarMembros();
+                } else {
+                    sessaoAutenticadaConfirmada = false;
+                    exibirTelaLogin();
+                }
+            } catch (err) {
+                console.error("Erro na verificação inicial de sessão:", err);
+                sessaoAutenticadaConfirmada = false;
+                exibirTelaLogin();
+            }
+        }
+
+        verificarSessaoInicial();
 
         // --- FUNÇÕES DE RECUPERAÇÃO E ALTERAÇÃO DE SENHA ---
         function mostrarFormRecuperacao() {
@@ -1943,6 +1996,7 @@
         }
 
         function mostrarTelaAlterarSenhaExternal() {
+            ocultarTelaCarregamento();
             document.getElementById('tela-login').classList.remove('hidden');
             document.getElementById('sidebar').classList.add('hidden');
             document.getElementById('painel-principal').classList.add('hidden');
@@ -1951,6 +2005,7 @@
             document.getElementById('card-recuperar-senha').classList.add('hidden');
             document.getElementById('card-alterar-senha-external').classList.remove('hidden');
             exibirMensagem('ext-msg-alterar-senha', '', 'limpar');
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
         }
 
         function exibirMensagem(idElemento, texto, tipo) {
@@ -2195,12 +2250,12 @@
                 }
                 
                 // Login com sucesso!
+                sessaoAutenticadaConfirmada = true;
                 if (data && data.session && data.session.user) {
-                    atualizarInfoUsuarioLogado(data.session.user);
+                    exibirPainelPrincipal(data.session.user);
+                } else {
+                    exibirPainelPrincipal(null);
                 }
-                document.getElementById('tela-login').classList.add('hidden');
-                document.getElementById('sidebar').classList.remove('hidden');
-                document.getElementById('painel-principal').classList.remove('hidden');
                 
                 // Recarrega o estado do app para liberar as telas
                 carregarMembros();
@@ -2234,11 +2289,10 @@
             // Limpa a sessão local do navegador
             localStorage.clear();
             sessionStorage.clear();
+            sessaoAutenticadaConfirmada = false;
             
             // Redireciona o usuário imediatamente de volta para a tela de login, escondendo o painel admin
-            document.getElementById('tela-login').classList.remove('hidden');
-            document.getElementById('sidebar').classList.add('hidden');
-            document.getElementById('painel-principal').classList.add('hidden');
+            exibirTelaLogin();
         }
 
         let editandoID = null;
@@ -7232,18 +7286,25 @@
                 });
             }
 
-            // Verificar sessão para decidir se carrega os dados
+            // Verificar sessão para decidir se carrega os dados ou mantém tela de login
             if (_supabase) {
                 try {
                     const { data: { session }, error } = await _supabase.auth.getSession();
-                    if (session) {
+                    if (session && session.user) {
+                        sessaoAutenticadaConfirmada = true;
+                        exibirPainelPrincipal(session.user);
                         carregarMembros();
+                    } else if (!sessaoAutenticadaConfirmada) {
+                        exibirTelaLogin();
                     }
                 } catch (e) {
                     console.error("Erro na verificação de sessão no onload:", e);
+                    if (!sessaoAutenticadaConfirmada) {
+                        exibirTelaLogin();
+                    }
                 }
-            } else {
-                carregarMembros();
+            } else if (!sessaoAutenticadaConfirmada) {
+                exibirTelaLogin();
             }
         };
     </script>
