@@ -183,6 +183,22 @@
                     </button>
                 </div>
             </form>
+
+            <!-- Status de Versão e Sincronização Mobile/Desktop -->
+            <div class="pt-4 border-t border-slate-800/80 flex flex-col items-center gap-2 text-center">
+                <div class="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Versão 2.5 Atualizada
+                    </span>
+                    <span class="text-slate-600 hidden sm:inline">•</span>
+                    <button type="button" onclick="forcarAtualizacaoSistema()" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-2 transition cursor-pointer" title="Limpar cache do navegador e forçar atualização">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span>Sincronizar Celular / Limpar Cache</span>
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-500 max-w-xs">Se o seu celular mostrar a tela antiga, toque em <strong>Sincronizar Celular</strong>.</p>
+            </div>
         </div>
 
         <!-- Card 2: Recuperar Senha -->
@@ -294,15 +310,27 @@
         </div>
     </section>
 
-    <div class="min-h-screen flex">
+    <div class="min-h-screen flex relative">
         
-        <aside id="sidebar" class="hidden w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed inset-y-0 left-0 h-screen z-20 overflow-y-auto">
+        <!-- Fundo Escuro Backdrop para Celular (ao tocar fora, fecha a sidebar) -->
+        <div id="sidebar-backdrop" onclick="fecharSidebarMobile()" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-30 lg:hidden transition-opacity duration-300"></div>
+
+        <aside id="sidebar" class="hidden w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between fixed inset-y-0 left-0 h-screen z-40 overflow-y-auto transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl lg:shadow-none">
             <div>
-                <div class="p-6 border-b border-slate-800">
-                    <h2 class="text-xl font-bold text-indigo-400 tracking-wide text-center">
-                        Igreja Digital
-                    </h2>
-                    <p class="text-xs text-slate-500 text-center mt-1 uppercase tracking-widest font-medium">Sub-Marilena</p>
+                <div class="p-4 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-900/90">
+                    <div class="flex-1 min-w-0 pl-1">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="church" class="w-5 h-5 text-indigo-400 shrink-0"></i>
+                            <h2 class="text-base font-bold text-white tracking-wide truncate">
+                                Igreja Digital
+                            </h2>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-medium tracking-wider pl-7">Sub-Marilena</p>
+                    </div>
+                    <!-- Botão para Recolher a Sidebar ao lado de "Igreja Digital Sub-Marilena" -->
+                    <button type="button" id="btn-recolher-sidebar" onclick="recolherSidebar()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-400 hover:text-white border border-slate-700 transition cursor-pointer shrink-0 shadow-sm flex items-center justify-center group" title="Recolher Menu Lateral">
+                        <i data-lucide="panel-left-close" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    </button>
                 </div>
 
                 <nav class="p-4 space-y-1">
@@ -390,6 +418,13 @@
                     <i id="icone-sidebar-tela-cheia" data-lucide="maximize-2" class="w-5 h-5 text-indigo-400"></i>
                     <span id="txt-sidebar-tela-cheia">Tela Cheia / Maximizar</span>
                 </button>
+                <button type="button" onclick="forcarAtualizacaoSistema()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-indigo-600/10 hover:text-indigo-300 rounded-xl transition font-medium cursor-pointer" title="Limpar cache do navegador e forçar atualização">
+                    <i data-lucide="refresh-cw" class="w-5 h-5 text-indigo-400"></i>
+                    <div class="text-left leading-tight">
+                        <span class="block text-sm">Atualizar / Limpar Cache</span>
+                        <span class="block text-[10px] text-slate-500 font-normal">Versão 2.5 Ativa</span>
+                    </div>
+                </button>
                 <button onclick="fazerLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-rose-950/30 hover:text-rose-400 rounded-xl transition font-medium">
                     <i data-lucide="log-out" class="w-5 h-5 text-rose-400"></i>
                     <span>Sair do Sistema</span>
@@ -397,17 +432,22 @@
             </div>
         </aside>
 
-        <div id="painel-principal" class="hidden flex-1 ml-64 flex flex-col min-h-screen">
+        <div id="painel-principal" class="hidden flex-1 ml-0 lg:ml-64 flex flex-col min-h-screen w-full min-w-0">
             
-            <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 backdrop-blur-sm sticky top-0 z-10">
-                <div class="max-w-6xl mx-auto flex justify-between items-center gap-4">
-                    <div class="flex items-center gap-3">
-                        <div id="iconeDinamicoTopbar" class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+            <header class="bg-slate-900/50 border-b border-slate-800 px-4 sm:px-8 py-3 sm:py-4 backdrop-blur-sm sticky top-0 z-10">
+                <div class="max-w-6xl mx-auto flex justify-between items-center gap-3 sm:gap-4">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <!-- Botão Hambúrguer para Abrir/Recolher Sidebar (Sempre Visível) -->
+                        <button id="btn-toggle-sidebar" onclick="alternarSidebarGeral()" class="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-750 text-indigo-400 hover:text-white border border-slate-700/80 transition cursor-pointer flex items-center justify-center shrink-0 shadow-sm group" title="Abrir / Recolher Menu Lateral">
+                            <i data-lucide="menu" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                        </button>
+
+                        <div id="iconeDinamicoTopbar" class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-500/20 shrink-0">
                             <i id="iconeHeader" data-lucide="users"></i>
                         </div>
-                        <div>
-                            <h1 id="tituloTopbar" class="text-xl font-bold tracking-tight text-white">Gestão de Membros</h1>
-                            <p id="subtituloTopbar" class="text-xs text-slate-500 font-medium uppercase tracking-wider">Módulos Ativos</p>
+                        <div class="min-w-0">
+                            <h1 id="tituloTopbar" class="text-base sm:text-xl font-bold tracking-tight text-white truncate">Gestão de Membros</h1>
+                            <p id="subtituloTopbar" class="text-[10px] sm:text-xs text-slate-500 font-medium uppercase tracking-wider">Módulos Ativos</p>
                         </div>
                     </div>
 
@@ -2055,6 +2095,10 @@
                     <i data-lucide="maximize-2" class="w-4 h-4"></i>
                     <span>3. Abrir Maximizado</span>
                 </button>
+                <button type="button" id="btn-tab-pwa-celular" onclick="alternarTabGuiaPwa('celular')" class="tab-guia-pwa-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition cursor-pointer shrink-0">
+                    <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+                    <span>4. Abrir no Celular</span>
+                </button>
             </div>
 
             <!-- Conteúdo com Scroll -->
@@ -2089,15 +2133,15 @@
                         </p>
                         
                         <!-- Mockup Visual da Barra de Endereços -->
-                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2">
+                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2 select-none pointer-events-none opacity-95">
                             <div class="text-[11px] font-semibold text-slate-400 flex items-center justify-between">
                                 <span>Opção A: Na própria barra de endereços do Chrome (ao lado dos favoritos ★)</span>
-                                <span class="text-emerald-400 font-mono text-[10px]">Mais Rápido</span>
+                                <span class="text-indigo-400 font-mono text-[10px] bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">Exemplo Ilustrativo</span>
                             </div>
                             <div class="flex items-center gap-2 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 text-xs text-slate-400 font-mono">
                                 <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
                                 <span class="text-slate-300 flex-1 truncate">https://.../index.html</span>
-                                <div class="flex items-center gap-1.5 bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 px-2.5 py-1 rounded-md text-[11px] font-sans font-semibold animate-pulse">
+                                <div class="flex items-center gap-1.5 bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 px-2.5 py-1 rounded-md text-[11px] font-sans font-semibold">
                                     <i data-lucide="monitor-down" class="w-3.5 h-3.5"></i>
                                     <span>Instalar Igreja Digital</span>
                                 </div>
@@ -2105,9 +2149,10 @@
                         </div>
 
                         <!-- Mockup Visual do Menu 3 Pontinhos -->
-                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2">
-                            <div class="text-[11px] font-semibold text-slate-400">
-                                Opção B: Pelo Menu de Opções do Chrome (3 pontinhos no canto superior direito)
+                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2 select-none pointer-events-none opacity-95">
+                            <div class="text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+                                <span>Opção B: Pelo Menu de Opções do Chrome (3 pontinhos no canto superior direito)</span>
+                                <span class="text-indigo-400 font-mono text-[10px] bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">Exemplo Ilustrativo</span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                                 <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center gap-2">
@@ -2120,7 +2165,7 @@
                                 </div>
                                 <div class="bg-slate-950 p-2.5 rounded-lg border border-indigo-500/40 text-indigo-300 flex items-center gap-2 font-medium">
                                     <span class="font-bold text-indigo-400">3.</span>
-                                    <span><strong>Criar atalho...</strong> (ou <strong>Instalar</strong>)</span>
+                                    <span><strong>Criar atalho...</strong></span>
                                 </div>
                             </div>
                         </div>
@@ -2134,9 +2179,12 @@
                         </div>
 
                         <!-- Mockup Ilustrado da Caixinha de Diálogo do Chrome -->
-                        <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 max-w-md mx-auto shadow-xl space-y-4">
+                        <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 max-w-md mx-auto shadow-xl space-y-4 select-none pointer-events-none opacity-95">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h5 class="font-bold text-xs text-white">Criar atalho?</h5>
+                                <div class="flex items-center gap-2">
+                                    <h5 class="font-bold text-xs text-white">Criar atalho?</h5>
+                                    <span class="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Exemplo da Janela</span>
+                                </div>
                                 <i data-lucide="x" class="w-3.5 h-3.5 text-slate-500"></i>
                             </div>
                             <div class="flex items-center gap-3">
@@ -2279,11 +2327,12 @@
                         </p>
 
                         <!-- Mockup Visual da Janela de Propriedades do Windows -->
-                        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 max-w-md mx-auto shadow-2xl space-y-4">
+                        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 max-w-md mx-auto shadow-2xl space-y-4 select-none pointer-events-none opacity-95">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
                                     <span class="font-bold text-xs text-white">Propriedades de Igreja Digital</span>
+                                    <span class="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Exemplo do Windows</span>
                                 </div>
                                 <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">Windows</span>
                             </div>
@@ -2307,11 +2356,11 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center justify-between pt-2 border-t border-slate-800">
-                                <button type="button" class="text-[11px] text-indigo-400 font-medium hover:underline flex items-center gap-1">
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+                                <div class="text-indigo-400 font-medium flex items-center gap-1">
                                     <i data-lucide="image" class="w-3.5 h-3.5"></i>
                                     <span>Alterar Ícone...</span>
-                                </button>
+                                </div>
                                 <div class="flex gap-2">
                                     <span class="px-3 py-1 bg-indigo-600 rounded-lg text-[11px] text-white font-bold">Aplicar</span>
                                     <span class="px-3 py-1 bg-slate-800 rounded-lg text-[11px] text-white font-semibold">OK</span>
@@ -2328,6 +2377,103 @@
                             <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
                                 <span class="font-bold text-emerald-400">2. Botão Rápido no Topo:</span>
                                 <p class="text-slate-400">Você também pode clicar no botão <strong>"Maximizar"</strong> no topo da barra de tarefas do sistema ou pressionar <strong>F11</strong> a qualquer momento.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 4: ABRIR E ATUALIZAR NO CELULAR -->
+                <div id="guia-pwa-tab-celular" class="tab-guia-pwa-content hidden space-y-5">
+                    <!-- Status do Link: Ativo e Funcionando -->
+                    <div class="p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center shrink-0">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-emerald-300 text-sm">O link do sistema NÃO está quebrado!</h4>
+                            <p class="text-xs text-slate-300">O servidor está 100% online e com a versão 2.5 ativa. Veja abaixo por que o seu celular ainda não mostrou as mudanças e como resolver em 30 segundos.</p>
+                        </div>
+                    </div>
+
+                    <!-- Explicação Simples do Cache do Celular -->
+                    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-indigo-600/20 flex items-center justify-center text-xs">1</span>
+                            <span>O que aconteceu no seu celular?</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Navegadores de celular (como o Google Chrome e o Safari) guardam a página antiga na memória interna do aparelho (chamada <em>Cache</em>) para economizar dados móveis. Por isso, quando você abre o link, o aparelho abre a versão de ontem que estava na memória ao invés de buscar a versão nova com o menu recolhível.
+                        </p>
+                    </div>
+
+                    <!-- Passos Fáceis para Forçar a Atualização no Celular -->
+                    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-emerald-600/20 flex items-center justify-center text-xs">2</span>
+                            <span>Como atualizar no celular (Escolha uma opção):</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <div class="p-4 bg-slate-900/90 border border-indigo-500/30 rounded-xl space-y-2">
+                                <div class="flex items-center gap-2 font-bold text-indigo-300">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4 text-indigo-400"></i>
+                                    <span>Opção Mais Rápida: Botão Sincronizar</span>
+                                </div>
+                                <p class="text-slate-300 leading-relaxed">
+                                    Na própria tela de login do sistema pelo celular, clique no link <strong>"Sincronizar Celular / Limpar Cache"</strong>. O sistema limpa toda a memória antiga e recarrega na hora!
+                                </p>
+                            </div>
+
+                            <div class="p-4 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2">
+                                <div class="flex items-center gap-2 font-bold text-emerald-300">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4 text-emerald-400"></i>
+                                    <span>Pelo Google Chrome do Celular</span>
+                                </div>
+                                <p class="text-slate-300 leading-relaxed">
+                                    Abra a página no Chrome do celular, toque nos <strong>3 pontinhos</strong> no topo e toque no ícone de <strong>Atualizar (↻)</strong>, ou arraste a tela do celular de cima para baixo.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-amber-950/30 border border-amber-500/20 rounded-xl text-xs text-amber-300/90 space-y-1">
+                            <span class="font-bold">⚠️ Se você já tinha um ícone na Tela Inicial do Celular:</span>
+                            <p class="text-slate-400">Como o atalho antigo do celular fica fixado na versão anterior, exclua o ícone antigo da tela do celular, abra o link oficial e toque em <strong>"Adicionar à tela inicial"</strong> novamente.</p>
+                        </div>
+                    </div>
+
+                    <!-- Link Oficial e QR Code para Abrir Direto com a Câmera do Celular -->
+                    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                            <span class="w-6 h-6 rounded-lg bg-indigo-600/20 flex items-center justify-center text-xs">3</span>
+                            <span>Link Oficial do seu Sistema (Aponte a câmera ou copie)</span>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center gap-5 p-4 bg-slate-900/90 rounded-xl border border-slate-800">
+                            <!-- QR Code Dinâmico gerado via API Oficial SVG -->
+                            <div class="bg-white p-2.5 rounded-xl shrink-0 shadow-lg flex flex-col items-center">
+                                <img id="qr-code-celular-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https%3A%2F%2Fais-pre-j4uzeyuhtnh3t53hpd6fas-313163465825.us-east1.run.app" alt="QR Code para Celular" class="w-32 h-32 rounded-lg" onerror="this.style.display='none'; document.getElementById('qr-fallback-msg').classList.remove('hidden');">
+                                <span class="text-[9px] text-slate-800 font-bold mt-1 text-center">Aponte a câmera</span>
+                                <div id="qr-fallback-msg" class="hidden text-slate-900 text-xs font-semibold p-2">Use o link ao lado</div>
+                            </div>
+
+                            <div class="space-y-3 flex-1 min-w-0 text-left">
+                                <div>
+                                    <label class="block text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1">Link Oficial para Acessar no Celular:</label>
+                                    <div class="bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 text-indigo-400 font-mono text-xs select-all break-all" id="link-celular-preview">
+                                        https://ais-pre-j4uzeyuhtnh3t53hpd6fas-313163465825.us-east1.run.app
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="copiarLinkOficialCelular()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md">
+                                        <i data-lucide="copy" class="w-4 h-4"></i>
+                                        <span>Copiar Link</span>
+                                    </button>
+                                    <button type="button" onclick="compartilharWhatsAppLink()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md">
+                                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                                        <span>Enviar p/ WhatsApp</span>
+                                    </button>
+                                </div>
+                                <div id="feedback-copiar-link-celular" class="hidden text-xs text-emerald-400 font-medium">Link copiado com sucesso!</div>
                             </div>
                         </div>
                     </div>
@@ -2471,22 +2617,63 @@
             }
         }
 
+        function obterLinkOficialSistema() {
+            const href = window.location.href;
+            if (href.startsWith('file:') || href.includes('localhost') || href.includes('127.0.0.1')) {
+                return 'https://ais-pre-j4uzeyuhtnh3t53hpd6fas-313163465825.us-east1.run.app';
+            }
+            return href.split('?')[0].split('#')[0];
+        }
+
         function abrirGuiaInstalacaoPwa(tabInicial) {
             const modal = document.getElementById('modal-guia-instalacao-pwa');
             if (modal) {
                 modal.classList.remove('hidden');
                 alternarTabGuiaPwa(tabInicial || 'chrome');
                 
-                // Atualizar dinamicamente o preview do comando com a URL atual
+                const officialUrl = obterLinkOficialSistema();
+                // Atualizar dinamicamente o preview do comando com a URL oficial
                 const cmdPreview = document.getElementById('cmd-pwa-web-preview');
                 if (cmdPreview) {
-                    const currentUrl = window.location.href.split('#')[0];
-                    cmdPreview.innerText = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="${currentUrl}" --start-maximized`;
+                    cmdPreview.innerText = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app="${officialUrl}" --start-maximized`;
+                }
+
+                // Atualizar link e QR Code para celular
+                const linkCelularPreview = document.getElementById('link-celular-preview');
+                if (linkCelularPreview) {
+                    linkCelularPreview.innerText = officialUrl;
+                }
+                const qrImg = document.getElementById('qr-code-celular-img');
+                if (qrImg) {
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(officialUrl)}`;
                 }
                 
                 atualizarVisibilidadeBotoesPwa();
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
             }
+        }
+
+        function copiarLinkOficialCelular() {
+            const link = obterLinkOficialSistema();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(link).then(() => {
+                    const feedback = document.getElementById('feedback-copiar-link-celular');
+                    if (feedback) {
+                        feedback.classList.remove('hidden');
+                        setTimeout(() => feedback.classList.add('hidden'), 4000);
+                    }
+                }).catch(() => {
+                    prompt("Copie o link oficial do sistema (Ctrl+C):", link);
+                });
+            } else {
+                prompt("Copie o link oficial do sistema (Ctrl+C):", link);
+            }
+        }
+
+        function compartilharWhatsAppLink() {
+            const link = obterLinkOficialSistema();
+            const texto = encodeURIComponent(`Igreja Digital - Gestão:\n${link}`);
+            window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
 
         function fecharGuiaInstalacaoPwa() {
@@ -2520,6 +2707,8 @@
                 alternarTabGuiaPwa('bloqueado');
             } else if (tabAtualGuiaPwa === 'bloqueado') {
                 alternarTabGuiaPwa('maximizado');
+            } else if (tabAtualGuiaPwa === 'maximizado') {
+                alternarTabGuiaPwa('celular');
             } else {
                 fecharGuiaInstalacaoPwa();
             }
@@ -2588,14 +2777,126 @@
             }
         }
 
-        // Registro de Service Worker para PWA (quando executado via HTTP/HTTPS)
+        // Registro de Service Worker para PWA (quando executado via HTTP/HTTPS) com verificação ativa de atualizações
         if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(err => {
+                navigator.serviceWorker.register('./sw.js?v=3').then(registration => {
+                    // Força busca imediata de atualizações no servidor (vital para celulares)
+                    registration.update();
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('Nova versão do sistema detectada e instalada!');
+                                }
+                            });
+                        }
+                    });
+                }).catch(err => {
                     console.log('ServiceWorker registration optional or ignored in current env:', err);
+                });
+
+                // Auto-refresh suave quando um novo service worker assumir o controle
+                let recarregandoPorAtualizacao = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!recarregandoPorAtualizacao) {
+                        recarregandoPorAtualizacao = true;
+                        window.location.reload();
+                    }
                 });
             });
         }
+
+        // Função global para forçar atualização no celular ou desktop (limpa cache local e Service Worker)
+        async function forcarAtualizacaoSistema() {
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const reg of registrations) {
+                        await reg.unregister();
+                    }
+                }
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    for (const key of keys) {
+                        await caches.delete(key);
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao limpar caches locais:', err);
+            }
+            // Força o navegador a buscar a versão mais recente direto do servidor sem cache
+            const urlBase = window.location.href.split('?')[0].split('#')[0];
+            window.location.href = urlBase + '?ts=' + Date.now();
+        }
+        window.forcarAtualizacaoSistema = forcarAtualizacaoSistema;
+
+        let sidebarAbertaDesktop = true;
+
+        function recolherSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const painelPrincipal = document.getElementById('painel-principal');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            
+            if (sidebar) {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0', 'lg:translate-x-0');
+            }
+            if (painelPrincipal) {
+                painelPrincipal.classList.remove('lg:ml-64');
+                painelPrincipal.classList.add('ml-0');
+            }
+            if (backdrop) {
+                backdrop.classList.add('hidden');
+            }
+            sidebarAbertaDesktop = false;
+        }
+
+        function expandirSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const painelPrincipal = document.getElementById('painel-principal');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            
+            if (sidebar) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+            }
+            if (window.innerWidth >= 1024) {
+                if (painelPrincipal) {
+                    painelPrincipal.classList.add('lg:ml-64');
+                    painelPrincipal.classList.remove('ml-0');
+                }
+                if (backdrop) backdrop.classList.add('hidden');
+            } else {
+                if (painelPrincipal) {
+                    painelPrincipal.classList.remove('lg:ml-64');
+                    painelPrincipal.classList.add('ml-0');
+                }
+                if (backdrop) backdrop.classList.remove('hidden');
+            }
+            sidebarAbertaDesktop = true;
+        }
+
+        function alternarSidebarGeral() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && (sidebar.classList.contains('-translate-x-full') || !sidebarAbertaDesktop)) {
+                expandirSidebar();
+            } else {
+                recolherSidebar();
+            }
+        }
+
+        function abrirSidebarMobile() { expandirSidebar(); }
+        function fecharSidebarMobile() { recolherSidebar(); }
+        function toggleSidebarMobile() { alternarSidebarGeral(); }
+
+        window.recolherSidebar = recolherSidebar;
+        window.expandirSidebar = expandirSidebar;
+        window.alternarSidebarGeral = alternarSidebarGeral;
+        window.abrirSidebarMobile = abrirSidebarMobile;
+        window.fecharSidebarMobile = fecharSidebarMobile;
+        window.toggleSidebarMobile = toggleSidebarMobile;
 
         window.abrirGuiaInstalacaoPwa = abrirGuiaInstalacaoPwa;
         window.fecharGuiaInstalacaoPwa = fecharGuiaInstalacaoPwa;
@@ -2700,6 +3001,7 @@
 
         function exibirTelaLogin() {
             ocultarTelaCarregamento();
+            fecharSidebarMobile();
             const sidebar = document.getElementById('sidebar');
             const painelPrincipal = document.getElementById('painel-principal');
             const telaLogin = document.getElementById('tela-login');
@@ -2797,6 +3099,13 @@
             if (painelPrincipal) painelPrincipal.classList.remove('hidden');
             if (usuario) atualizarInfoUsuarioLogado(usuario);
             if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+
+            // Configuração responsiva da barra lateral: recolhida no celular, aberta no computador
+            if (window.innerWidth < 1024) {
+                recolherSidebar();
+            } else {
+                expandirSidebar();
+            }
 
             // Força a janela a tentar o modo 'maximized' ou 'fullscreen' imediatamente após o carregamento da tela principal
             forcarTelaCheiaOuMaximizada();
@@ -3232,6 +3541,11 @@
 
             document.querySelectorAll('.dynamic-screen').forEach(tela => tela.classList.add('hidden'));
             document.getElementById(`tela-${idTela}`).classList.remove('hidden');
+
+            // No celular ou tablet, fecha o menu automaticamente após escolher a opção
+            if (window.innerWidth < 1024) {
+                fecharSidebarMobile();
+            }
 
             const botoesMenu = {
                 membros: document.getElementById('btn-menu-membros'),
