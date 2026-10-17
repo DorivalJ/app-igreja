@@ -19,25 +19,35 @@
         /* Garante que a barra de rolagem vertical da página SEMPRE exista e seja visível */
         html {
             overflow-y: scroll !important;
-            scrollbar-color: #6366f1 #090d16 !important;
-            scrollbar-width: auto !important;
         }
 
-        /* Barra de rolagem vertical e horizontal de alto contraste, fácil de ver e arrastar */
+        body {
+            overflow-y: auto !important;
+            min-height: 100vh !important;
+        }
+
+        /* ==========================================================================
+           BARRAS DE ROLAGEM DE ALTO CONTRASTE (SEMPRE VISÍVEIS)
+           Universal para Chromium (Google Chrome, MS Edge, Opera, Brave e Modo PWA)
+           NOTA: Não declaramos 'scrollbar-color' diretamente no Chrome porque isso 
+           faz o Chromium desativar o ::-webkit-scrollbar e ocultar as barras.
+           ========================================================================== */
+        
         ::-webkit-scrollbar {
             width: 14px !important;
             height: 14px !important;
+            display: block !important;
         }
         ::-webkit-scrollbar-track {
-            background: #090d16 !important;
+            background: #0f172a !important; /* Slate escuro com contraste nítido contra o fundo */
             border-left: 1px solid #1e293b !important;
             border-top: 1px solid #1e293b !important;
         }
         ::-webkit-scrollbar-thumb {
-            background: #4f46e5 !important;
-            border-radius: 8px !important;
-            border: 2px solid #090d16 !important;
-            min-height: 40px !important;
+            background: #4f46e5 !important; /* Índigo vibrante fácil de enxergar e arrastar */
+            border-radius: 7px !important;
+            border: 2px solid #0f172a !important;
+            min-height: 48px !important;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #6366f1 !important;
@@ -45,15 +55,18 @@
         ::-webkit-scrollbar-thumb:active {
             background: #818cf8 !important;
         }
+        ::-webkit-scrollbar-corner {
+            background: #0f172a !important;
+        }
 
         /* Barras de rolagem horizontais em tabelas (Membros, Livro Caixa, Ofertas, Relatórios) */
         .overflow-x-auto {
-            scrollbar-color: #6366f1 #0f172a !important;
-            scrollbar-width: thin !important;
+            overflow-x: auto !important;
             padding-bottom: 8px !important;
         }
         .overflow-x-auto::-webkit-scrollbar {
-            height: 12px !important;
+            height: 13px !important;
+            display: block !important;
         }
         .overflow-x-auto::-webkit-scrollbar-track {
             background: #0f172a !important;
@@ -67,6 +80,14 @@
         }
         .overflow-x-auto::-webkit-scrollbar-thumb:hover {
             background: #6366f1 !important;
+        }
+
+        /* Fallback exclusivo para Firefox (que não possui suporte a ::-webkit-scrollbar) */
+        @supports not selector(::-webkit-scrollbar) {
+            * {
+                scrollbar-color: #4f46e5 #0f172a !important;
+                scrollbar-width: auto !important;
+            }
         }
     </style>
     <meta name="description" content="Sistema completo para gestão de membros, tesouraria, fluxo de caixa, agenda semanal, emissão de cartas e controle de ofertas voluntárias.">
@@ -8140,7 +8161,7 @@
         <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" title="Rolar até o Topo (Formulário)" class="w-10 h-10 rounded-xl bg-slate-900/90 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-indigo-500 shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer backdrop-blur-md group">
             <i data-lucide="chevron-up" class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
         </button>
-        <button type="button" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })" title="Rolar até o Final (Lançamentos / Tabelas)" class="w-10 h-10 rounded-xl bg-slate-900/90 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-indigo-500 shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer backdrop-blur-md group">
+        <button type="button" onclick="window.scrollTo({ top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight), behavior: 'smooth' })" title="Rolar até o Final (Lançamentos / Tabelas)" class="w-10 h-10 rounded-xl bg-slate-900/90 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-indigo-500 shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer backdrop-blur-md group">
             <i data-lucide="chevron-down" class="w-5 h-5 group-hover:translate-y-0.5 transition-transform"></i>
         </button>
     </div>
