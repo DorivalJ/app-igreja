@@ -2608,6 +2608,7 @@
         window.voltarParaLoginAposCancelar = voltarParaLoginAposCancelar;
         window.fecharJanelaDefinitiva = fecharJanelaDefinitiva;
         window.tentarAutoMaximizarJanela = tentarAutoMaximizarJanela;
+        window.forcarTelaCheiaOuMaximizada = forcarTelaCheiaOuMaximizada;
 
         window.temAcessoTesouraria = temAcessoTesouraria;
         window.notificarAcessoNegadoTesouraria = notificarAcessoNegadoTesouraria;
@@ -2716,6 +2717,76 @@
             if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
         }
 
+        let listenerAutoFullscreenRegistrado = false;
+        function registrarAutoFullscreenNoPrimeiroClique() {
+            if (listenerAutoFullscreenRegistrado) return;
+            listenerAutoFullscreenRegistrado = true;
+
+            const dispararFullscreenNoGesto = () => {
+                const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+                if (!isFull) {
+                    try {
+                        const docEl = document.documentElement;
+                        const reqFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+                        if (reqFs) {
+                            const res = reqFs.call(docEl);
+                            if (res && typeof res.then === 'function') {
+                                res.then(() => {
+                                    if (typeof atualizarIconeTelaCheia === 'function') atualizarIconeTelaCheia();
+                                }).catch(() => {});
+                            }
+                        }
+                    } catch (e) {}
+                }
+                document.removeEventListener('click', dispararFullscreenNoGesto);
+                document.removeEventListener('keydown', dispararFullscreenNoGesto);
+            };
+
+            document.addEventListener('click', dispararFullscreenNoGesto, { once: true });
+            document.addEventListener('keydown', dispararFullscreenNoGesto, { once: true });
+        }
+
+        // Script de inicialização que força a janela da aplicação a tentar o modo 'maximized' ou 'fullscreen' imediatamente
+        function forcarTelaCheiaOuMaximizada() {
+            // 1. Tenta maximizar e reposicionar a janela para ocupar 100% da resolução do monitor
+            try {
+                if (window.screen && window.screen.availWidth && window.screen.availHeight) {
+                    window.moveTo(0, 0);
+                    window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+                }
+            } catch (err) {
+                // Silencioso se restrito pelo navegador
+            }
+
+            // 2. Tenta entrar em modo Fullscreen imediato via HTML5 Fullscreen API
+            try {
+                const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+                if (!isFull) {
+                    const docEl = document.documentElement;
+                    const reqFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+                    if (reqFs) {
+                        const promise = reqFs.call(docEl);
+                        if (promise && typeof promise.then === 'function') {
+                            promise.then(() => {
+                                if (typeof atualizarIconeTelaCheia === 'function') atualizarIconeTelaCheia();
+                            }).catch(() => {
+                                // Caso a política de segurança do navegador exija interação, ativa no primeiro clique
+                                registrarAutoFullscreenNoPrimeiroClique();
+                            });
+                        }
+                    } else {
+                        registrarAutoFullscreenNoPrimeiroClique();
+                    }
+                }
+            } catch (e) {
+                registrarAutoFullscreenNoPrimeiroClique();
+            }
+        }
+
+        function tentarAutoMaximizarJanela() {
+            forcarTelaCheiaOuMaximizada();
+        }
+
         function exibirPainelPrincipal(usuario) {
             ocultarTelaCarregamento();
             const telaLogin = document.getElementById('tela-login');
@@ -2726,33 +2797,19 @@
             if (painelPrincipal) painelPrincipal.classList.remove('hidden');
             if (usuario) atualizarInfoUsuarioLogado(usuario);
             if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+
+            // Força a janela a tentar o modo 'maximized' ou 'fullscreen' imediatamente após o carregamento da tela principal
+            forcarTelaCheiaOuMaximizada();
+            setTimeout(forcarTelaCheiaOuMaximizada, 150);
+            setTimeout(forcarTelaCheiaOuMaximizada, 500);
         }
 
         let sessaoAutenticadaConfirmada = false;
 
-        // Tenta auto-maximizar a janela do aplicativo no carregamento (quando executado em modo app / standalone)
-        function tentarAutoMaximizarJanela() {
-            try {
-                if (window.screen && window.screen.availWidth && window.screen.availHeight) {
-                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                                         (window.navigator && window.navigator.standalone === true) ||
-                                         window.location.search.includes('mode=app');
-                    
-                    // Em janelas de app/standalone, redimensiona e reposiciona para ocupar 100% da área útil do monitor
-                    if (isStandalone || window.outerWidth < window.screen.availWidth * 0.98 || window.outerHeight < window.screen.availHeight * 0.98) {
-                        window.moveTo(0, 0);
-                        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
-                    }
-                }
-            } catch (err) {
-                // Bloqueado silenciosamente se for uma aba comum de navegador
-            }
-        }
-
         // Dispara a tentativa de auto-ajuste de tamanho
-        tentarAutoMaximizarJanela();
-        window.addEventListener('load', tentarAutoMaximizarJanela);
-        setTimeout(tentarAutoMaximizarJanela, 300);
+        forcarTelaCheiaOuMaximizada();
+        window.addEventListener('load', forcarTelaCheiaOuMaximizada);
+        setTimeout(forcarTelaCheiaOuMaximizada, 300);
 
         async function verificarSessaoInicial() {
             tentarAutoMaximizarJanela();
