@@ -15,9 +15,59 @@
             margin: 0 !important;
             padding: 0 !important;
         }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        /* Garante que a barra de rolagem vertical da página SEMPRE exista e seja visível */
+        html {
+            overflow-y: scroll !important;
+            scrollbar-color: #6366f1 #090d16 !important;
+            scrollbar-width: auto !important;
+        }
+
+        /* Barra de rolagem vertical e horizontal de alto contraste, fácil de ver e arrastar */
+        ::-webkit-scrollbar {
+            width: 14px !important;
+            height: 14px !important;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16 !important;
+            border-left: 1px solid #1e293b !important;
+            border-top: 1px solid #1e293b !important;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5 !important;
+            border-radius: 8px !important;
+            border: 2px solid #090d16 !important;
+            min-height: 40px !important;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1 !important;
+        }
+        ::-webkit-scrollbar-thumb:active {
+            background: #818cf8 !important;
+        }
+
+        /* Barras de rolagem horizontais em tabelas (Membros, Livro Caixa, Ofertas, Relatórios) */
+        .overflow-x-auto {
+            scrollbar-color: #6366f1 #0f172a !important;
+            scrollbar-width: thin !important;
+            padding-bottom: 8px !important;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 12px !important;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #0f172a !important;
+            border-radius: 6px !important;
+            border: 1px solid #1e293b !important;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #4f46e5 !important;
+            border-radius: 6px !important;
+            border: 2px solid #0f172a !important;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: #6366f1 !important;
+        }
     </style>
     <meta name="description" content="Sistema completo para gestão de membros, tesouraria, fluxo de caixa, agenda semanal, emissão de cartas e controle de ofertas voluntárias.">
     <link rel="manifest" href="./manifest.json">
@@ -377,15 +427,21 @@
                     <!-- Alerta Visual / Notificação de Aniversariantes da Semana e do Mês -->
                     <div id="container-alerta-aniversariantes" class="hidden"></div>
 
-                    <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                    <section id="secaoForm" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden scroll-mt-20">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-2">
                                 <i id="iconeForm" data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
                                 <h2 id="tituloForm" class="font-semibold text-slate-100">Novo Cadastro</h2>
                             </div>
-                            <button id="btnCancelar" onclick="resetarEstado()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                                Cancelar Edição
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="document.getElementById('secao-tabela-membros')?.scrollIntoView({ behavior: 'smooth' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-400 hover:text-indigo-300 rounded-xl text-xs font-semibold border border-slate-700 transition cursor-pointer shadow-sm">
+                                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                                    <span>Ver Lista de Membros</span>
+                                </button>
+                                <button id="btnCancelar" onclick="resetarEstado()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                    Cancelar Edição
+                                </button>
+                            </div>
                         </div>
                         
                         <form id="formMembro" class="p-6 md:p-8">
@@ -450,11 +506,17 @@
                         </div>
                     </div>
 
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                    <section id="secao-tabela-membros" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden scroll-mt-20">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2">
-                                <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
-                            </h2>
+                            <div class="flex items-center gap-3">
+                                <h2 class="font-semibold text-slate-100 flex items-center gap-2">
+                                    <i data-lucide="align-left" class="w-5 h-5 text-indigo-400"></i> Lista de Membros
+                                </h2>
+                                <button type="button" onclick="document.getElementById('secaoForm')?.scrollIntoView({ behavior: 'smooth' })" class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium border border-slate-700 transition cursor-pointer">
+                                    <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                                    <span>Novo Cadastro</span>
+                                </button>
+                            </div>
                             <input type="text" id="busca" oninput="carregarMembros()" placeholder="Buscar por nome..." class="w-full max-w-sm pl-4 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none transition-all">
                         </div>
                         <div class="overflow-x-auto">
@@ -479,15 +541,21 @@
                 </div>
 
                 <div id="tela-financeiro" class="hidden space-y-8 dynamic-screen">
-                    <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                    <section id="secaoFormFinanceiro" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden scroll-mt-20">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-2">
                                 <i id="iconeFormFinanceiro" data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
                                 <h2 id="tituloFormFinanceiro" class="font-semibold text-slate-100">Lançamento de Caixa</h2>
                             </div>
-                            <button id="btnCancelarFinanceiro" onclick="resetarEstadoFinanceiro()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                                Cancelar Edição
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="document.getElementById('secao-tabela-livro-caixa')?.scrollIntoView({ behavior: 'smooth' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 rounded-xl text-xs font-semibold border border-slate-700 transition cursor-pointer shadow-sm">
+                                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                                    <span>Ver Lançamentos (Livro Caixa)</span>
+                                </button>
+                                <button id="btnCancelarFinanceiro" onclick="resetarEstadoFinanceiro()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                    Cancelar Edição
+                                </button>
+                            </div>
                         </div>
                         
                         <form id="formFinanceiro" class="p-6 md:p-8">
@@ -688,13 +756,19 @@
                         </div>
                     </section>
 
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                    <section id="secao-tabela-livro-caixa" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden scroll-mt-20">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
-                                <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i>
-                                <span>Livro Caixa</span>
-                                <span id="labelPeriodoFinanceiro" class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 ml-1">Julho/2026</span>
-                            </h2>
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
+                                    <i data-lucide="list" class="w-5 h-5 text-emerald-400"></i>
+                                    <span>Livro Caixa</span>
+                                    <span id="labelPeriodoFinanceiro" class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 ml-1">Julho/2026</span>
+                                </h2>
+                                <button type="button" onclick="document.getElementById('secaoFormFinanceiro')?.scrollIntoView({ behavior: 'smooth' })" class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium border border-slate-700 transition cursor-pointer">
+                                    <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                                    <span>Novo Lançamento</span>
+                                </button>
+                            </div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <i data-lucide="filter" class="w-4 h-4 text-emerald-500"></i>
                                 <select id="filtroMes" onchange="carregarFinancas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
@@ -1068,15 +1142,21 @@
                 </div>
 
                 <div id="tela-ofertas" class="hidden space-y-8 dynamic-screen">
-                    <section id="secaoFormOfertas" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+                    <section id="secaoFormOfertas" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden scroll-mt-20">
+                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-2">
                                 <i id="iconeFormOfertas" data-lucide="gift" class="w-5 h-5 text-rose-400"></i>
                                 <h2 id="tituloFormOfertas" class="font-semibold text-slate-100">Ofertas Voluntárias</h2>
                             </div>
-                            <button id="btnCancelarOfertas" onclick="resetarEstadoOfertas()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
-                                Cancelar Edição
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="document.getElementById('secao-tabela-ofertas')?.scrollIntoView({ behavior: 'smooth' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 rounded-xl text-xs font-semibold border border-slate-700 transition cursor-pointer shadow-sm">
+                                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                                    <span>Ver Tabela de Ofertas</span>
+                                </button>
+                                <button id="btnCancelarOfertas" onclick="resetarEstadoOfertas()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-lg border border-slate-700 transition-all">
+                                    Cancelar Edição
+                                </button>
+                            </div>
                         </div>
                         
                         <form id="formOfertas" class="p-6 md:p-8" onsubmit="salvarOferta(event)">
@@ -1179,13 +1259,19 @@
                         </div>
                     </div>
 
-                    <section class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                    <section id="secao-tabela-ofertas" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden scroll-mt-20">
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
-                                <i data-lucide="list" class="w-5 h-5 text-rose-400"></i>
-                                <span>Visão Geral dos Lançamentos</span>
-                                <span id="labelPeriodoOfertas" class="text-xs text-rose-400 font-bold bg-rose-500/10 px-2.5 py-1 rounded-xl border border-rose-500/20 ml-1">Todos</span>
-                            </h2>
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <h2 class="font-semibold text-slate-100 flex items-center gap-2 flex-wrap">
+                                    <i data-lucide="list" class="w-5 h-5 text-rose-400"></i>
+                                    <span>Visão Geral dos Lançamentos</span>
+                                    <span id="labelPeriodoOfertas" class="text-xs text-rose-400 font-bold bg-rose-500/10 px-2.5 py-1 rounded-xl border border-rose-500/20 ml-1">Todos</span>
+                                </h2>
+                                <button type="button" onclick="document.getElementById('secaoFormOfertas')?.scrollIntoView({ behavior: 'smooth' })" class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium border border-slate-700 transition cursor-pointer">
+                                    <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                                    <span>Nova Oferta</span>
+                                </button>
+                            </div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <i data-lucide="filter" class="w-4 h-4 text-emerald-500"></i>
                                 <select id="filtroMesOfertas" onchange="carregarOfertas()" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
@@ -8048,5 +8134,15 @@
             }
         };
     </script>
+
+    <!-- Botão Flutuante de Rolagem Rápida (Topo / Fim da Página) -->
+    <div id="btn-flutuante-scroll" class="fixed bottom-6 right-6 z-40 flex flex-col gap-2">
+        <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" title="Rolar até o Topo (Formulário)" class="w-10 h-10 rounded-xl bg-slate-900/90 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-indigo-500 shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer backdrop-blur-md group">
+            <i data-lucide="chevron-up" class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
+        </button>
+        <button type="button" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })" title="Rolar até o Final (Lançamentos / Tabelas)" class="w-10 h-10 rounded-xl bg-slate-900/90 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-indigo-500 shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer backdrop-blur-md group">
+            <i data-lucide="chevron-down" class="w-5 h-5 group-hover:translate-y-0.5 transition-transform"></i>
+        </button>
+    </div>
 </body>
 </html>
