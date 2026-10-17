@@ -276,38 +276,6 @@
                 </button>
             </form>
         </div>
-
-        <!-- Card 4: Login Cancelado / Desistência -->
-        <div id="card-login-cancelado" class="hidden w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
-            <div class="inline-flex p-3 bg-slate-800/80 rounded-2xl text-slate-400 mb-1 border border-slate-700/60">
-                <i data-lucide="power" class="w-10 h-10 text-slate-300"></i>
-            </div>
-            <div class="space-y-2">
-                <h2 class="text-2xl font-bold tracking-tight text-white">Acesso Cancelado</h2>
-                <p class="text-sm text-slate-400">Você optou por não entrar no sistema.</p>
-            </div>
-            
-            <div class="p-4 bg-slate-950/70 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed space-y-2 text-left">
-                <div class="flex items-center gap-2 text-slate-200 font-semibold">
-                    <i data-lucide="info" class="w-4 h-4 text-indigo-400 shrink-0"></i>
-                    <span>Você já pode fechar esta janela:</span>
-                </div>
-                <p class="text-slate-400">
-                    No teclado, pressione <kbd class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 font-mono text-[11px] border border-slate-700">Alt</kbd> + <kbd class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 font-mono text-[11px] border border-slate-700">F4</kbd> ou clique no <strong>X</strong> da janela no canto superior direito.
-                </p>
-            </div>
-
-            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                <button type="button" onclick="voltarParaLoginAposCancelar()" class="w-full sm:w-1/2 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl active:scale-[0.98] transition-all cursor-pointer text-xs shadow-md shadow-indigo-600/20">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span>Voltar ao Login</span>
-                </button>
-                <button type="button" onclick="fecharJanelaDefinitiva()" class="w-full sm:w-1/2 flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-rose-950/40 text-slate-300 hover:text-rose-300 font-semibold rounded-xl border border-slate-700 hover:border-rose-500/40 active:scale-[0.98] transition-all cursor-pointer text-xs">
-                    <i data-lucide="log-out" class="w-4 h-4 text-rose-400"></i>
-                    <span>Fechar Janela</span>
-                </button>
-            </div>
-        </div>
     </section>
 
     <div class="min-h-screen flex relative">
@@ -3014,8 +2982,6 @@
             if (cardRecuperar) cardRecuperar.classList.add('hidden');
             const cardAlterar = document.getElementById('card-alterar-senha-external');
             if (cardAlterar) cardAlterar.classList.add('hidden');
-            const cardCancelado = document.getElementById('card-login-cancelado');
-            if (cardCancelado) cardCancelado.classList.add('hidden');
             if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
         }
 
@@ -3160,52 +3126,53 @@
         }
 
         function ocultarFormRecuperacao() {
-            document.getElementById('card-recuperar-senha').classList.add('hidden');
-            document.getElementById('card-alterar-senha-external').classList.add('hidden');
-            document.getElementById('card-login').classList.remove('hidden');
-            const cardCancelado = document.getElementById('card-login-cancelado');
-            if (cardCancelado) cardCancelado.classList.add('hidden');
+            document.getElementById('card-recuperar-senha')?.classList.add('hidden');
+            document.getElementById('card-alterar-senha-external')?.classList.add('hidden');
+            document.getElementById('card-login')?.classList.remove('hidden');
             exibirMensagem('msg-recuperacao', '', 'limpar');
             if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
         }
 
         function cancelarLogin() {
-            // Limpa os dados preenchidos
+            // 1. Limpa os campos preenchidos e o armazenamento local
             const inputEmail = document.getElementById('login-email');
             const inputSenha = document.getElementById('login-senha');
             if (inputEmail) inputEmail.value = '';
             if (inputSenha) inputSenha.value = '';
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+            } catch (e) {}
 
-            // Tenta fechar a janela do aplicativo (em modo PWA / Atalho de Janela Exclusiva, o navegador permite o fechamento)
+            // 2. Fecha a tela de login imediatamente
+            const telaLogin = document.getElementById('tela-login');
+            if (telaLogin) telaLogin.classList.add('hidden');
+            const cardLogin = document.getElementById('card-login');
+            if (cardLogin) cardLogin.classList.add('hidden');
+            document.getElementById('card-recuperar-senha')?.classList.add('hidden');
+            document.getElementById('card-alterar-senha-external')?.classList.add('hidden');
+
+            // 3. Fecha a janela ou aba no dispositivo imediatamente
             try {
                 window.close();
-            } catch (err) {
-                console.log('window.close() ignorado pelo navegador:', err);
-            }
-
-            // Exibe a tela de confirmação de desistência/fechamento caso a janela do navegador permaneça aberta
-            document.getElementById('card-login').classList.add('hidden');
-            document.getElementById('card-recuperar-senha').classList.add('hidden');
-            document.getElementById('card-alterar-senha-external').classList.add('hidden');
-            const cardCancelado = document.getElementById('card-login-cancelado');
-            if (cardCancelado) {
-                cardCancelado.classList.remove('hidden');
-            }
-            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+            } catch (err) {}
+            try {
+                window.open('', '_self', '');
+                window.close();
+            } catch (err) {}
+            try {
+                if (window.history && window.history.length > 1) {
+                    window.history.back();
+                }
+            } catch (err) {}
         }
 
         function voltarParaLoginAposCancelar() {
-            const cardCancelado = document.getElementById('card-login-cancelado');
-            if (cardCancelado) cardCancelado.classList.add('hidden');
-            const cardLogin = document.getElementById('card-login');
-            if (cardLogin) cardLogin.classList.remove('hidden');
-            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+            exibirTelaLogin();
         }
 
         function fecharJanelaDefinitiva() {
-            try {
-                window.close();
-            } catch(e) {}
+            cancelarLogin();
         }
 
         function mostrarTelaAlterarSenhaExternal() {
